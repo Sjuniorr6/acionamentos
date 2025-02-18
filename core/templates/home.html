@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Ajuste do body para ocupar a tela inteira e centralizar o conteúdo */
+  body {
+    background-color: #555758;
+    background: #5e5d5d url("{% static 'core/images/background.png' %}") no-repeat center center;
+    background-size: 50% auto;
+    min-height: 90vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Container principal: quase toda a largura da tela */
+  .home-container {
+    position: relative;
+    max-width: 100%;
+    width: 95%; /* Ocupa 95% da largura da tela */
+    background: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+    border-radius: 15px;
+    padding: 50px 40px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    text-align: left;
+    animation: fadeIn 3.5s ease;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Título principal */
+  .home-container h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  /* Parágrafos e listas com espaçamentos maiores */
+  .home-container p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    text-align: justify;
+  }
+  .home-container h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    text-align: left;
+  }
+  .home-container ul {
+    text-align: left;
+    margin-bottom: 1.5rem;
+    padding-left: 20px;
+  }
+  .home-container ul ul {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-left: 1.5rem;
+  }
+  .home-container li {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Botão de logout */
+  .logout-btn {
+    display: inline-block;
+    background: #ff4c4c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+  }
+  .logout-btn:hover {
+    background: #ff2e2e;
+  }
+
+  /* Animação suave de entrada */
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+  <h1>Bem-vindo, {{ user.username }}!</h1>
+  
+  <p>
+    Nossa plataforma de <strong>Controle de Acionamento de Agentes de Pronta Resposta</strong> foi desenvolvida para oferecer uma solução completa e eficiente na coordenação de equipes em situações críticas. Ela integra funcionalidades avançadas e uma interface intuitiva, garantindo rapidez na tomada de decisão e segurança no tratamento dos dados.
+  </p>
+
+  <h2>Principais Tópicos e Benefícios:</h2>
+  <ul>
+    <li><strong>Interface Intuitiva e Ágil:</strong>
+      <ul>
+        <li>Registro de acionamentos em poucos cliques.</li>
+        <li>Atribuição rápida e eficiente de tarefas específicas para cada agente.</li>
+        <li>Monitoramento em tempo real da localização e progresso das equipes.</li>
+      </ul>
+    </li>
+    <li><strong>Gerenciamento Completo de Ocorrências:</strong>
+      <ul>
+        <li>Registro detalhado de horários e dados operacionais.</li>
+        <li>Cálculo automático de custos operacionais, permitindo uma análise precisa dos gastos.</li>
+        <li>Geração de relatórios detalhados para suporte à tomada de decisão.</li>
+      </ul>
+    </li>
+    <li><strong>Segurança e Integridade da Informação com Django:</strong>
+      <ul>
+        <li><strong>Validação Robusta de Dados:</strong> Utilizamos os Models e Forms do Django para garantir que apenas informações válidas e consistentes sejam armazenadas no banco de dados.</li>
+        <li><strong>Proteção Contra Vulnerabilidades:</strong> O Django oferece mecanismos integrados contra ataques como CSRF, XSS e SQL Injection, assegurando que os dados dos acionamentos e dos agentes estejam sempre protegidos.</li>
+        <li><strong>Transações Atômicas e Consistência:</strong> Com o suporte a transações, o Django garante que todas as operações de escrita sejam executadas de forma completa e consistente, evitando dados parciais ou corrompidos.</li>
+        <li><strong>Auditoria e Logs:</strong> A plataforma pode ser configurada para registrar logs detalhados, permitindo o rastreamento de alterações e garantindo a transparência e confiabilidade das informações.</li>
+      </ul>
+    </li>
+    <li><strong>Relatórios e Análises Detalhadas:</strong>
+      <ul>
+        <li>Visualização completa de cada acionamento.</li>
+        <li>Dados consolidados que facilitam a avaliação de desempenho e o planejamento estratégico.</li>
+      </ul>
+    </li>
+  </ul>
+  
+  <p>
+    Com essa estrutura, nossa plataforma não só otimiza a coordenação de respostas em cenários de emergência, como também assegura a integridade e a confiabilidade de todas as informações geradas, respaldada pela robustez e segurança do framework Django.
+  </p>
+
+  <!-- Botão de Logout -->
+
+</div>
+{% endblock %}

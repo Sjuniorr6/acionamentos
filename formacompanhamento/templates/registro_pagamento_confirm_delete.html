@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Confirmação de Exclusão</h2>
+    <p class="text-center">
+        Tem certeza de que deseja excluir o registro do cliente <strong>{{ object.cliente }}</strong>? <br>
+        Esta ação não poderá ser desfeita.
+    </p>
+
+    <div class="text-center mt-4">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Excluir</button>
+            <a href="{% url 'registro_pagamento_list' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+<style>
+    .container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        color: black;
+    }
+
+    .btn {
+        margin: 0 10px;
+    }
+</style>
+{% endblock %}

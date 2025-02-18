@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h3 class="display-6">Detalhes</h3>
+
+
+   
+ <!-- Adjusted to take full width on all screen sizes -->
+        <div class="card card-horizontal">
+            <div class="card-body">
+           
+                <p class="card-text"><b>ID</b>: {{ acompanhamento.id }}</p>
+                <p class="card-text"><b>Data Inicial</b>: {{ acompanhamento.data_inicio }}</p>
+                <p class="card-text"><b>Data Final</b>: {{ acompanhamento.data_final }}</p>
+                <p class="card-text"><b>Prestador</b>: {{ acompanhamento.prestador }}</p>
+                <p class="card-text"><b>Agente</b>: {{ acompanhamento.agente }}</p>
+                <p class="card-text"><b>Placa</b>: {{ acompanhamento.placa }}</p>
+                <p class="card-text"><b>ID Equipamento</b>: {{ acompanhamento.id_equipamento }}</p>
+                <p class="card-text"><b>KM Inicial</b>: {{ acompanhamento.km_inicial }}</p>
+                <p class="card-text"><b>KM Final</b>: {{ acompanhamento.km_final }}</p>
+                <p class="card-text"><b>Pedagio</b>: {{ acompanhamento.pedagio }}</p>
+                <div class='buttons'>
+    <a href="{% url 'formacompanhamento' %}" class="btn btn-secondary mt3">  Voltar</a>
+   
+                </div></div>
+</div>
+{% endblock %}

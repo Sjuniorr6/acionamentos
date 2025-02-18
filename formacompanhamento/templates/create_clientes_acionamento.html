@@ -1,0 +1,574 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-white">Cadastro de Clientes</h1>
+  <div class="container py-4 bg-white shadow-sm rounded text-dark">
+    <h2>{% if form.instance.pk %}Editar Cliente{% else %}Novo Cliente{% endif %}</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <!-- Linha 1: Nome, CNPJ e Telefone -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="id_nome" class="form-label">Nome</label>
+          {{ form.nome|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4">
+          <label for="id_cnpj" class="form-label">CNPJ</label>
+          {{ form.cnpj|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4">
+          <label for="id_telefone" class="form-label">Telefone</label>
+          {{ form.telefone|add_class:"form-control" }}
+        </div>
+      </div>
+      
+      <!-- Linha 2: Banco, Agência e Conta -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="id_banco" class="form-label">Banco</label>
+          {{ form.banco|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4">
+          <label for="id_agencia" class="form-label">Agência</label>
+          {{ form.agencia|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4">
+          <label for="id_conta" class="form-label">Conta</label>
+          {{ form.conta|add_class:"form-control" }}
+        </div>
+      </div>
+      
+      <!-- Linha 3: Serviços -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="{{ form.servicos.id_for_label }}" class="form-label">Serviços</label>
+          <select name="{{ form.servicos.name }}" id="{{ form.servicos.id_for_label }}" class="form-control">
+            <option value="">Selecione o serviço</option>
+            <option value="Antenista" {% if form.servicos.value == "Antenista" %}selected{% endif %}>Antenista</option>
+            <option value="Ponta Resposta Armado" {% if form.servicos.value == "Ponta Resposta Armado" %}selected{% endif %}>Ponta Resposta Armado</option>
+            <option value="Pronta Resposta Desarmado" {% if form.servicos.value == "Pronta Resposta Desarmado" %}selected{% endif %}>Pronta Resposta Desarmado</option>
+          
+            <option value="Todos os serviços" {% if form.servicos.value == "Todos os serviços" %}selected{% endif %}>Todos os serviços</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Containers para campos específicos de cada serviço -->
+      <div id="div_antenista_fields" style="display: none;">
+        <h5 class="mb-3">Antenista</h5>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="id_valor_antenista" class="form-label">Valor Antenista</label>
+            {{ form.valor_antenista|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_hora_antenista" class="form-label">Franquia Hora (Antenista)</label>
+            {{ form.franquia_hora_antenista|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_km_antenista" class="form-label">Franquia KM (Antenista)</label>
+            {{ form.franquia_km_antenista|add_class:"form-control" }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_valorkm_antenista" class="form-label">Valor por KM (Antenista)</label>
+            {{ form.valorkm_antenista|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_valorh_antenista" class="form-label">Valor por Hora (Antenista)</label>
+            {{ form.valorh_antenista|add_class:"form-control" }}
+          </div>
+        </div>
+      </div>
+      
+      <div id="div_armado_fields" style="display: none;">
+        <h5 class="mb-3">Ponta Resposta Armado</h5>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="id_valor_prontaresposta_armado" class="form-label">Valor Pronta Resposta Armado</label>
+            {{ form.valor_prontaresposta_armado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_hora_armado" class="form-label">Franquia Hora (Armado)</label>
+            {{ form.franquia_hora_armado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_km_armado" class="form-label">Franquia KM (Armado)</label>
+            {{ form.franquia_km_armado|add_class:"form-control" }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_valorkm_armado" class="form-label">Valor por KM (Armado)</label>
+            {{ form.valorkm_armado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_valorh_armado" class="form-label">Valor por Hora (Armado)</label>
+            {{ form.valorh_armado|add_class:"form-control" }}
+          </div>
+        </div>
+      </div>
+      
+      <div id="div_desarmado_fields" style="display: none;">
+        <h5 class="mb-3">Pronta Resposta Desarmado</h5>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="id_valor_prontaresposta_desarmado" class="form-label">Valor Pronta Resposta Desarmado</label>
+            {{ form.valor_prontaresposta_desarmado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_hora_desarmado" class="form-label">Franquia Hora (Desarmado)</label>
+            {{ form.franquia_hora_desarmado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_km_desarmado" class="form-label">Franquia KM (Desarmado)</label>
+            {{ form.franquia_km_desarmado|add_class:"form-control" }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_valorkm_desarmado" class="form-label">Valor por KM (Desarmado)</label>
+            {{ form.valorkm_desarmado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_valorh_desarmado" class="form-label">Valor por Hora (Desarmado)</label>
+            {{ form.valorh_desarmado|add_class:"form-control" }}
+          </div>
+        </div>
+      </div>
+      
+
+      
+      <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-success btn-lg">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  // Atualiza os containers dos campos de serviço conforme o valor selecionado
+  function updateServiceFields(){
+    var select = document.getElementById("{{ form.servicos.id_for_label }}");
+    var divAntenista = document.getElementById("div_antenista_fields");
+    var divArmado = document.getElementById("div_armado_fields");
+    var divDesarmado = document.getElementById("div_desarmado_fields");
+    
+    var selectedValue = select.value.trim();
+    // Oculta todos inicialmente
+    if(divAntenista) divAntenista.style.display = "none";
+    if(divArmado) divArmado.style.display = "none";
+    if(divDesarmado) divDesarmado.style.display = "none";
+    
+    // Lógica para exibição dos containers conforme o serviço selecionado
+    if(selectedValue === "Antenista"){
+      if(divAntenista) divAntenista.style.display = "block";
+    } else if(selectedValue === "Ponta Resposta Armado"){
+      if(divArmado) divArmado.style.display = "block";
+    } else if(selectedValue === "Pronta Resposta Desarmado"){
+      if(divDesarmado) divDesarmado.style.display = "block";
+    } else if(selectedValue.toLowerCase() === "antenista e prontaresposta desarmado"){
+      if(divAntenista) divAntenista.style.display = "block";
+      if(divDesarmado) divDesarmado.style.display = "block";
+    } else if(selectedValue.toLowerCase() === "antenista e prontaresposta armado"){
+      if(divAntenista) divAntenista.style.display = "block";
+      if(divArmado) divArmado.style.display = "block";
+    } else if(selectedValue === "Todos os serviços" || selectedValue === "Todos os servicos"){
+      if(divAntenista) divAntenista.style.display = "block";
+      if(divArmado) divArmado.style.display = "block";
+      if(divDesarmado) divDesarmado.style.display = "block";
+    }
+  }
+  updateServiceFields();
+  document.getElementById("{{ form.servicos.id_for_label }}").addEventListener("change", updateServiceFields);
+
+  // Função registrarDataHora (inalterada)
+  function registrarDataHora(inputId, btnId) {
+      var agora = new Date();
+      var ano = agora.getFullYear();
+      var mes = ("0" + (agora.getMonth() + 1)).slice(-2);
+      var dia = ("0" + agora.getDate()).slice(-2);
+      var hora = ("0" + agora.getHours()).slice(-2);
+      var minutos = ("0" + agora.getMinutes()).slice(-2);
+      var segundos = ("0" + agora.getSeconds()).slice(-2);
+      var dataHoraFormatada = ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
+      console.log("[registrarDataHora] Input ID:", inputId, "Valor calculado:", dataHoraFormatada);
+      
+      var inputField = document.getElementById(inputId);
+      if (inputField) {
+          inputField.value = dataHoraFormatada;
+          console.log("[registrarDataHora] Campo", inputId, "preenchido com", dataHoraFormatada);
+      } else {
+          console.error("[registrarDataHora] Elemento com id", inputId, "não encontrado.");
+      }
+      
+      var botao = document.getElementById(btnId);
+      if (botao) {
+          botao.style.display = "none";
+          console.log("[registrarDataHora] Botão", btnId, "ocultado.");
+      } else {
+          console.error("[registrarDataHora] Elemento com id", btnId, "não encontrado.");
+      }
+      
+      if (inputId.indexOf("id_data_hora_inicial") === 0 || inputId.indexOf("id_data_hora_final") === 0) {
+          var block = inputId.replace(/id_data_hora_(inicial|final)/, "");
+          calculateHoraTotal(block);
+          calculateHoraExcedente(block);
+      }
+  }
+  window.registrarDataHora = registrarDataHora;
+  
+  // Variável global para armazenar os dados do prestador via AJAX.
+  var lastPrestadorData = null;
+  function attachPrestadorChangeListener(selectElem) {
+      selectElem.addEventListener("change", function() {
+          var prestadorId = this.value;
+          var block = this.id.replace("id_prestador", "");
+          if (prestadorId) {
+              fetch("{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId)
+                  .then(function(response) {
+                      if (!response.ok) {
+                          throw new Error("Erro na resposta da rede.");
+                      }
+                      return response.json();
+                  })
+                  .then(function(data) {
+                      if (!data.error) {
+                          lastPrestadorData = data;
+                          
+                          var acionamentoId = "id_acionamento" + block;
+                          var franquiaHoraId = "id_franquia_hora" + block;
+                          var kmFranquiaId = "id_km_franquia" + block;
+                          var valorHoraExcedenteId = "id_valor_hora_excedente" + block;
+                          var valorKmExcedenteId = "id_valor_km_excedente" + block;
+      
+                          var campoFranquiaHora = document.getElementById(franquiaHoraId);
+                          var campoKmFranquia = document.getElementById(kmFranquiaId);
+                          var campoValorHoraExcedente = document.getElementById(valorHoraExcedenteId);
+                          var campoValorKmExcedente = document.getElementById(valorKmExcedenteId);
+      
+                          if (campoFranquiaHora) { campoFranquiaHora.value = data.franquia_hora; }
+                          if (campoKmFranquia) { campoKmFranquia.value = data.km_franquia; }
+                          if (campoValorHoraExcedente) { campoValorHoraExcedente.value = data.valor_hora_excedente; }
+                          if (campoValorKmExcedente) { campoValorKmExcedente.value = data.valor_km_excedente; }
+      
+                          updateAcionamentoByMotivo(block);
+      
+                          calculateHoraExcedente(block);
+                      } else {
+                          console.error("Erro:", data.error);
+                      }
+                  })
+                  .catch(function(error) {
+                      console.error("Erro ao buscar os dados do prestador:", error);
+                  });
+          }
+      });
+  }
+  var prestadorSelects = document.querySelectorAll(".prestador-select");
+  prestadorSelects.forEach(function(selectElem) {
+      attachPrestadorChangeListener(selectElem);
+  });
+  var mainSelect = document.getElementById("id_prestador");
+  if (mainSelect && !mainSelect.classList.contains("prestador-select")) {
+      attachPrestadorChangeListener(mainSelect);
+  }
+  
+  // Atualiza "Valor de Acionamento" com base no motivo.
+  function updateAcionamentoByMotivo(block) {
+      var motivoElem = document.getElementById("id_motivo" + block) || document.getElementById("id_motivo");
+      var motivo = motivoElem ? motivoElem.value.trim().toLowerCase() : "";
+      var acionamentoId = "id_acionamento" + block;
+      var campoAcionamento = document.getElementById(acionamentoId);
+      console.log("Atualizando Valor de Acionamento para block", block, "com motivo:", motivo);
+      if (campoAcionamento && lastPrestadorData) {
+          if (motivo === "antenista") {
+              campoAcionamento.value = lastPrestadorData.valor_antenista || lastPrestadorData.acionamento || "";
+          } else if (motivo === "antenista e prontaresposta armado") {
+              campoAcionamento.value = lastPrestadorData.valor_prontaresposta_armado || lastPrestadorData.acionamento || "";
+          } else if (motivo === "antenista e prontaresposta desarmado") {
+              campoAcionamento.value = lastPrestadorData.valor_prontaresposta_desarmado || lastPrestadorData.acionamento || "";
+          } else {
+              campoAcionamento.value = lastPrestadorData.acionamento || "";
+          }
+          console.log("Campo acionamento atualizado para:", campoAcionamento.value);
+      }
+  }
+  var motivoElemMain = document.getElementById("id_motivo");
+  if (motivoElemMain) {
+      motivoElemMain.addEventListener("change", function() {
+          updateAcionamentoByMotivo("");
+      });
+  }
+  
+  // toggleFieldVisibility: Exibe/oculta campos baseados em selects (ex.: rastreador, isca).
+  function toggleFieldVisibility(selectId, fieldIds, expectedValue="sim") {
+      var selectElem = document.getElementById(selectId);
+      if (!selectElem) return;
+      function updateVisibility() {
+          var valor = selectElem.value.toLowerCase();
+          fieldIds.forEach(function(fieldId) {
+              var fieldElem = document.getElementById(fieldId);
+              if (fieldElem) {
+                  fieldElem.style.display = (valor === expectedValue.toLowerCase()) ? "block" : "none";
+              }
+          });
+      }
+      updateVisibility();
+      selectElem.addEventListener("change", updateVisibility);
+  }
+  toggleFieldVisibility("id_rastreador", ["id_equipamento_field", "ultima_posicao_field", "latlong_field"], "sim");
+  toggleFieldVisibility("id_isca", ["id_isca_field", "ultima_posicao_isca_field", "latlong_isca_field"], "sim");
+  
+  // calculatePrevisaoChegada: Calcula a previsão de chegada a partir do SLA e da data/hora de início.
+  function formatDateTime(dateObj) {
+      var ano = dateObj.getFullYear();
+      var mes = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+      var dia = ("0" + dateObj.getDate()).slice(-2);
+      var hora = ("0" + dateObj.getHours()).slice(-2);
+      var minutos = ("0" + dateObj.getMinutes()).slice(-2);
+      var segundos = ("0" + dateObj.getSeconds()).slice(-2);
+      return ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
+  }
+  function calculatePrevisaoChegada() {
+      var slaElem = document.getElementById("id_sla");
+      var inicioElem = document.getElementById("id_data_hora_inicial");
+      var previsaoElem = document.getElementById("id_previsa_chegada");
+      if (slaElem && inicioElem && previsaoElem) {
+          var slaValue = parseFloat(slaElem.value);
+          var inicioStr = inicioElem.value;
+          if (!isNaN(slaValue) && inicioStr) {
+              var inicioISO = inicioStr.indexOf("T") === -1 ? inicioStr.replace(" ", "T") : inicioStr;
+              var inicioDate = new Date(inicioISO);
+              if (!isNaN(inicioDate.getTime())) {
+                  var previsaoDate = new Date(inicioDate.getTime() + slaValue * 60000);
+                  previsaoElem.value = formatDateTime(previsaoDate);
+              } else {
+                  console.error("Data de início inválida:", inicioStr);
+              }
+          }
+      }
+  }
+  var slaElem = document.getElementById("id_sla");
+  if (slaElem) {
+      slaElem.addEventListener("input", calculatePrevisaoChegada);
+      slaElem.addEventListener("change", calculatePrevisaoChegada);
+  }
+  var inicioElem = document.getElementById("id_data_hora_inicial");
+  if (inicioElem) {
+      inicioElem.addEventListener("change", calculatePrevisaoChegada);
+      inicioElem.addEventListener("blur", calculatePrevisaoChegada);
+  }
+  
+  // calculateHoraTotal: Calcula a diferença entre a data/hora final e de início e preenche o campo "Hora Total".
+  function parseDateTimeGeneric(dateTimeStr) {
+      if (!dateTimeStr) return NaN;
+      var isoStr = dateTimeStr.indexOf("T") === -1 ? dateTimeStr.replace(" ", "T") : dateTimeStr;
+      return new Date(isoStr);
+  }
+  function calculateHoraTotal(block) {
+      var inicioId = "id_data_hora_inicial" + block;
+      var finalId = "id_data_hora_final" + block;
+      var totalId = "id_hora_total" + block;
+      console.log("Calculando Hora Total para block:", block);
+      var inicioElem = document.getElementById(inicioId);
+      var finalElem = document.getElementById(finalId);
+      var totalElem = document.getElementById(totalId);
+      if (inicioElem && finalElem && totalElem) {
+          var inicioStr = inicioElem.value.trim();
+          var finalStr = finalElem.value.trim();
+          console.log("Valores para block", block, ":", inicioStr, finalStr);
+          if (inicioStr && finalStr) {
+              var inicioDate = parseDateTimeGeneric(inicioStr);
+              var finalDate = parseDateTimeGeneric(finalStr);
+              if (isNaN(inicioDate.getTime()) || isNaN(finalDate.getTime())) {
+                  console.error("Data inválida para block", block);
+                  totalElem.value = "";
+                  return;
+              }
+              if (finalDate < inicioDate) {
+                  console.error("Data final é anterior à de início para block", block);
+                  totalElem.value = "";
+                  return;
+              }
+              var diffMs = finalDate - inicioDate;
+              var diffMinutes = Math.floor(diffMs / 60000);
+              var hours = Math.floor(diffMinutes / 60);
+              var minutes = diffMinutes % 60;
+              var minutesStr = minutes < 10 ? "0" + minutes : minutes.toString();
+              var resultStr = hours + "." + minutesStr;
+              console.log("Hora Total calculada para block", block, ":", resultStr);
+              totalElem.value = resultStr;
+          } else {
+              console.log("Campos vazios para block", block);
+              totalElem.value = "";
+          }
+      } else {
+          console.error("Elementos não encontrados para block:", block);
+      }
+  }
+  function attachHoraTotalCalculation(block) {
+      var inicioId = "id_data_hora_inicial" + block;
+      var finalId = "id_data_hora_final" + block;
+      var inicioElem = document.getElementById(inicioId);
+      var finalElem = document.getElementById(finalId);
+      if (inicioElem) {
+          inicioElem.addEventListener("change", function() { 
+              calculateHoraTotal(block); 
+              calculateHoraExcedente(block);
+          });
+          inicioElem.addEventListener("blur", function() { 
+              calculateHoraTotal(block); 
+              calculateHoraExcedente(block);
+          });
+      } else {
+          console.error("Não encontrou o elemento com id:", inicioId);
+      }
+      if (finalElem) {
+          finalElem.addEventListener("change", function() { 
+              calculateHoraTotal(block); 
+              calculateHoraExcedente(block);
+          });
+          finalElem.addEventListener("blur", function() { 
+              calculateHoraTotal(block); 
+              calculateHoraExcedente(block);
+          });
+      } else {
+          console.error("Não encontrou o elemento com id:", finalId);
+      }
+      var franquiaElem = document.getElementById("id_franquia_hora" + block);
+      if (franquiaElem) {
+          franquiaElem.addEventListener("change", function() { 
+              calculateHoraExcedente(block);
+          });
+          franquiaElem.addEventListener("blur", function() { 
+              calculateHoraExcedente(block);
+          });
+      }
+  }
+  attachHoraTotalCalculation("");    
+  attachHoraTotalCalculation("1");     
+  attachHoraTotalCalculation("2");     
+  attachHoraTotalCalculation("3");     
+  
+  function calculateHoraExcedente(block) {
+      var inicioId = "id_data_hora_inicial" + block;
+      var finalId = "id_data_hora_final" + block;
+      var franquiaId = "id_franquia_hora" + block;
+      var excedenteId = "id_hora_excedente" + block;
+      var inicioElem = document.getElementById(inicioId);
+      var finalElem = document.getElementById(finalId);
+      var franquiaElem = document.getElementById(franquiaId);
+      var excedenteElem = document.getElementById(excedenteId);
+      if (inicioElem && finalElem && franquiaElem && excedenteElem) {
+          var inicioStr = inicioElem.value.trim();
+          var finalStr = finalElem.value.trim();
+          if (inicioStr && finalStr) {
+              var inicioDate = parseDateTimeGeneric(inicioStr);
+              var finalDate = parseDateTimeGeneric(finalStr);
+              if (isNaN(inicioDate.getTime()) || isNaN(finalDate.getTime())) {
+                  excedenteElem.value = "";
+                  return;
+              }
+              if (finalDate < inicioDate) {
+                  excedenteElem.value = "";
+                  return;
+              }
+              var diffMs = finalDate - inicioDate;
+              var diffMinutes = Math.floor(diffMs / 60000);
+              var franquia = parseFloat(franquiaElem.value);
+              if (isNaN(franquia)) { franquia = 0; }
+              var franquiaMinutes = franquia * 60;
+              var excedenteMinutes = diffMinutes - franquiaMinutes;
+              if (excedenteMinutes < 0) { excedenteMinutes = 0; }
+              var hoursEx = Math.floor(excedenteMinutes / 60);
+              var minutesEx = excedenteMinutes % 60;
+              var minutesExStr = minutesEx < 10 ? "0" + minutesEx : minutesEx.toString();
+              var resultExStr = hoursEx + "." + minutesExStr;
+              console.log("Hora Excedente calculada para block", block, ":", resultExStr);
+              excedenteElem.value = resultExStr;
+          } else {
+              excedenteElem.value = "";
+          }
+      }
+  }
+  
+  function calculateKmTotal(block) {
+      var kmInicialElem = document.getElementById("id_km_inicial" + block);
+      var kmFinalElem = document.getElementById("id_km_final" + block);
+      var kmTotalElem = document.getElementById("id_km_total" + block);
+      var kmFranquiaElem = document.getElementById("id_km_franquia" + block);
+      var kmExcedenteElem = document.getElementById("id_km_excedente" + block);
+      
+      console.log("Calculando KM para block:", block);
+      
+      if(kmInicialElem && kmFinalElem && kmTotalElem) {
+          var kmInicial = parseFloat(kmInicialElem.value);
+          var kmFinal = parseFloat(kmFinalElem.value);
+          console.log("Km Inicial:", kmInicial, "Km Final:", kmFinal);
+          if(isNaN(kmInicial) || isNaN(kmFinal)) {
+              kmTotalElem.value = "";
+              if(kmExcedenteElem) { kmExcedenteElem.value = ""; }
+              console.warn("Valores de KM inválidos para block:", block);
+              return;
+          }
+          var kmTotal = kmFinal - kmInicial;
+          kmTotalElem.value = kmTotal;
+          console.log("KM Total calculado:", kmTotal);
+          if(kmFranquiaElem && kmExcedenteElem) {
+              var kmFranquia = parseFloat(kmFranquiaElem.value);
+              console.log("Franquia de KM:", kmFranquia);
+              if(!isNaN(kmFranquia)) {
+                  var kmExcedente = kmTotal - kmFranquia;
+                  kmExcedenteElem.value = kmExcedente;
+                  console.log("KM Excedente calculado:", kmExcedente);
+              } else {
+                  kmExcedenteElem.value = "";
+                  console.warn("Valor de Franquia de KM inválido para block:", block);
+              }
+          }
+      }
+  }
+  function attachKmCalculation(block) {
+      var kmInicialElem = document.getElementById("id_km_inicial" + block);
+      var kmFinalElem = document.getElementById("id_km_final" + block);
+      var kmFranquiaElem = document.getElementById("id_km_franquia" + block);
+      if(kmInicialElem) {
+          kmInicialElem.addEventListener("change", function() { calculateKmTotal(block); });
+          kmInicialElem.addEventListener("blur", function() { calculateKmTotal(block); });
+      }
+      if(kmFinalElem) {
+          kmFinalElem.addEventListener("change", function() { calculateKmTotal(block); });
+          kmFinalElem.addEventListener("blur", function() { calculateKmTotal(block); });
+      }
+      if(kmFranquiaElem) {
+          kmFranquiaElem.addEventListener("change", function() { calculateKmTotal(block); });
+          kmFranquiaElem.addEventListener("blur", function() { calculateKmTotal(block); });
+      }
+  }
+  attachKmCalculation("");    
+  attachKmCalculation("1");     
+  attachKmCalculation("2");     
+  attachKmCalculation("3");     
+  
+  // Exibir blocos dos agentes adicionais um por vez.
+  var btnAdicionarAgente = document.getElementById("btnAdicionarAgente");
+  if (btnAdicionarAgente) {
+      btnAdicionarAgente.addEventListener("click", function() {
+          var agentes = document.querySelectorAll(".agente-dinamico");
+          for (var i = 0; i < agentes.length; i++) {
+              if (agentes[i].style.display === "none") {
+                  agentes[i].style.display = "block";
+                  break;
+              }
+          }
+      });
+  }
+});
+</script>
+{% endblock %}

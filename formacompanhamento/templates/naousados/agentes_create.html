@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+<h3 class="display-4"> Registro de Agentes</h3>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" class="form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary"> Registrar</button>
+        </form>
+    </div>
+</div>
+<a href="{% url 'agenteCreateView' %}" class="btn btn-secondary mt3"> Cancelar e Voltar</a>
+</div>
+
+{% endblock %}

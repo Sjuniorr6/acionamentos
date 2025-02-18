@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="display-4">Confirmar Exclusão</h3>
+    <div class="card mb-4">
+        <div class="card-body">
+            <p>Tem certeza de que deseja excluir este registro?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Excluir</button>
+                <a href="{% url 'registro_pagamento_list' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

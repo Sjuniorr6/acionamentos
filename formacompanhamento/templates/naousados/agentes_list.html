@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}
+| Grupo Golden Sat |
+{% endblock %}
+
+{% include 'components/_header.html' %}
+{% block content %}
+
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <h2>Lista de Agentes</h2>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Placa</th>
+                    <th>Franquia Hora</th>
+                    <th>Franquia km</th>
+                    <th>Editar</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for agentes in agente %}
+                <tr class="{% if requisicao.status == 'Aprovado' %}status-aprovado{% elif requisicao.status == 'Reprovado' %}status-reprovado{% elif requisicao.status == 'Configurado' %}status-configurado{% elif requisicao.status == 'Pendente' %}status-pendente{% elif requisicao.status == 'Reprovado pelo CEO' %}status-reprovado-ceo{% elif requisicao.status == 'Aprovado pelo CEO' %}status-aprovado-ceo{% elif requisicao.status == 'Reprovado pela Diretoria' %}status-reprovado-diretoria{% elif requisicao.status == 'Aprovado pela Diretoria' %}status-aprovado-diretoria{% endif %}">
+                    <td>{{ agentes.id }}</td>
+                    <td>{{ agentes.agente }}</td>
+                    <td>{{ agentes.placa }}</td>
+                    <td>{{ agentes.franquia_hora }}</td>
+                    <td>{{ agentes.franquia_km }}</td>
+                    <td> <a href="{% url 'agenteUpdateView' agentes.id%}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'components/_pagination.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-white">Cadastro de Prestador</h2>
+  <div class="card shadow-lg">
+    <div class="card-body">
+      <form id="prestadorForm" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- Linha 1: Nome, CPF/CNPJ e Vencimento CNH -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="{{ form.Nome.id_for_label }}" class="form-label">Nome</label>
+            {{ form.Nome }}
+            {% for error in form.Nome.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.cpf_cnpj.id_for_label }}" class="form-label">CPF/CNPJ</label>
+            {{ form.cpf_cnpj }}
+            {% for error in form.cpf_cnpj.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.vencimento_cnh.id_for_label }}" class="form-label">Vencimento CNH</label>
+            {{ form.vencimento_cnh }}
+            {% for error in form.vencimento_cnh.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Linha 2: Tipo de Prestador, Endereço e Telefone -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="{{ form.tipo_prestador.id_for_label }}" class="form-label">Tipo de Prestador</label>
+            {{ form.tipo_prestador }}
+            {% for error in form.tipo_prestador.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.endereco.id_for_label }}" class="form-label">Endereço</label>
+            {{ form.endereco }}
+            {% for error in form.endereco.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
+            {{ form.telefone }}
+            {% for error in form.telefone.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Linha 3: Email, Conta e Disponibilidade -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.conta.id_for_label }}" class="form-label">Conta</label>
+            {{ form.conta }}
+            {% for error in form.conta.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.disponibilidade.id_for_label }}" class="form-label">Disponibilidade</label>
+            {{ form.disponibilidade }}
+            {% for error in form.disponibilidade.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Linha 4: Região de Atuação e Status do Prestador -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="{{ form.regiao_atuacao.id_for_label }}" class="form-label">Região de Atuação</label>
+            {{ form.regiao_atuacao }}
+            {% for error in form.regiao_atuacao.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label for="{{ form.status_prestador.id_for_label }}" class="form-label">Status do Prestador</label>
+            <select name="{{ form.status_prestador.name }}" id="{{ form.status_prestador.id_for_label }}" class="form-control">
+              <option value="">Selecione o status</option>
+              <option value="ATIVO" {% if form.status_prestador.value == "ATIVO" %}selected{% endif %}>ATIVO</option>
+              <option value="INATIVO" {% if form.status_prestador.value == "INATIVO" %}selected{% endif %}>INATIVO</option>
+              <option value="PENDENTE" {% if form.status_prestador.value == "PENDENTE" %}selected{% endif %}>PENDENTE</option>
+            </select>
+            {% for error in form.status_prestador.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Linha 5: Agência, Tipo de Conta e Banco -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="{{ form.agencia.id_for_label }}" class="form-label">Agência</label>
+            {{ form.agencia }}
+            {% for error in form.agencia.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.tipo_de_conta.id_for_label }}" class="form-label">Tipo de Conta</label>
+            {{ form.tipo_de_conta }}
+            {% for error in form.tipo_de_conta.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label for="{{ form.banco.id_for_label }}" class="form-label">Banco</label>
+            {{ form.banco }}
+            {% for error in form.banco.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Linha 6: Franquia Hora, Valor por KM e Valor por Hora -->
+        
+         
+
+        <!-- Linha 7: Franquia KM e Valor de Acionamento -->
+       
+
+        <!-- Linha 8: Motivo (campo adicionado para o script) -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="{{ form.motivo.id_for_label }}" class="form-label">Motivo</label>
+            {{ form.motivo }}
+            {% for error in form.motivo.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Linha 9: Serviços -->
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <label for="{{ form.servicos.id_for_label }}" class="form-label">Serviços</label>
+            <select name="{{ form.servicos.name }}" id="{{ form.servicos.id_for_label }}" class="form-control">
+              <option value="">Selecione o serviço</option>
+              <option value="Antenista" {% if form.servicos.value == "Antenista" %}selected{% endif %}>Antenista</option>
+              <option value="Ponta Resposta Armado" {% if form.servicos.value == "Ponta Resposta Armado" %}selected{% endif %}>Ponta Resposta Armado</option>
+              <option value="Pronta Resposta Desarmado" {% if form.servicos.value == "Pronta Resposta Desarmado" %}selected{% endif %}>Pronta Resposta Desarmado</option>
+              <option value="Antenista e Pronta Resposta Desarmado" {% if form.servicos.value == "Antenista e Pronta Resposta Desarmado" %}selected{% endif %}>Antenista e Pronta Resposta Desarmado</option>
+              <option value="Antenista e Pronta Resposta Armado" {% if form.servicos.value == "Antenista e Pronta Resposta Armado" %}selected{% endif %}>Antenista e Pronta Resposta Armado</option>
+              <option value="Todos os serviços" {% if form.servicos.value == "Todos os serviços" %}selected{% endif %}>Todos os serviços</option>
+            </select>
+            {% for error in form.servicos.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Containers para os campos específicos de cada serviço -->
+        <div id="div_antenista_fields" style="display: none;">
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <h5>Antenista</h5>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <label for="{{ form.valor_antenista.id_for_label }}" class="form-label">Valor Antenista</label>
+              {{ form.valor_antenista }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.franquia_hora_antenista.id_for_label }}" class="form-label">Franquia Hora</label>
+              {{ form.franquia_hora_antenista }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.franquia_km_antenista.id_for_label }}" class="form-label">Franquia KM</label>
+              {{ form.franquia_km_antenista }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ form.valorkm_antenista.id_for_label }}" class="form-label">Valor por KM</label>
+              {{ form.valorkm_antenista }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ form.valorh_antenista.id_for_label }}" class="form-label">Valor por Hora</label>
+              {{ form.valorh_antenista }}
+            </div>
+          </div>
+        </div>
+
+        <div id="div_armado_fields" style="display: none;">
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <h5>Ponta Resposta Armado</h5>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <label for="{{ form.valor_prontaresposta_armado.id_for_label }}" class="form-label">Valor Pronta Resposta Armado</label>
+              {{ form.valor_prontaresposta_armado }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.franquia_hora_armado.id_for_label }}" class="form-label">Franquia Hora</label>
+              {{ form.franquia_hora_armado }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.franquia_km_armado.id_for_label }}" class="form-label">Franquia KM</label>
+              {{ form.franquia_km_armado }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ form.valorkm_armado.id_for_label }}" class="form-label">Valor por KM</label>
+              {{ form.valorkm_armado }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ form.valorh_armado.id_for_label }}" class="form-label">Valor por Hora</label>
+              {{ form.valorh_armado }}
+            </div>
+          </div>
+        </div>
+
+        <div id="div_desarmado_fields" style="display: none;">
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <h5>Pronta Resposta Desarmado</h5>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <label for="{{ form.valor_prontaresposta_desarmado.id_for_label }}" class="form-label">Valor Pronta Resposta Desarmado</label>
+              {{ form.valor_prontaresposta_desarmado }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.franquia_hora_desarmado.id_for_label }}" class="form-label">Franquia Hora</label>
+              {{ form.franquia_hora_desarmado }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.franquia_km_desarmado.id_for_label }}" class="form-label">Franquia KM</label>
+              {{ form.franquia_km_desarmado }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ form.valorkm_desarmado.id_for_label }}" class="form-label">Valor por KM</label>
+              {{ form.valorkm_desarmado }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ form.valorh_desarmado.id_for_label }}" class="form-label">Valor por Hora</label>
+              {{ form.valorh_desarmado }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha 10: CNH e Foto -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="{{ form.cnh.id_for_label }}" class="form-label">CNH</label>
+            {{ form.cnh }}
+            {% for error in form.cnh.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label for="{{ form.foto.id_for_label }}" class="form-label">Foto</label>
+            {{ form.foto }}
+            {% for error in form.foto.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-success btn-lg">Salvar Prestador</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  console.log("DOM carregado. Iniciando scripts...");
+
+  // Função dummy para cálculo de Hora Excedente
+  function calculateHoraExcedente(block) {
+    console.log("calculateHoraExcedente chamada para o block:", block);
+    // Implemente a lógica de cálculo aqui, se necessário.
+  }
+
+  // Função para anexar listener de mudança no campo "prestador"
+  function attachPrestadorChangeListener(selectElem) {
+    selectElem.addEventListener("change", function() {
+      var prestadorId = this.value;
+      // Obtém o "block" a partir do id (ex.: "id_prestador_block1")
+      var block = this.id.replace("id_prestador", "");
+      console.log("Prestador selecionado:", prestadorId, "Block:", block);
+      if (prestadorId) {
+        fetch("{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId)
+          .then(function(response) {
+            if (!response.ok) {
+              throw new Error("Erro na resposta da rede.");
+            }
+            return response.json();
+          })
+          .then(function(data) {
+            if (!data.error) {
+              console.log("Dados recebidos para o prestador:", data);
+              // Atualiza os campos conforme os dados recebidos
+              var acionamentoField = document.getElementById("id_acionamento" + block);
+              var franquiaHoraField = document.getElementById("id_franquia_hora" + block);
+              var kmFranquiaField = document.getElementById("id_km_franquia" + block);
+              var valorHoraExcedenteField = document.getElementById("id_valor_hora_excedente" + block);
+              var valorKmExcedenteField = document.getElementById("id_valor_km_excedente" + block);
+
+              if (franquiaHoraField) { 
+                franquiaHoraField.value = data.franquia_hora;
+                console.log("Atualizado franquia_hora:", data.franquia_hora);
+              }
+              if (kmFranquiaField) { 
+                kmFranquiaField.value = data.km_franquia;
+                console.log("Atualizado km_franquia:", data.km_franquia);
+              }
+              if (valorHoraExcedenteField) { 
+                valorHoraExcedenteField.value = data.valor_hora_excedente;
+                console.log("Atualizado valor_hora_excedente:", data.valor_hora_excedente);
+              }
+              if (valorKmExcedenteField) { 
+                valorKmExcedenteField.value = data.valor_km_excedente;
+                console.log("Atualizado valor_km_excedente:", data.valor_km_excedente);
+              }
+
+              updateAcionamentoByMotivo(block);
+              calculateHoraExcedente(block);
+            } else {
+              console.error("Erro retornado pelo servidor:", data.error);
+            }
+          })
+          .catch(function(error) {
+            console.error("Erro ao buscar os dados do prestador:", error);
+          });
+      }
+    });
+  }
+
+  // Anexa o listener para o select principal (se existir)
+  var mainPrestadorSelect = document.getElementById("id_prestador");
+  if (mainPrestadorSelect) {
+    attachPrestadorChangeListener(mainPrestadorSelect);
+    console.log("Listener anexado ao mainPrestadorSelect");
+  }
+
+  // Atualiza "Valor de Acionamento" com base no campo "Motivo"
+  function updateAcionamentoByMotivo(block) {
+    var motivoElem = document.getElementById("id_motivo" + block) || document.getElementById("id_motivo");
+    var motivo = motivoElem ? motivoElem.value.trim().toLowerCase() : "";
+    var acionamentoField = document.getElementById("id_acionamento" + block);
+    console.log("Atualizando Acionamento para block:", block, "com motivo:", motivo);
+    if (acionamentoField) {
+      // Exemplo de lógica: escolha o valor conforme o motivo
+      if (motivo === "antenista") {
+        acionamentoField.value = "valor_antenista";
+      } else if (motivo === "ponta resposta armado") {
+        acionamentoField.value = "valor_armado";
+      } else if (motivo === "pronta resposta desarmado") {
+        acionamentoField.value = "valor_desarmado";
+      } else {
+        acionamentoField.value = "";
+      }
+      console.log("Campo Acionamento atualizado para:", acionamentoField.value);
+    }
+  }
+
+  // Atualiza os campos de serviços conforme a opção selecionada
+  function updateServiceFields(){
+    var select = document.getElementById("{{ form.servicos.id_for_label }}");
+    var divAntenista = document.getElementById("div_antenista_fields");
+    var divArmado = document.getElementById("div_armado_fields");
+    var divDesarmado = document.getElementById("div_desarmado_fields");
+
+    var selectedValue = select.value.trim().toLowerCase();
+    console.log("Serviço selecionado:", selectedValue);
+
+    // Oculta todos os blocos inicialmente
+    if(divAntenista) divAntenista.style.display = "none";
+    if(divArmado) divArmado.style.display = "none";
+    if(divDesarmado) divDesarmado.style.display = "none";
+
+    if(selectedValue === "antenista"){
+      if(divAntenista) divAntenista.style.display = "block";
+    } else if(selectedValue === "ponta resposta armado"){
+      if(divArmado) divArmado.style.display = "block";
+    } else if(selectedValue === "pronta resposta desarmado"){
+      if(divDesarmado) divDesarmado.style.display = "block";
+    } else if(selectedValue === "antenista e pronta resposta desarmado"){
+      if(divAntenista) divAntenista.style.display = "block";
+      if(divDesarmado) divDesarmado.style.display = "block";
+    } else if(selectedValue === "antenista e pronta resposta armado"){
+      if(divAntenista) divAntenista.style.display = "block";
+      if(divArmado) divArmado.style.display = "block";
+    } else if(selectedValue === "todos os serviços" || selectedValue === "todos os servicos"){
+      if(divAntenista) divAntenista.style.display = "block";
+      if(divArmado) divArmado.style.display = "block";
+      if(divDesarmado) divDesarmado.style.display = "block";
+    }
+  }
+
+  // Inicia o update dos campos de serviços e anexa listener
+  var servicosSelect = document.getElementById("{{ form.servicos.id_for_label }}");
+  if(servicosSelect){
+    updateServiceFields();
+    servicosSelect.addEventListener("change", updateServiceFields);
+    console.log("Listener anexado para mudanças no campo serviços");
+  }
+
+});
+</script>
+{% endblock %}

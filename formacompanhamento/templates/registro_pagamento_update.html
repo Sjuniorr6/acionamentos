@@ -1,0 +1,874 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container mt-4">
+    <h3 class="display-4">Editar Pagamento</h3>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="post" action="{% url 'formacompanhamento:registro_pagamento_update' form.instance.pk %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- CAMPOS CLIENTE E PRESTADOR -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="id_cliente" class="form-label">Cliente</label>
+                        {{ form.cliente.errors }}
+                        {{ form.cliente }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_protocolo" class="form-label">Protocolo</label>
+                        {{ form.protocolo }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_prestador" class="form-label">Prestador</label>
+                        {{ form.prestador }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_acionamento" class="form-label">Valor de Acionamento</label>
+                        {{ form.acionamento }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_franquia_hora" class="form-label">Franquia de Horas</label>
+                        {{ form.franquia_hora }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_km_franquia" class="form-label">Franquia de KM</label>
+                        {{ form.km_franquia }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_valor_hora_excedente" class="form-label">Valor de Hora Excedente</label>
+                        {{ form.valor_hora_excedente }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_valor_km_excedente" class="form-label">Valor de KM Excedente</label>
+                        {{ form.valor_km_excedente }}
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- DADOS DO ACIONAMENTO -->
+                <h4 class="mt-2">Dados do Acionamento</h4>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="id_solicitante" class="form-label">Solicitante</label>
+                        {{ form.solicitante }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_tipo_contato" class="form-label">Tipo de Contato</label>
+                        {{ form.tipo_contato }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="id_tipo" class="form-label">Tipo</label>
+                        {{ form.tipo }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_quantidade_agentes" class="form-label">Quantidade de Agentes</label>
+                        {{ form.quantidade_agentes }}
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- DADOS DA OPERAÇÃO -->
+                <h4 class="mt-4">Dados da Operação</h4>
+                <!-- Bloco do Agente Principal (Sempre visível) -->
+                <div class="row mb-3">
+                    <!-- Linha 1: Início de Operação, SLA, Previsão de Chegada, Data e Hora (Chegada), Final de Operação -->
+                    <div class="col-md-3">
+                        <label for="id_data_hora_inicial" class="form-label">Início de Operação</label>
+                        <div class="input-group">
+                            {{ form.data_hora_inicial }}
+                            <button type="button" class="btn btn-primary" id="btn_inicial" onclick="registrarDataHora('id_data_hora_inicial', 'btn_inicial')">Registrar</button>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <label for="id_sla" class="form-label">SLA</label>
+                        {{ form.sla }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_previsa_chegada" class="form-label">Previsão de Chegada</label>
+                        {{ form.previsa_chegada }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="id_data_hora_chegada" class="form-label">Data e Hora (Chegada)</label>
+                        <div class="input-group">
+                            {{ form.data_hora_chegada }}
+                            <button type="button" class="btn btn-primary" id="btn_chegada" onclick="registrarDataHora('id_data_hora_chegada', 'btn_chegada')">Registrar</button>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="id_data_hora_final" class="form-label">Final de Operação</label>
+                        <div class="input-group">
+                            {{ form.data_hora_final }}
+                            <button type="button" class="btn btn-primary" id="btn_final" onclick="registrarDataHora('id_data_hora_final', 'btn_final')">Registrar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <!-- Linha 2: Km Inicial, Km Final, KM Total, KM Excedente, Hora Excedente -->
+                    <div class="col-md-2">
+                        <label for="id_hora_total" class="form-label">Hora Total</label>
+                        {{ form.hora_total }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_km_inicial" class="form-label">Km Inicial</label>
+                        {{ form.km_inicial }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_km_final" class="form-label">Km Final</label>
+                        {{ form.km_final }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_km_total" class="form-label">KM Total</label>
+                        {{ form.km_total }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_km_excedente" class="form-label">KM Excedente</label>
+                        {{ form.km_excedente }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_hora_excedente" class="form-label">Hora Excedente</label>
+                        {{ form.hora_excedente }}
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- CAMPOS DINÂMICOS PARA AGENTES ADICIONAIS -->
+                <h5>Agentes Adicionais</h5>
+                <div id="agentes-container">
+                    <!-- Bloco para Agente Adicional 1 -->
+                    <div class="agente-dinamico" id="agente1" style="display: {% if form.instance.prestador1 %}block{% else %}none{% endif %};">
+                        <!-- Linha 1: Prestador, Acionamento, Franquia de KM, Franquia Hora, Valor Hora Excedente e Hora Excedente -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="id_prestador1" class="form-label">Prestador</label>
+                                {{ form.prestador1|add_class:"prestador-select" }}
+                            </div>
+                            <div class="col-md-1">
+                                <label for="id_acionamento1" class="form-label">Acionamento</label>
+                                {{ form.acionamento1 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_km_franquia1" class="form-label">Franquia de KM</label>
+                                {{ form.km_franquia1 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_franquia_hora1" class="form-label">Franquia Hora</label>
+                                {{ form.franquia_hora1 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_valor_hora_excedente1" class="form-label">Valor Hora Excedente</label>
+                                {{ form.valor_hora_excedente1 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_hora_excedente1" class="form-label">Hora Excedente</label>
+                                {{ form.hora_excedente1 }}
+                            </div>
+                        </div>
+                        <!-- Linha 2: Início de Operação, Data e Hora (Chegada) e Final de Operação -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_data_hora_inicial1" class="form-label">Início de Operação 1</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_inicial1 }}
+                                    <button type="button" class="btn btn-primary" id="btn_inicial1" onclick="registrarDataHora('id_data_hora_inicial1', 'btn_inicial1')">Registrar</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_data_hora_chegada1" class="form-label">Data e Hora (Chegada) 1</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_chegada1 }}
+                                    <button type="button" class="btn btn-primary" id="btn_chegada1" onclick="registrarDataHora('id_data_hora_chegada1', 'btn_chegada1')">Registrar</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_data_hora_final1" class="form-label">Final de Operação 1</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_final1 }}
+                                    <button type="button" class="btn btn-primary" id="btn_final1" onclick="registrarDataHora('id_data_hora_final1', 'btn_final1')">Registrar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Linha 3: Km Inicial, Km Final e KM Total -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_km_inicial1" class="form-label">Km Inicial 1</label>
+                                {{ form.km_inicial1 }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_km_final1" class="form-label">Km Final 1</label>
+                                {{ form.km_final1 }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_km_total1" class="form-label">KM Total 1</label>
+                                {{ form.km_total1 }}
+                            </div>
+                        </div>
+                        <!-- Linha 4: KM Excedente, Valor KM Excedente e (opcionalmente) Hora Total -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="id_km_excedente1" class="form-label">KM Excedente 1</label>
+                                {{ form.km_excedente1 }}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="id_valor_total_km_excedente1" class="form-label">Valor KM Excedente 1</label>
+                                {{ form.valor_km_excedente1 }}
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+                <!-- Bloco para Agente Adicional 2 -->
+                <div id="agentes-container">
+                    <div class="agente-dinamico" id="agente2" style="display: {% if form.instance.prestador2 %}block{% else %}none{% endif %};">
+                        <h3>_______________________________________________________________________________</h3>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="id_prestador2" class="form-label">Prestador</label>
+                                {{ form.prestador2|add_class:"prestador-select" }}
+                            </div>
+                            <div class="col-md-1">
+                                <label for="id_acionamento2" class="form-label">Acionamento</label>
+                                {{ form.acionamento2 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_km_franquia2" class="form-label">Franquia de KM</label>
+                                {{ form.km_franquia2 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_franquia_hora2" class="form-label">Franquia Hora</label>
+                                {{ form.franquia_hora2 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_valor_hora_excedente2" class="form-label">Valor Hora Excedente</label>
+                                {{ form.valor_hora_excedente2 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_hora_excedente2" class="form-label">Hora Excedente</label>
+                                {{ form.hora_excedente2 }}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_data_hora_inicial2" class="form-label">Início de Operação 2</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_inicial2 }}
+                                    <button type="button" class="btn btn-primary" id="btn_inicial2" onclick="registrarDataHora('id_data_hora_inicial2', 'btn_inicial2')">Registrar</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_data_hora_chegada2" class="form-label">Data e Hora (Chegada) 2</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_chegada2 }}
+                                    <button type="button" class="btn btn-primary" id="btn_chegada2" onclick="registrarDataHora('id_data_hora_chegada2', 'btn_chegada2')">Registrar</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_data_hora_final2" class="form-label">Final de Operação 2</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_final2 }}
+                                    <button type="button" class="btn btn-primary" id="btn_final2" onclick="registrarDataHora('id_data_hora_final2', 'btn_final2')">Registrar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_km_inicial2" class="form-label">Km Inicial 2</label>
+                                {{ form.km_inicial2 }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_km_final2" class="form-label">Km Final 2</label>
+                                {{ form.km_final2 }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_km_total2" class="form-label">KM Total 2</label>
+                                {{ form.km_total2 }}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="id_km_excedente2" class="form-label">KM Excedente 2</label>
+                                {{ form.km_excedente2 }}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="id_valor_total_km_excedente2" class="form-label">Valor KM Excedente 2</label>
+                                {{ form.valor_km_excedente2 }}
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- Bloco para Agente Adicional 3 -->
+                <div id="agentes-container">
+                    <div class="agente-dinamico" id="agente3" style="display: {% if form.instance.prestador3 %}block{% else %}none{% endif %};">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="id_prestador3" class="form-label">Prestador</label>
+                                {{ form.prestador3|add_class:"prestador-select" }}
+                            </div>
+                            <div class="col-md-1">
+                                <label for="id_acionamento3" class="form-label">Acionamento</label>
+                                {{ form.acionamento3 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_km_franquia3" class="form-label">Franquia de KM</label>
+                                {{ form.km_franquia3 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_franquia_hora3" class="form-label">Franquia Hora</label>
+                                {{ form.franquia_hora3 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_valor_hora_excedente3" class="form-label">Valor Hora Excedente</label>
+                                {{ form.valor_hora_excedente3 }}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="id_hora_excedente3" class="form-label">Hora Excedente</label>
+                                {{ form.hora_excedente3 }}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_data_hora_inicial3" class="form-label">Início de Operação 3</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_inicial3 }}
+                                    <button type="button" class="btn btn-primary" id="btn_inicial3" onclick="registrarDataHora('id_data_hora_inicial3', 'btn_inicial3')">Registrar</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_data_hora_chegada3" class="form-label">Data e Hora (Chegada) 3</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_chegada3 }}
+                                    <button type="button" class="btn btn-primary" id="btn_chegada3" onclick="registrarDataHora('id_data_hora_chegada3', 'btn_chegada3')">Registrar</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_data_hora_final3" class="form-label">Final de Operação 3</label>
+                                <div class="input-group">
+                                    {{ form.data_hora_final3 }}
+                                    <button type="button" class="btn btn-primary" id="btn_final3" onclick="registrarDataHora('id_data_hora_final3', 'btn_final3')">Registrar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="id_km_inicial3" class="form-label">Km Inicial 3</label>
+                                {{ form.km_inicial3 }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_km_final3" class="form-label">Km Final 3</label>
+                                {{ form.km_final3 }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="id_km_total3" class="form-label">KM Total 3</label>
+                                {{ form.km_total3 }}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="id_km_excedente3" class="form-label">KM Excedente 3</label>
+                                {{ form.km_excedente3 }}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="id_valor_total_km_excedente3" class="form-label">Valor KM Excedente 3</label>
+                                {{ form.valor_km_excedente3 }}
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- DADOS GERAIS -->
+                <h4 class="mt-4">Dados Gerais</h4>
+                <!-- Botão para adicionar novos agentes -->
+                <button type="button" id="btnAdicionarAgente" class="btn btn-secondary mb-3">Adicionar Agente</button>
+                <!-- CAMPOS Marca / Modelo, Ano Fabricação / Modelo e Cor -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="id_modelo_cor_ano" class="form-label">Marca / Modelo</label>
+                        {{ form.modelo }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_ano" class="form-label">Ano Fabricação / Modelo</label>
+                        {{ form.ano }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_cor" class="form-label">Cor</label>
+                        {{ form.cor }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label for="id_rastreador" class="form-label">Rastreador</label>
+                        {{ form.rastreador }}
+                    </div>
+                    <div class="col-md-2" style="display: none;" id="id_equipamento_field">
+                        <label for="id_id_equipamento" class="form-label">ID Equipamento</label>
+                        {{ form.id_equipamento }}
+                    </div>
+                    <div class="col-md-6" style="display: none;" id="ultima_posicao_field">
+                        <label for="id_ultima_posicao" class="form-label">Endereço da Última Posição</label>
+                        {{ form.ultima_posicao }}
+                    </div>
+                    <div class="col-md-2" style="display: none;" id="latlong_field">
+                        <label for="id_latlong" class="form-label">Latitude - Longitude</label>
+                        {{ form.latlong }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label for="id_isca" class="form-label">Isca</label>
+                        {{ form.isca }}
+                    </div>
+                    <div class="col-md-2" style="display: none;" id="id_isca_field">
+                        <label for="id_id_isca" class="form-label">ID Equipamento</label>
+                        {{ form.id_isca }}
+                    </div>
+                    <div class="col-md-6" style="display: none;" id="ultima_posicao_isca_field">
+                        <label for="id_ultima_posicao_isca" class="form-label">Endereço da Última Posição</label>
+                        {{ form.ultima_posicao_isca }}
+                    </div>
+                    <div class="col-md-2" style="display: none;" id="latlong_isca_field">
+                        <label for="id_latlong_isca" class="form-label">Latitude - Longitude</label>
+                        {{ form.latlong_isca }}
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- IMAGENS -->
+                <h4 class="mt-4">Imagens</h4>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label for="id_imagem1" class="form-label">Imagem 1</label>
+                        {{ form.imagem1 }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_imagem2" class="form-label">Imagem 2</label>
+                        {{ form.imagem2 }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_imagem3" class="form-label">Imagem 3</label>
+                        {{ form.imagem3 }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_imagem4" class="form-label">Imagem 4</label>
+                        {{ form.imagem4 }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_imagem5" class="form-label">Imagem 5</label>
+                        {{ form.imagem5 }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_imagem6" class="form-label">Imagem 6</label>
+                        {{ form.imagem6 }}
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a href="{% url 'formacompanhamento:registro_pagamento_list' %}" class="btn btn-secondary">Cancelar e Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in form.errors.items %}
+                <li><strong>{{ field }}</strong>: {{ errors|join:", " }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<!-- Script para exibir os blocos dos agentes adicionais e realizar os cálculos -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    // ======================================================
+    // 1. registrarDataHora: Preenche o campo com a data/hora atual e oculta o botão.
+    function registrarDataHora(inputId, btnId) {
+        var agora = new Date();
+        var ano = agora.getFullYear();
+        var mes = ("0" + (agora.getMonth() + 1)).slice(-2);
+        var dia = ("0" + agora.getDate()).slice(-2);
+        var hora = ("0" + agora.getHours()).slice(-2);
+        var minutos = ("0" + agora.getMinutes()).slice(-2);
+        var segundos = ("0" + agora.getSeconds()).slice(-2);
+        var dataHoraFormatada = ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
+        console.log("[registrarDataHora] Input ID:", inputId, "Valor calculado:", dataHoraFormatada);
+        
+        var inputField = document.getElementById(inputId);
+        if (inputField) {
+            inputField.value = dataHoraFormatada;
+            console.log("[registrarDataHora] Campo", inputId, "preenchido com", dataHoraFormatada);
+        } else {
+            console.error("[registrarDataHora] Elemento com id", inputId, "não encontrado.");
+        }
+        
+        var botao = document.getElementById(btnId);
+        if (botao) {
+            botao.style.display = "none";
+            console.log("[registrarDataHora] Botão", btnId, "ocultado.");
+        } else {
+            console.error("[registrarDataHora] Elemento com id", btnId, "não encontrado.");
+        }
+        
+        // Se o campo for de início ou final, dispara os cálculos da Hora Total e Hora Excedente.
+        if(inputId.indexOf("id_data_hora_inicial") === 0 || inputId.indexOf("id_data_hora_final") === 0){
+            var block = inputId.replace(/id_data_hora_(inicial|final)/, "");
+            calculateHoraTotal(block);
+            calculateHoraExcedente(block);
+        }
+    }
+    window.registrarDataHora = registrarDataHora;
+    
+    
+    // ======================================================
+    // 2. attachPrestadorChangeListener: Atualiza os campos do prestador via AJAX.
+    function attachPrestadorChangeListener(selectElem) {
+        selectElem.addEventListener("change", function() {
+            var prestadorId = this.value;
+            var block = this.id.replace("id_prestador", "");
+            if (prestadorId) {
+                fetch("{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId)
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error("Erro na resposta da rede.");
+                        }
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        if (!data.error) {
+                            var acionamentoId = "id_acionamento" + block;
+                            var franquiaHoraId = "id_franquia_hora" + block;
+                            var kmFranquiaId = "id_km_franquia" + block;
+                            var valorHoraExcedenteId = "id_valor_hora_excedente" + block;
+                            var valorKmExcedenteId = "id_valor_km_excedente" + block;
+        
+                            var campoAcionamento = document.getElementById(acionamentoId);
+                            var campoFranquiaHora = document.getElementById(franquiaHoraId);
+                            var campoKmFranquia = document.getElementById(kmFranquiaId);
+                            var campoValorHoraExcedente = document.getElementById(valorHoraExcedenteId);
+                            var campoValorKmExcedente = document.getElementById(valorKmExcedenteId);
+        
+                            if (campoAcionamento) { campoAcionamento.value = data.acionamento; }
+                            if (campoFranquiaHora) { campoFranquiaHora.value = data.franquia_hora; }
+                            if (campoKmFranquia) { campoKmFranquia.value = data.km_franquia; }
+                            if (campoValorHoraExcedente) { campoValorHoraExcedente.value = data.valor_hora_excedente; }
+                            if (campoValorKmExcedente) { campoValorKmExcedente.value = data.valor_km_excedente; }
+        
+                            // Após atualizar a franquia de hora, recalcula a Hora Excedente.
+                            calculateHoraExcedente(block);
+                        } else {
+                            console.error("Erro:", data.error);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error("Erro ao buscar os dados do prestador:", error);
+                    });
+            }
+        });
+    }
+    var prestadorSelects = document.querySelectorAll(".prestador-select");
+    prestadorSelects.forEach(function(selectElem) {
+        attachPrestadorChangeListener(selectElem);
+    });
+    var mainSelect = document.getElementById("id_prestador");
+    if (mainSelect && !mainSelect.classList.contains("prestador-select")) {
+        attachPrestadorChangeListener(mainSelect);
+    }
+    
+    
+    // ======================================================
+    // 3. toggleFieldVisibility: Exibe/oculta campos com base no valor selecionado.
+    function toggleFieldVisibility(selectId, fieldIds, expectedValue="sim") {
+        var selectElem = document.getElementById(selectId);
+        if (!selectElem) return;
+        function updateVisibility() {
+            var valor = selectElem.value.toLowerCase();
+            fieldIds.forEach(function(fieldId) {
+                var fieldElem = document.getElementById(fieldId);
+                if (fieldElem) {
+                    fieldElem.style.display = (valor === expectedValue.toLowerCase()) ? "block" : "none";
+                }
+            });
+        }
+        updateVisibility();
+        selectElem.addEventListener("change", updateVisibility);
+    }
+    toggleFieldVisibility("id_rastreador", ["id_equipamento_field", "ultima_posicao_field", "latlong_field"], "sim");
+    toggleFieldVisibility("id_isca", ["id_isca_field", "ultima_posicao_isca_field", "latlong_isca_field"], "sim");
+    
+    
+    // ======================================================
+    // 4. calculatePrevisaoChegada: Calcula a previsão de chegada a partir do SLA e da data/hora de início.
+    function formatDateTime(dateObj) {
+        var ano = dateObj.getFullYear();
+        var mes = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+        var dia = ("0" + dateObj.getDate()).slice(-2);
+        var hora = ("0" + dateObj.getHours()).slice(-2);
+        var minutos = ("0" + dateObj.getMinutes()).slice(-2);
+        var segundos = ("0" + dateObj.getSeconds()).slice(-2);
+        return ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
+    }
+    function calculatePrevisaoChegada() {
+        var slaElem = document.getElementById("id_sla");
+        var inicioElem = document.getElementById("id_data_hora_inicial");
+        var previsaoElem = document.getElementById("id_previsa_chegada");
+        if (slaElem && inicioElem && previsaoElem) {
+            var slaValue = parseFloat(slaElem.value);
+            var inicioStr = inicioElem.value;
+            if (!isNaN(slaValue) && inicioStr) {
+                var inicioISO = inicioStr.indexOf("T") === -1 ? inicioStr.replace(" ", "T") : inicioStr;
+                var inicioDate = new Date(inicioISO);
+                if (!isNaN(inicioDate.getTime())) {
+                    var previsaoDate = new Date(inicioDate.getTime() + slaValue * 60000);
+                    previsaoElem.value = formatDateTime(previsaoDate);
+                } else {
+                    console.error("Data de início inválida:", inicioStr);
+                }
+            }
+        }
+    }
+    var slaElem = document.getElementById("id_sla");
+    if (slaElem) {
+        slaElem.addEventListener("input", calculatePrevisaoChegada);
+        slaElem.addEventListener("change", calculatePrevisaoChegada);
+    }
+    var inicioElem = document.getElementById("id_data_hora_inicial");
+    if (inicioElem) {
+        inicioElem.addEventListener("change", calculatePrevisaoChegada);
+        inicioElem.addEventListener("blur", calculatePrevisaoChegada);
+    }
+    
+    
+    // ======================================================
+    // 5. calculateHoraTotal: Calcula a diferença entre a data/hora final e de início e preenche o campo "Hora Total".
+    function parseDateTimeGeneric(dateTimeStr) {
+        if (!dateTimeStr) return NaN;
+        var isoStr = dateTimeStr.indexOf("T") === -1 ? dateTimeStr.replace(" ", "T") : dateTimeStr;
+        return new Date(isoStr);
+    }
+    function calculateHoraTotal(block) {
+        var inicioId = "id_data_hora_inicial" + block;
+        var finalId = "id_data_hora_final" + block;
+        var totalId = "id_hora_total" + block;
+        console.log("Calculando Hora Total para block:", block);
+        var inicioElem = document.getElementById(inicioId);
+        var finalElem = document.getElementById(finalId);
+        var totalElem = document.getElementById(totalId);
+        if (inicioElem && finalElem && totalElem) {
+            var inicioStr = inicioElem.value.trim();
+            var finalStr = finalElem.value.trim();
+            console.log("Valores para block", block, ":", inicioStr, finalStr);
+            if (inicioStr && finalStr) {
+                var inicioDate = parseDateTimeGeneric(inicioStr);
+                var finalDate = parseDateTimeGeneric(finalStr);
+                if (isNaN(inicioDate.getTime()) || isNaN(finalDate.getTime())) {
+                    console.error("Data inválida para block", block);
+                    totalElem.value = "";
+                    return;
+                }
+                if (finalDate < inicioDate) {
+                    console.error("Data final é anterior à de início para block", block);
+                    totalElem.value = "";
+                    return;
+                }
+                var diffMs = finalDate - inicioDate;
+                var diffMinutes = Math.floor(diffMs / 60000);
+                var hours = Math.floor(diffMinutes / 60);
+                var minutes = diffMinutes % 60;
+                var minutesStr = minutes < 10 ? "0" + minutes : minutes.toString();
+                var resultStr = hours + "." + minutesStr;
+                console.log("Hora Total calculada para block", block, ":", resultStr);
+                totalElem.value = resultStr;
+            } else {
+                console.log("Campos vazios para block", block);
+                totalElem.value = "";
+            }
+        } else {
+            console.error("Elementos não encontrados para block:", block);
+        }
+    }
+    function attachHoraTotalCalculation(block) {
+        var inicioId = "id_data_hora_inicial" + block;
+        var finalId = "id_data_hora_final" + block;
+        var inicioElem = document.getElementById(inicioId);
+        var finalElem = document.getElementById(finalId);
+        if (inicioElem) {
+            inicioElem.addEventListener("change", function() { 
+                calculateHoraTotal(block); 
+                calculateHoraExcedente(block);
+            });
+            inicioElem.addEventListener("blur", function() { 
+                calculateHoraTotal(block); 
+                calculateHoraExcedente(block);
+            });
+        } else {
+            console.error("Não encontrou o elemento com id:", inicioId);
+        }
+        if (finalElem) {
+            finalElem.addEventListener("change", function() { 
+                calculateHoraTotal(block); 
+                calculateHoraExcedente(block);
+            });
+            finalElem.addEventListener("blur", function() { 
+                calculateHoraTotal(block); 
+                calculateHoraExcedente(block);
+            });
+        } else {
+            console.error("Não encontrou o elemento com id:", finalId);
+        }
+        // Listener para alterações na franquia de hora
+        var franquiaElem = document.getElementById("id_franquia_hora" + block);
+        if (franquiaElem) {
+            franquiaElem.addEventListener("change", function() { 
+                calculateHoraExcedente(block);
+            });
+            franquiaElem.addEventListener("blur", function() { 
+                calculateHoraExcedente(block);
+            });
+        }
+    }
+    // Anexa os listeners para o cálculo de Hora Total e Hora Excedente (agente principal e agentes adicionais)
+    attachHoraTotalCalculation("");    // Agente principal
+    attachHoraTotalCalculation("1");     // Agente adicional 1
+    attachHoraTotalCalculation("2");     // Agente adicional 2
+    attachHoraTotalCalculation("3");     // Agente adicional 3
+    
+    
+    // ======================================================
+    // 6. calculateHoraExcedente: Calcula a "Hora Excedente" como a diferença entre a duração total (em minutos)
+    // e a franquia de hora (convertida para minutos). O resultado é exibido no formato H.MM.
+    function calculateHoraExcedente(block) {
+        var inicioId = "id_data_hora_inicial" + block;
+        var finalId = "id_data_hora_final" + block;
+        var franquiaId = "id_franquia_hora" + block;
+        var excedenteId = "id_hora_excedente" + block;
+        var inicioElem = document.getElementById(inicioId);
+        var finalElem = document.getElementById(finalId);
+        var franquiaElem = document.getElementById(franquiaId);
+        var excedenteElem = document.getElementById(excedenteId);
+        if (inicioElem && finalElem && franquiaElem && excedenteElem) {
+            var inicioStr = inicioElem.value.trim();
+            var finalStr = finalElem.value.trim();
+            if (inicioStr && finalStr) {
+                var inicioDate = parseDateTimeGeneric(inicioStr);
+                var finalDate = parseDateTimeGeneric(finalStr);
+                if (isNaN(inicioDate.getTime()) || isNaN(finalDate.getTime())) {
+                    excedenteElem.value = "";
+                    return;
+                }
+                if (finalDate < inicioDate) {
+                    excedenteElem.value = "";
+                    return;
+                }
+                var diffMs = finalDate - inicioDate;
+                var diffMinutes = Math.floor(diffMs / 60000);
+                var franquia = parseFloat(franquiaElem.value);
+                if (isNaN(franquia)) { franquia = 0; }
+                var franquiaMinutes = franquia * 60;
+                var excedenteMinutes = diffMinutes - franquiaMinutes;
+                if (excedenteMinutes < 0) {
+                    excedenteMinutes = 0;
+                }
+                var hoursEx = Math.floor(excedenteMinutes / 60);
+                var minutesEx = excedenteMinutes % 60;
+                var minutesExStr = minutesEx < 10 ? "0" + minutesEx : minutesEx.toString();
+                var resultExStr = hoursEx + "." + minutesExStr;
+                console.log("Hora Excedente calculada para block", block, ":", resultExStr);
+                excedenteElem.value = resultExStr;
+            } else {
+                excedenteElem.value = "";
+            }
+        }
+    }
+    
+    
+    // ======================================================
+    // 7. calculateKmTotal: Calcula o KM Total e o KM Excedente.
+    //     KM Total = Km Final - Km Inicial
+    //     KM Excedente = KM Total - Franquia de KM
+    function calculateKmTotal(block) {
+        var kmInicialElem = document.getElementById("id_km_inicial" + block);
+        var kmFinalElem = document.getElementById("id_km_final" + block);
+        var kmTotalElem = document.getElementById("id_km_total" + block);
+        var kmFranquiaElem = document.getElementById("id_km_franquia" + block);
+        var kmExcedenteElem = document.getElementById("id_km_excedente" + block);
+        
+        console.log("Calculando KM para block:", block);
+        
+        if(kmInicialElem && kmFinalElem && kmTotalElem) {
+            var kmInicial = parseFloat(kmInicialElem.value);
+            var kmFinal = parseFloat(kmFinalElem.value);
+            console.log("Km Inicial:", kmInicial, "Km Final:", kmFinal);
+            if(isNaN(kmInicial) || isNaN(kmFinal)) {
+                kmTotalElem.value = "";
+                if(kmExcedenteElem) {
+                    kmExcedenteElem.value = "";
+                }
+                console.warn("Valores de KM inválidos para block:", block);
+                return;
+            }
+            var kmTotal = kmFinal - kmInicial;
+            kmTotalElem.value = kmTotal;
+            console.log("KM Total calculado:", kmTotal);
+            if(kmFranquiaElem && kmExcedenteElem) {
+                var kmFranquia = parseFloat(kmFranquiaElem.value);
+                console.log("Franquia de KM:", kmFranquia);
+                if(!isNaN(kmFranquia)) {
+                    var kmExcedente = kmTotal - kmFranquia;
+                    kmExcedenteElem.value = kmExcedente;
+                    console.log("KM Excedente calculado:", kmExcedente);
+                } else {
+                    kmExcedenteElem.value = "";
+                    console.warn("Valor de Franquia de KM inválido para block:", block);
+                }
+            }
+        }
+    }
+    function attachKmCalculation(block) {
+        var kmInicialElem = document.getElementById("id_km_inicial" + block);
+        var kmFinalElem = document.getElementById("id_km_final" + block);
+        var kmFranquiaElem = document.getElementById("id_km_franquia" + block);
+        if(kmInicialElem) {
+            kmInicialElem.addEventListener("change", function() { calculateKmTotal(block); });
+            kmInicialElem.addEventListener("blur", function() { calculateKmTotal(block); });
+        }
+        if(kmFinalElem) {
+            kmFinalElem.addEventListener("change", function() { calculateKmTotal(block); });
+            kmFinalElem.addEventListener("blur", function() { calculateKmTotal(block); });
+        }
+        if(kmFranquiaElem) {
+            kmFranquiaElem.addEventListener("change", function() { calculateKmTotal(block); });
+            kmFranquiaElem.addEventListener("blur", function() { calculateKmTotal(block); });
+        }
+    }
+    // Anexa os listeners para o cálculo de KM (agente principal e agentes adicionais)
+    attachKmCalculation("");    // Agente principal
+    attachKmCalculation("1");     // Agente adicional 1
+    attachKmCalculation("2");     // Agente adicional 2
+    attachKmCalculation("3");     // Agente adicional 3
+    
+    
+    // ======================================================
+    // 8. Evento para exibir os blocos dos agentes adicionais.
+    // Certifique-se de que cada bloco tenha um ID único (por exemplo, "agente1", "agente2", "agente3")
+    var btnAdicionarAgente = document.getElementById("btnAdicionarAgente");
+    if (btnAdicionarAgente) {
+        btnAdicionarAgente.addEventListener("click", function() {
+            var agentes = document.querySelectorAll(".agente-dinamico");
+            for (var i = 0; i < agentes.length; i++) {
+                if (agentes[i].style.display === "none") {
+                    agentes[i].style.display = "block";
+                    break; // Exibe apenas um bloco por clique
+                }
+            }
+        });
+    }
+    
+});
+</script>
+    
+{% endblock %}

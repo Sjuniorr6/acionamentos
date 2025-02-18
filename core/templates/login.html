@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_head %}
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* Faz o body ocupar toda a tela e centraliza horizontal e verticalmente */
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #5e5d5d url("{% static 'core/images/background.png' %}") no-repeat center center fixed;
+      background-size: 50% auto;
+    }
+
+    /* Cartão de login */
+    .login-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      background: rgba(39, 39, 39, 0.15);
+      border-radius: 15px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      margin-top: 15rem;
+      
+      /* Inicialmente invisível, será animado até ficar opaco */
+      opacity: 0;
+      /* Animação para surgir gradualmente */
+      animation: fadeIn 3.5s forwards;
+    }
+
+    /* Animação de fadeIn (0% -> 100% em 3.5s) */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Logo centralizada */
+    .login-logo {
+      width: 100%;
+      max-width: 250px;
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    /* Campos de input */
+    .form-control {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      color: white;
+    }
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Botão de login */
+    .login-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      text-transform: uppercase;
+      padding: 10px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .login-btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Links e botões adicionais */
+    .login-options,
+    .register-option {
+      margin-top: 15px;
+    }
+    .register-option a {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar %}
+  {# Sobrescrevemos o bloco do navbar para que ele não seja exibido nesta página #}
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <img src="{% static 'core/images/background.png' %}" alt="Logo" class="login-logo">
+  <h3 class="text-white mt-4">Login</h3>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <input type="text" class="form-control text-dark" name="username" placeholder="Usuário" required>
+    </div>
+    <div class="mb-3">
+      <input type="password" class="form-control text-white" name="password" placeholder="Senha" required>
+    </div>
+    <div class="login-options">
+      <div>
+        <input type="checkbox" id="remember"> 
+        <label for="remember" class="text-white">Lembrar-me</label>
+      </div>
+    </div>
+    <button type="submit" class="login-btn">Login</button>
+  </form>
+  <div class="register-option">
+    <p class="text-white">Não possui conta? <a href="{% url 'register' %}">Criar conta</a></p>
+  </div>
+</div>
+{% endblock %}

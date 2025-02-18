@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-4">
+  <h2 class="text-center text-white mb-4">Lista de Faturamento (Todos os Registros)</h2>
+  
+  <!-- Estilo para evitar que as células quebrem a linha -->
+  <style>
+    .table th,
+    .table td {
+      white-space: nowrap;
+    }
+  </style>
+
+  <!-- Formulário de filtros -->
+  <form method="GET" class="row mb-3">
+    <!-- Filtro por ID -->
+    <div class="col-md-2">
+      <input type="text" name="id" value="{{ request.GET.id }}" placeholder="ID" class="form-control">
+    </div>
+    
+    <!-- Filtro por Cliente -->
+    <div class="col-md-2">
+      <input type="text" name="cliente" value="{{ request.GET.cliente }}" placeholder="Cliente" class="form-control">
+    </div>
+    
+    <!-- Filtro por Data Inicial -->
+    <div class="col-md-2">
+      <input type="date" name="data_inicial" value="{{ request.GET.data_inicial }}" placeholder="Data Inicial" class="form-control">
+    </div>
+
+    <!-- Filtro por Data Final -->
+    <div class="col-md-2">
+      <input type="date" name="data_final" value="{{ request.GET.data_final }}" placeholder="Data Final" class="form-control">
+    </div>
+    
+    <!-- Filtro por Agente -->
+    <div class="col-md-2">
+      <input type="text" name="agente" value="{{ request.GET.agente }}" placeholder="Agente" class="form-control">
+    </div>
+
+    <!-- Botão de Filtrar -->
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+    </div>
+  </form>
+
+  <!-- Tabela sem container de scroll -->
+  <table class="table table-bordered table-striped table-dark">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th class="calendar">Data/Hora Inicial</th>
+        <th class="calendar">Data/Hora Final</th>
+        <th>Prestador</th>
+        <th>Agentes Adicionais</th>
+        <th>Agentes</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reg in registros %}
+        <tr>
+          <td>{{ reg.pk }}</td>
+          <td>{{ reg.cliente }}</td>
+          <td class="calendar">{{ reg.data_hora_inicial|date:"d/m/Y H:i" }}</td>
+          <td class="calendar">{{ reg.data_hora_final|date:"d/m/Y H:i" }}</td>
+          <td>{{ reg.prestador }}</td>
+          <td>
+            {% if reg.prestador1 %}
+              <strong>Agente 2:</strong> {{ reg.prestador1 }}<br>
+            {% endif %}
+            {% if reg.prestador2 %}
+              <strong>Agente 3:</strong> {{ reg.prestador2 }}<br>
+            {% endif %}
+            {% if reg.prestador3 %}
+              <strong>Agente 4:</strong> {{ reg.prestador3 }}<br>
+            {% endif %}
+          </td>
+          <td>{{ reg.quantidade_agentes }}</td>
+          <td>
+            {% if reg.status %}
+              {{ reg.status }}
+            {% else %}
+              Pendente
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'formacompanhamento:detalhar_acionamento' reg.pk %}" class="btn btn-sm btn-primary mb-1">Detalhes</a>
+            {% if reg.status != "Pago" %}
+              <a href="{% url 'formacompanhamento:marcar_pago' reg.pk %}" class="btn btn-sm btn-success">Pago</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="9" class="text-center">Nenhum registro encontrado.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

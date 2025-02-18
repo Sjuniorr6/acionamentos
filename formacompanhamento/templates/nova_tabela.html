@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h3 class="text-center my-4">Nova Tabela Derivada</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped" id="tabela-derivada">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Clientes</th>
+                    <th>Hora Excedente</th>
+                    <th>Valor Hora Excedente</th>
+                    <th>KM Excedente</th>
+                    <th>Valor KM Excedente</th>
+                    <th>Acionamento</th>
+                    <th>Total Cliente</th>
+                    <th>Total Acionamento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in registros %}
+                <tr data-id="{{ registro.id }}">
+                    <td>{{ registro.id }}</td>
+                    <td>{{ registro.cliente }}</td>
+                    <td class="hora-excedente">{{ registro.hora_excedente }}</td>
+                    <td class="valor-hora-excedente">{{ registro.valor_hora_excedente }}</td>
+                    <td class="km-excedente">{{ registro.km_excedente }}</td>
+                    <td class="valor-km-excedente">{{ registro.valor_km_excedente }}</td>
+                    <td class="acionamento">{{ registro.acionamento }}</td>
+                    <td class="total-cliente">{{ registro.total_cliente|floatformat:2 }}</td>
+                    <td class="total-acionamento">{{ registro.total_acionamento|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">Nenhum registro encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Formulário de Edição -->
+    <div id="card-edicao" class="card mt-4" style="display: none;">
+        <div class="card-body">
+            <h5 class="card-title text-center">Editar Registro</h5>
+            <form id="form-edicao">
+                <input type="hidden" id="registroId">
+                <div class="form-group">
+                    <label for="horaExcedente">Hora Excedente</label>
+                    <input type="number" id="horaExcedente" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="valorHoraExcedente">Valor Hora Excedente</label>
+                    <input type="number" id="valorHoraExcedente" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="kmExcedente">KM Excedente</label>
+                    <input type="number" id="kmExcedente" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="valorKmExcedente">Valor KM Excedente</label>
+                    <input type="number" id="valorKmExcedente" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="acionamento">Acionamento</label>
+                    <input type="number" id="acionamento" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="totalCliente">Total Cliente</label>
+                    <input type="number" id="totalCliente" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="totalAcionamento">Total Acionamento</label>
+                    <input type="number" id="totalAcionamento" class="form-control" disabled>
+                </div>
+                <div class="text-center">
+                    <button type="button" id="salvarEdicao" class="btn btn-primary">Salvar</button>
+                    <button type="button" id="cancelarEdicao" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tabela = document.querySelector('#tabela-derivada tbody');
+    const card = document.getElementById('card-edicao');
+    const salvarBotao = document.getElementById('salvarEdicao');
+    const cancelarBotao = document.getElementById('cancelarEdicao');
+    let idRegistro = null;
+
+    // Abrir o formulário de edição ao clicar em uma linha
+    tabela.addEventListener('click', function (event) {
+        const row = event.target.closest('tr');
+        if (row) {
+            idRegistro = row.dataset.id;
+
+            document.getElementById('horaExcedente').value = parseFloat(row.querySelector('.hora-excedente').textContent.trim());
+            document.getElementById('valorHoraExcedente').value = parseFloat(row.querySelector('.valor-hora-excedente').textContent.trim());
+            document.getElementById('kmExcedente').value = parseFloat(row.querySelector('.km-excedente').textContent.trim());
+            document.getElementById('valorKmExcedente').value = parseFloat(row.querySelector('.valor-km-excedente').textContent.trim());
+            document.getElementById('acionamento').value = parseFloat(row.querySelector('.acionamento').textContent.trim());
+            document.getElementById('totalCliente').value = parseFloat(row.querySelector('.total-cliente').textContent.trim());
+            document.getElementById('totalAcionamento').value = parseFloat(row.querySelector('.total-acionamento').textContent.trim());
+
+            atualizarTotais();
+            card.style.display = 'block';
+        }
+    });
+
+    // Atualizar os totais dinamicamente
+    const atualizarTotais = () => {
+        const horaExcedente = parseFloat(document.getElementById('horaExcedente').value) || 0;
+        const valorHoraExcedente = parseFloat(document.getElementById('valorHoraExcedente').value) || 0;
+        const kmExcedente = parseFloat(document.getElementById('kmExcedente').value) || 0;
+        const valorKmExcedente = parseFloat(document.getElementById('valorKmExcedente').value) || 0;
+        const acionamento = parseFloat(document.getElementById('acionamento').value) || 0;
+
+        const totalAcionamento = (horaExcedente * valorHoraExcedente) + (kmExcedente * valorKmExcedente) + acionamento;
+
+        document.getElementById('totalAcionamento').value = totalAcionamento.toFixed(2);
+        document.getElementById('totalCliente').value = totalAcionamento.toFixed(2);
+    };
+
+    // Adicionar evento para atualização dinâmica dos totais
+    document.querySelectorAll('#horaExcedente, #valorHoraExcedente, #kmExcedente, #valorKmExcedente, #acionamento').forEach(element => {
+        element.addEventListener('input', atualizarTotais);
+    });
+
+    // Salvar alterações
+    salvarBotao.addEventListener('click', function () {
+        if (!idRegistro) {
+            alert("Selecione um registro para editar.");
+            return;
+        }
+
+        const horaExcedente = parseFloat(document.getElementById('horaExcedente').value) || 0;
+        const valorHoraExcedente = parseFloat(document.getElementById('valorHoraExcedente').value) || 0;
+        const kmExcedente = parseFloat(document.getElementById('kmExcedente').value) || 0;
+        const valorKmExcedente = parseFloat(document.getElementById('valorKmExcedente').value) || 0;
+        const acionamento = parseFloat(document.getElementById('acionamento').value) || 0;
+        const totalAcionamento = (horaExcedente * valorHoraExcedente) + (kmExcedente * valorKmExcedente) + acionamento;
+
+        fetch("{% url 'formacompanhamento:atualizar_registro' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({
+                id: idRegistro,
+                hora_excedente: horaExcedente,
+                valor_hora_excedente: valorHoraExcedente,
+                km_excedente: kmExcedente,
+                valor_km_excedente: valorKmExcedente,
+                acionamento: acionamento,
+                total_cliente: totalAcionamento,
+                total_acionamento: totalAcionamento,
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erro ao salvar os dados.");
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message || "Registro atualizado com sucesso!");
+            card.style.display = 'none';
+
+            const row = tabela.querySelector(`[data-id="${idRegistro}"]`);
+            if (row) {
+                row.querySelector('.hora-excedente').textContent = horaExcedente.toFixed(2);
+                row.querySelector('.valor-hora-excedente').textContent = valorHoraExcedente.toFixed(2);
+                row.querySelector('.km-excedente').textContent = kmExcedente.toFixed(2);
+                row.querySelector('.valor-km-excedente').textContent = valorKmExcedente.toFixed(2);
+                row.querySelector('.acionamento').textContent = acionamento.toFixed(2);
+                row.querySelector('.total-cliente').textContent = totalAcionamento.toFixed(2);
+                row.querySelector('.total-acionamento').textContent = totalAcionamento.toFixed(2);
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao atualizar:", error);
+            alert("Ocorreu um erro ao salvar os dados. Tente novamente.");
+        });
+    });
+
+    // Cancelar edição
+    cancelarBotao.addEventListener('click', function () {
+        card.style.display = 'none';
+        idRegistro = null;
+        document.querySelectorAll('#form-edicao input').forEach(input => input.value = "");
+    });
+});
+</script>
+{% endblock %}

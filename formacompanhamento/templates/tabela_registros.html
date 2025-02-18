@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Tabela de Registros</h1>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Registro Pagamento</th>
+                <th>KM Total</th>
+                <th>Hora Total</th>
+                <th>Valor Pago ao Prestador</th>
+                <th>Cliente</th>
+                <th>Valor de Acionamento do Cliente</th>
+                <th>Franquia KM</th>
+                <th>Franquia Hora</th>
+                <th>Valor Hora</th>
+                <th>Valor KM</th>
+                <th>Valor Cobrado do Cliente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros %}
+            <tr>
+                <td>{{ registro.id }}</td>
+                <td>{{ registro.registro_pagamento }}</td>
+                <td>{{ registro.km_total }}</td>
+                <td>{{ registro.hora_total }}</td>
+                <td>{{ registro.total_acionamento }}</td>
+                <td>{{ registro.cliente }}</td>
+                <td class="valor-acionamento">{{ registro.valor_acionamento }}</td>
+                <td>{{ registro.franquia_km }}</td>
+                <td>{{ registro.franquia_hora }}</td>
+                <td>{{ registro.valor_hora }}</td>
+                <td>{{ registro.valor_km }}</td>
+                <td class="valor-cobrado"></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="12" class="text-center">Nenhum registro encontrado</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Seleciona todas as linhas do corpo da tabela
+        const rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            // Captura os elementos necessários de cada linha
+            const kmTotal = parseFloat(row.querySelector("td:nth-child(3)").innerText) || 0; // KM Total
+            const horaTotal = parseFloat(row.querySelector("td:nth-child(4)").innerText) || 0; // Hora Total
+            const totalAcionamento = parseFloat(row.querySelector("td:nth-child(5)").innerText) || 0; // Valor Pago ao Prestador
+            const valorAcionamento = parseFloat(row.querySelector("td:nth-child(7)").innerText) || 0; // Valor de Acionamento do Cliente
+            const valorHora = parseFloat(row.querySelector("td:nth-child(10)").innerText) || 0; // Valor Hora
+            const valorKm = parseFloat(row.querySelector("td:nth-child(11)").innerText) || 0; // Valor KM
+
+            // Calcula o valor cobrado do cliente
+            const valorCobrado = (kmTotal * valorKm) + (horaTotal * valorHora) + totalAcionamento + valorAcionamento;
+
+            // Insere o valor cobrado calculado na célula correspondente
+            const valorCobradoCell = row.querySelector(".valor-cobrado");
+            valorCobradoCell.innerText = valorCobrado.toFixed(2);
+        });
+    });
+</script>
+{% endblock %}

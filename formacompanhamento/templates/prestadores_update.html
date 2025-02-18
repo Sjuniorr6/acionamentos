@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Atualizar Cliente</h2>
+
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-success">Salvar Alterações</button>
+            <a href="{% url 'formacompanhamento:lista_prestadores' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

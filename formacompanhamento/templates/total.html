@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Formulário de Total</h1>
+
+    <form method="post" id="totalform" class="card p-4 shadow-sm">
+        {% csrf_token %}
+
+        <!-- Seleção do Registro -->
+        <div class="mb-3">
+            <label for="id_registro_pagamento" class="form-label">Registro Pagamento:</label>
+            <select id="id_registro_pagamento" name="registro_pagamento" class="form-select">
+                <option value="" selected>Selecione um Registro</option>
+                {% for registro in registros %}
+                <option value="{{ registro.id }}">
+                    ID: {{ registro.id }} - {{ registro.registro_pagamento }} ({{ registro.cliente }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Campo Total Acionamento -->
+        <div class="mb-3">
+            <label for="id_total_acionamento" class="form-label">Total Acionamento:</label>
+            <input type="text" id="id_total_acionamento" name="total_acionamento" class="form-control" readonly placeholder="0.0">
+        </div>
+
+        <!-- KM e Hora Excedente -->
+        <div class="mb-3">
+            <label for="id_km_excedente" class="form-label">KM Excedente:</label>
+            <input type="text" id="id_km_excedente" name="km_excedente" class="form-control" readonly placeholder="0.0">
+        </div>
+        <div class="mb-3">
+            <label for="id_hora_excedente" class="form-label">Hora Excedente:</label>
+            <input type="text" id="id_hora_excedente" name="hora_excedente" class="form-control" readonly placeholder="0.0">
+        </div>
+
+        <!-- Valor Hora Excedente e Valor KM Excedente -->
+        <div class="mb-3">
+            <label for="id_valor_hora_excedente" class="form-label">Valor Hora Excedente:</label>
+            <input type="text" id="id_valor_hora_excedente" name="valor_hora_excedente" class="form-control" readonly placeholder="0.0">
+        </div>
+        <div class="mb-3">
+            <label for="id_valor_km_excedente" class="form-label">Valor KM Excedente:</label>
+            <input type="text" id="id_valor_km_excedente" name="valor_km_excedente" class="form-control" readonly placeholder="0.0">
+        </div>
+
+        <!-- Seleção do Cliente -->
+        <div class="mb-3">
+            <label for="id_cliente" class="form-label">Cliente:</label>
+            <select id="id_cliente" name="cliente" class="form-select">
+                <option value="" selected>Selecione um Cliente</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Campo Valor de Acionamento -->
+        <div class="mb-3">
+            <label for="id_valor_acionamento" class="form-label">Valor de Acionamento:</label>
+            <input type="text" id="id_valor_acionamento" name="valor_acionamento" class="form-control" readonly placeholder="0.0">
+        </div>
+
+        <!-- Franquia KM/Hora + Valor KM/Hora -->
+        <div class="mb-3">
+            <label for="id_franquia_km" class="form-label">Franquia KM:</label>
+            <input type="text" id="id_franquia_km" name="franquia_km" class="form-control" readonly placeholder="0.0">
+        </div>
+        <div class="mb-3">
+            <label for="id_franquia_hora" class="form-label">Franquia Hora:</label>
+            <input type="text" id="id_franquia_hora" name="franquia_hora" class="form-control" readonly placeholder="0.0">
+        </div>
+        <div class="mb-3">
+            <label for="id_valor_km" class="form-label">Valor KM:</label>
+            <input type="text" id="id_valor_km" name="valor_km" class="form-control" readonly placeholder="0.0">
+        </div>
+        <div class="mb-3">
+            <label for="id_valor_hora" class="form-label">Valor Hora:</label>
+            <input type="text" id="id_valor_hora" name="valor_hora" class="form-control" readonly placeholder="0.0">
+        </div>
+
+        <!-- Botão de Submissão -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+    </form>
+</div>
+
+<!-- Carrega jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Quando um registro de pagamento é selecionado
+        $('#id_registro_pagamento').change(function () {
+            const registroId = $(this).val();
+            if (registroId) {
+                $.ajax({
+                    url: `/formacompanhamento/registro/${registroId}/dados/`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#id_total_acionamento').val(data.total_acionamento || '0.0');
+                        $('#id_km_excedente').val(data.km_excedente || '0.0');
+                        $('#id_hora_excedente').val(data.hora_excedente || '0.0');
+                        $('#id_valor_hora_excedente').val(data.valor_hora_excedente || '0.0'); // ✅ Correção
+                        $('#id_valor_km_excedente').val(data.valor_km_excedente || '0.0'); // ✅ Correção
+                    },
+                    error: function () {
+                        alert("Erro ao buscar dados do registro.");
+                    }
+                });
+            }
+        });
+
+        // Quando um cliente é selecionado
+        $('#id_cliente').change(function () {
+            const clienteId = $(this).val();
+            if (clienteId) {
+                $.ajax({
+                    url: `/formacompanhamento/cliente/${clienteId}/dados/`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#id_franquia_km').val(data.franquia_km || '0.0');
+                        $('#id_franquia_hora').val(data.franquia_hora || '0.0');
+                        $('#id_valor_km').val(data.valor_km || '0.0');
+                        $('#id_valor_hora').val(data.valor_hora || '0.0');
+                        $('#id_valor_acionamento').val(data.valor_acionamento || '0.0'); // ✅ Correção
+                    },
+                    error: function () {
+                        alert("Erro ao buscar dados do cliente.");
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

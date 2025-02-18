@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2>Editar Cliente</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Exibe mensagens de erro, se houver -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Por favor, corrija os erros abaixo:</strong>
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulário para edição -->
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save me-2"></i>Salvar
+                            </button>
+                            <a href="{% url 'formacompanhamento:clientes_acionamento_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Icons (opcional) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+{% endblock %}
