@@ -11,7 +11,7 @@ SECRET_KEY = 'django-insecure-(a9zwwyq%q9n#%wq!j398bt_to7@dsc(p88t#ph=fe*330$w_$
 DEBUG = True
 
 # Hosts permitidos (adicione '127.0.0.1' e 'localhost' se necessário)
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '107.20.1.121', 'gsacionamento.com', 'www.gsacionamento.com']
 
 # Aplicações instaladas
 INSTALLED_APPS = [
@@ -66,13 +66,14 @@ WSGI_APPLICATION = 'acionamento.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'postgres',  # ou o nome do banco que você definiu
+        'USER': 'postgres',  # ou o usuário mestre que você criou
         'PASSWORD': '44523913',
-        'HOST': 'acionamentosdb.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
+        'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
+
 
 # Validação de senhas
 AUTH_PASSWORD_VALIDATORS = [
