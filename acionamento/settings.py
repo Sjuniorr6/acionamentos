@@ -67,14 +67,13 @@ WSGI_APPLICATION = 'acionamento.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # ou o nome do banco que você definiu
-        'USER': 'postgres',  # ou o usuário mestre que você criou
-        'PASSWORD': '44523913',
-        'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'outra_senha',
+        'HOST': 'database-2.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
-
 
 # Validação de senhas
 AUTH_PASSWORD_VALIDATORS = [
