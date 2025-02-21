@@ -363,7 +363,7 @@ class prestadores(models.Model):
     
     Nome = models.CharField(max_length=50, null=True, blank=True)
     cpf_cnpj = models.CharField(max_length=50, null=True, blank=True)
-    vencimento_cnh = models.DateField()
+    vencimento_cnh = models.DateField(null=True, blank=True)
     tipo_prestador = models.CharField(max_length=50, null=True, blank=True)
     endereco = models.CharField(max_length=50, null=True, blank=True)
     telefone = models.CharField(max_length=50, null=True, blank=True)
