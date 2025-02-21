@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'core',  # Seu aplicativo principal
     'formacompanhamento',
     'widget_tweaks',
-    'location',
+    
     
 ]
 
