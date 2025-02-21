@@ -83,20 +83,57 @@
 {% block content %}
 <div class="register-container">
   <img src="{% static 'core/images/logo_full_hd_2023.png' %}" alt="Logo" class="register-logo">
-  <h4 class="text-white mb-4">Cadastre-se</h4>
+  <h4 class="text-black mb-4">Cadastre-se</h4>
+
   <form method="post">
     {% csrf_token %}
+
+    <!-- Aqui exibimos erros gerais (senhas diferentes, por exemplo) -->
+    {% if form.non_field_errors %}
+      <div style="color: red; margin-bottom: 10px;">
+        {{ form.non_field_errors }}
+      </div>
+      <script>
+        console.error("Erros não relacionados a campos: {{ form.non_field_errors|escapejs }}");
+      </script>
+    {% endif %}
+
+    <!-- Campo username + erros -->
+    {% if form.username.errors %}
+      <div style="color: red;">{{ form.username.errors }}</div>
+      <script>
+        console.error("Erro no campo username: {{ form.username.errors|escapejs }}");
+      </script>
+    {% endif %}
     <div class="mb-3">
-      <input type="text" name="username" class="form-control" placeholder="Usuário" required>
+      <input type="text" name="{{ form.username.html_name }}" class="form-control" placeholder="Usuário" required>
     </div>
+
+    <!-- Campo password1 + erros -->
+    {% if form.password1.errors %}
+      <div style="color: red;">{{ form.password1.errors }}</div>
+      <script>
+        console.error("Erro no campo password1: {{ form.password1.errors|escapejs }}");
+      </script>
+    {% endif %}
     <div class="mb-3">
-      <input type="password" name="password1" class="form-control" placeholder="Senha" required>
+      <input type="password" name="{{ form.password1.html_name }}" class="form-control" placeholder="Senha" required>
     </div>
+
+    <!-- Campo password2 + erros -->
+    {% if form.password2.errors %}
+      <div style="color: red;">{{ form.password2.errors }}</div>
+      <script>
+        console.error("Erro no campo password2: {{ form.password2.errors|escapejs }}");
+      </script>
+    {% endif %}
     <div class="mb-3">
-      <input type="password" name="password2" class="form-control" placeholder="Confirme a senha" required>
+      <input type="password" name="{{ form.password2.html_name }}" class="form-control" placeholder="Confirme a senha" required>
     </div>
+
     <button type="submit" class="register-btn">Cadastrar</button>
   </form>
+
   <a href="{% url 'login' %}" class="back-login">Login</a>
 </div>
 {% endblock %}
