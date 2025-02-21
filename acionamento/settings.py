@@ -13,6 +13,7 @@ DEBUG = True
 # Hosts permitidos (adicione '127.0.0.1' e 'localhost' se necessário)
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '107.20.1.121','3.226.129.82', 'gsacionamento.com', 'www.gsacionamento.com']
 
+
 # Aplicações instaladas
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -24,8 +25,8 @@ INSTALLED_APPS = [
     'core',  # Seu aplicativo principal
     'formacompanhamento',
     'widget_tweaks',
-    
-    
+    'location',
+
 ]
 
 # Middlewares
@@ -67,13 +68,14 @@ WSGI_APPLICATION = 'acionamento.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'outra_senha',
-        'HOST': 'database-2.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
+        'NAME': 'postgres',  # ou o nome do banco que você definiu
+        'USER': 'postgres',  # ou o usuário mestre que você criou
+        'PASSWORD': '44523913',
+        'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
+
 
 # Validação de senhas
 AUTH_PASSWORD_VALIDATORS = [
@@ -113,5 +115,4 @@ LOGIN_REDIRECT_URL = 'home'       # Redireciona para a página inicial após log
 LOGIN_URL = 'login'               # URL para redirecionamento em caso de acesso negado
 LOGOUT_REDIRECT_URL = 'login'  # ou 'home', '/', etc.    # Redireciona para a página de login após logout
 
-# Configuração padrão para o campo de chave primária
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Configuração padrão para o campo de chave primáriay
