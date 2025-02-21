@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block content %}
+<style>
+  /* Cor de fundo e texto */
+  body {
+    background-color: #3f3f3f;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+
+<!-- CSS do Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<!-- CSS do OpenLayers -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@7.3.0/ol.css" />
+
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Localizações Recebidas</h1>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Device</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for location in locations %}
+          <tr>
+            <td>{{ location.id }}</td>
+            <td>{{ location.device_id }}</td>
+            <!-- Limita a 10 caracteres -->
+            <td>{{ location.latitude|float_limit10 }}</td>
+<td>{{ location.longitude|float_limit10 }}</td>
+            <td>{{ location.timestamp }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="text-center">
+              Nenhuma localização registrada.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Div onde o mapa será renderizado -->
+  <div id="map" style="width: 100%; height: 500px; margin-top: 20px;"></div>
+</div>
+
+<!-- JS do OpenLayers -->
+<script src="https://cdn.jsdelivr.net/npm/ol@7.3.0/dist/ol.js"></script>
+
+<script>
+  // Debug: mostra quantas localizações o Django passou
+  console.log("Total de localizações:",
+    {% if locations %}{{ locations|length }}{% else %}0{% endif %}
+  );
+
+  // 1) Cria o mapa com camada do OpenStreetMap
+  var map = new ol.Map({
+    target: 'map',
+    layers: [
+      new ol.layer.Tile({
+        source: new ol.source.OSM()
+      })
+    ],
+    view: new ol.View({
+      // Centraliza inicialmente em SP (ou ajuste para sua região)
+      center: ol.proj.fromLonLat([-46.6333, -23.5505]),
+      zoom: 10
+    })
+  });
+
+  // 2) Fonte vetorial para marcadores
+  var vectorSource = new ol.source.Vector();
+
+  // 3) Itera sobre as localizações para criar Features (marcadores)
+  {% for location in locations %}
+    // Pegamos novamente as strings com o filtro "float_limit10"
+    // para garantir que o JS receba algo como "-23.63649" (no máx. 10 chars).
+    var latStr = "{{ location.latitude|float_limit10 }}";
+    var lonStr = "{{ location.longitude|float_limit10 }}";
+
+    var deviceId = "{{ location.device_id }}";
+    var timestamp = "{{ location.timestamp }}";
+
+    // Converte para float
+    var lat = parseFloat(latStr);
+    var lon = parseFloat(lonStr);
+
+    console.log("Criando feature com Lat:", lat, "e Lon:", lon);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+      var feature = new ol.Feature({
+        geometry: new ol.geom.Point(
+          ol.proj.fromLonLat([lon, lat])
+        ),
+        device_id: deviceId,
+        latitude: lat,
+        longitude: lon,
+        timestamp: timestamp
+      });
+      vectorSource.addFeature(feature);
+    }
+  {% endfor %}
+
+  // 4) Adiciona a camada vetorial
+  var vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+    style: new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 1],
+        src: 'https://cdn.jsdelivr.net/npm/ol@7.3.0/examples/data/icon.png'
+      })
+    })
+  });
+  map.addLayer(vectorLayer);
+
+  // 5) Ajusta o mapa para abranger todos os marcadores, se houver
+  var featureCount = vectorSource.getFeatures().length;
+  console.log("Qtd de features adicionadas:", featureCount);
+
+  if (featureCount > 0) {
+    var extent = vectorSource.getExtent();
+    console.log("Extent calculado:", extent);
+    map.getView().fit(extent, {
+      size: map.getSize(),
+      padding: [50, 50, 50, 50],
+      maxZoom: 16
+    });
+  } else {
+    console.warn("Nenhum marcador foi adicionado ao mapa.");
+  }
+</script>
+
+{% endblock %}

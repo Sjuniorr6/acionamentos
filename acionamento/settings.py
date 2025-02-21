@@ -11,7 +11,7 @@ SECRET_KEY = 'django-insecure-(a9zwwyq%q9n#%wq!j398bt_to7@dsc(p88t#ph=fe*330$w_$
 DEBUG = True
 
 # Hosts permitidos (adicione '127.0.0.1' e 'localhost' se necessário)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '107.20.1.121', 'gsacionamento.com', 'www.gsacionamento.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.0.227', 'gsacionamento.com', 'www.gsacionamento.com']
 
 # Aplicações instaladas
 INSTALLED_APPS = [
@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'core',  # Seu aplicativo principal
     'formacompanhamento',
     'widget_tweaks',
+    'location',
     
 ]
 
