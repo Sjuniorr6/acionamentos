@@ -6,10 +6,22 @@
 
     {# Alerta de atraso para cada registro atrasado #}
     {% for registro in registros %}
-        {% if registro.status == "Pendente" and registro.previsa_chegada|date:"U" < current_time %}
-            <div class="alert alert-danger" role="alert">
-                O acionamento com id {{ registro.id }} está com atraso. Favor verificar.
-            </div>
+        {% if registro.status == "Pendente" %}
+            {% if registro.data_hora_chegada %}
+                {# Se data_hora_chegada estiver preenchido, compara com previsa_chegada #}
+                {% if registro.data_hora_chegada|date:"U" > registro.previsa_chegada|date:"U" %}
+                    <div class="alert alert-danger" role="alert">
+                        O acionamento com id {{ registro.id }} está com atraso. Favor verificar.
+                    </div>
+                {% endif %}
+            {% else %}
+                {# Se data_hora_chegada não estiver preenchido, compara com hora atual e previsa_chegada #}
+                {% if current_time > registro.previsa_chegada|date:"U" %}
+                    <div class="alert alert-danger" role="alert">
+                        O acionamento com id {{ registro.id }} está com atraso. Favor verificar.
+                    </div>
+                {% endif %}
+            {% endif %}
         {% endif %}
     {% endfor %}
 
@@ -67,7 +79,7 @@
         {% for registro in registros %}
             {% if registro.status != "A Faturar" and registro.status != "Pago" %}
                 <!-- Determina cor de fundo da linha conforme o status -->
-                <tr style="
+                <tr style=" 
                     {% if registro.status == 'Pendente' and registro.previsa_chegada|date:'U' < current_time %}
                         background-color: #FF0000;
                     {% elif registro.status == 'Pendente' %}
@@ -98,8 +110,20 @@
                                 margin-right: 6px;
                                 border-radius: 50%;
                                 background-color:
-                                    {% if registro.status == 'Pendente' and registro.previsa_chegada|date:'U' < current_time %}
-                                        red;
+                                    {% if registro.status == 'Pendente' %}
+                                        {% if registro.data_hora_chegada %}
+                                            {% if registro.data_hora_chegada|date:'U' > registro.previsa_chegada|date:'U' %}
+                                                red;
+                                            {% else %}
+                                                green;
+                                            {% endif %}
+                                        {% else %}
+                                            {% if current_time > registro.previsa_chegada|date:"U" %}
+                                                red;
+                                            {% else %}
+                                                green;
+                                            {% endif %}
+                                        {% endif %}
                                     {% else %}
                                         green;
                                     {% endif %}
@@ -111,7 +135,6 @@
                             <a href="https://www.google.com/maps?q={{ registro.endereco|urlencode }}"
                                target="_blank"
                                style="margin-right: 10px; vertical-align: middle;">
-                                <!-- Imagem do marcador -->
                                 <img src="{% static 'images/map_marker.png' %}"
                                      alt=""
                                      style="width:24px; height:24px;">
@@ -155,26 +178,14 @@
                         {% endif %}
                     </td>
                     <td class="text-center">
-                        <a href="{% url 'formacompanhamento:registro_pagamento_update' registro.pk %}"
-                           class="my-btn my-btn-warning my-btn-sm">
-                           Editar
-                        </a>
+                        <a href="{% url 'formacompanhamento:registro_pagamento_update' registro.pk %}" class="my-btn my-btn-warning my-btn-sm">Editar</a>
                         {% if registro.status != "Pago" and registro.status != "A Faturar" %}
-                            <a href="{% url 'formacompanhamento:validar' registro.pk %}"
-                               class="my-btn my-btn-info my-btn-sm">
-                               Validar
-                            </a>
+                            <a href="{% url 'formacompanhamento:validar' registro.pk %}" class="my-btn my-btn-info my-btn-sm">Validar</a>
                         {% endif %}
                         {% if registro.status == 'A Faturar' or registro.status == 'Pago' %}
-                            <a href="{% url 'formacompanhamento:download_pdf' registro.pk %}"
-                               class="my-btn my-btn-danger my-btn-sm">
-                               Download
-                            </a>
+                            <a href="{% url 'formacompanhamento:download_pdf' registro.pk %}" class="my-btn my-btn-danger my-btn-sm">Download</a>
                         {% endif %}
-                        <a href="{% url 'formacompanhamento:detalhar_acionamento' registro.pk %}"
-                           class="my-btn my-btn-primary my-btn-sm">
-                           Resumo
-                        </a>
+                        <a href="{% url 'formacompanhamento:detalhar_acionamento' registro.pk %}" class="my-btn my-btn-primary my-btn-sm">Resumo</a>
                     </td>
                 </tr>
             {% endif %}
@@ -208,6 +219,5 @@
     .my-btn-secondary { background-color: #83b9a2; color: #fff; }
     .my-btn:hover { opacity: 0.9; }
 </style>
-
 
 {% endblock %}
