@@ -13,14 +13,18 @@
         <!-- CAMPOS CLIENTE E PRESTADOR -->
         <h4 class="mt-2">Dados do Cliente</h4>
         <div class="row mb-3">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label for="id_cliente" class="form-label">Cliente</label>
             {{ form.cliente.errors }}
             {{ form.cliente }}
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label for="id_protocolo" class="form-label">Protocolo</label>
             {{ form.protocolo }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_endereco" class="form-label">Endereço</label>
+            {{ form.endereco }}
           </div>
           <div></div>
           <br>

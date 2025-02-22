@@ -286,16 +286,21 @@ from .models import RegistroPagamento, prestadores  # ajuste conforme sua organi
 from .forms import RegistroPagamentoForm
 
 logger = logging.getLogger(__name__)
-
-class RegistroPagamentoCreateView(LoginRequiredMixin,PermissionRequiredMixin,CreateView):
+class RegistroPagamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = RegistroPagamento
     form_class = RegistroPagamentoForm
     template_name = 'registro_pagamento_form.html'
     success_url = reverse_lazy('formacompanhamento:registro_pagamento_list')
     permission_required = "formacompanhamento.view_agentes"
+
     def form_valid(self, form):
-        # Cria a instância sem salvá-la imediatamente
+        print("POST RECEBIDO:", self.request.POST)  # Debug para verificar os valores enviados
         instance = form.save(commit=False)
+
+        # Adicionar os valores dos campos motivo1, motivo2, motivo3 antes de salvar
+        instance.motivo1 = form.cleaned_data.get("motivo1")
+        instance.motivo2 = form.cleaned_data.get("motivo2")
+        instance.motivo3 = form.cleaned_data.get("motivo3")
 
         # Preencher previsa_chegada com base em data_hora_inicial e sla
         if instance.data_hora_inicial and instance.sla:
@@ -331,10 +336,10 @@ class RegistroPagamentoCreateView(LoginRequiredMixin,PermissionRequiredMixin,Cre
                 instance.km_total = 0
                 instance.km_excedente = 0
 
-        # Salva a instância modificada e define self.object
+        # Salvar a instância modificada
         try:
             instance.save()
-            self.object = instance  # Garante que self.object não será None
+            self.object = instance
             logger.info("Registro criado com sucesso: %s", instance.id)
         except Exception as e:
             logger.error("Erro ao salvar o registro no banco de dados: %s", e)
@@ -350,6 +355,7 @@ class RegistroPagamentoCreateView(LoginRequiredMixin,PermissionRequiredMixin,Cre
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
         # Gerar os nomes dos campos dinamicamente para os agentes
         quantidade_agentes = 4  # Exemplo de quantidade de agentes
         agentes_lista = list(range(1, quantidade_agentes + 1))
@@ -359,14 +365,15 @@ class RegistroPagamentoCreateView(LoginRequiredMixin,PermissionRequiredMixin,Cre
             'data_hora_chegada',
             'data_hora_final',
             'km_inicial',
-            'km_final'
+            'km_final',
+            'motivo'  # Adicionado motivo para cada agente
         ]
+        
         campos = {}
         for i in agentes_lista:
             for campo in campos_dinamicos:
-                # Exemplo: "prestador1", "data_hora_inicial1", etc.
                 campos[f'{campo}{i}'] = f'{campo}{i}'
-
+        
         context['agentes_lista'] = agentes_lista
         context['campos'] = campos
         return context

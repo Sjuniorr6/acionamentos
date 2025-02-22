@@ -21,6 +21,7 @@
     max-width: 100%;
     margin: auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: #fff; /* Apenas para destacar a tabela no fundo cinza */
   }
   
   /* Tabela customizada com margem à esquerda de 20px */
@@ -58,74 +59,73 @@
 <div class="container custom-container">
   <h2 class="text-white">Lista de Clientes Acionamento</h2>
   <div class="card custom-card">
-    
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>CNPJ</th>
-            <th>Telefone</th>
-            <th>Banco</th>
-            <th>Agência</th>
-            <th>Conta</th>
-            <th>Serviços</th>
-            <th>Valor Pronta Resp. Armado</th>
-            <th>Franq. Hora Armado</th>
-            <th>Franq. KM Armado</th>
-            <th>Valor KM Armado</th>
-            <th>Valor Hora Armado</th>
-            <th>Valor Pronta Resp. Desarmado</th>
-            <th>Franq. Hora Desarmado</th>
-            <th>Franq. KM Desarmado</th>
-            <th>Valor KM Desarmado</th>
-            <th>Valor Hora Desarmado</th>
-            <th>Valor Antenista</th>
-            <th>Franq. Hora Antenista</th>
-            <th>Franq. KM Antenista</th>
-            <th>Valor KM Antenista</th>
-            <th>Valor Hora Antenista</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for cliente in clientes %}
-          <tr>
-            <td>{{ cliente.id }}</td>
-            <td>{{ cliente.nome|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.cnpj|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.telefone|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.banco|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.agencia|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.conta|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.servicos|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valor_prontaresposta_armado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.franquia_hora_armado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.franquia_km_armado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valorkm_armado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valorh_armado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valor_prontaresposta_desarmado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.franquia_hora_desarmado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.franquia_km_desarmado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valorkm_desarmado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valorh_desarmado|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valor_antenista|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.franquia_hora_antenista|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.franquia_km_antenista|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valorkm_antenista|default:"NAO CONTRATADO" }}</td>
-            <td>{{ cliente.valorh_antenista|default:"NAO CONTRATADO" }}</td>
-            <td>
-              <a href="{% url 'formacompanhamento:ClienteUpdateView' cliente.pk %}" class="btn btn-sm btn-warning custom-btn">Editar</a>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="24" class="text-center">Nenhum cliente encontrado.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>CNPJ</th>
+          <th>Telefone</th>
+          <th>Banco</th>
+          <th>Agência</th>
+          <th>Conta</th>
+          <th>Serviços</th>
+          <th>Valor Pronta Resp. Armado</th>
+          <th>Franq. Hora Armado</th>
+          <th>Franq. KM Armado</th>
+          <th>Valor KM Armado</th>
+          <th>Valor Hora Armado</th>
+          <th>Valor Pronta Resp. Desarmado</th>
+          <th>Franq. Hora Desarmado</th>
+          <th>Franq. KM Desarmado</th>
+          <th>Valor KM Desarmado</th>
+          <th>Valor Hora Desarmado</th>
+          <th>Valor Antenista</th>
+          <th>Franq. Hora Antenista</th>
+          <th>Franq. KM Antenista</th>
+          <th>Valor KM Antenista</th>
+          <th>Valor Hora Antenista</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      {% for cliente in clientes %}
+      <tbody>
+        <tr>
+          <td>{{ cliente.id }}</td>
+          <td>{{ cliente.nome|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.cnpj|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.telefone|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.banco|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.agencia|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.conta|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.servicos|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valor_prontaresposta_armado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.franquia_hora_armado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.franquia_km_armado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valorkm_armado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valorh_armado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valor_prontaresposta_desarmado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.franquia_hora_desarmado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.franquia_km_desarmado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valorkm_desarmado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valorh_desarmado|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valor_antenista|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.franquia_hora_antenista|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.franquia_km_antenista|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valorkm_antenista|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.valorh_antenista|default:"NAO CONTRATADO" }}</td>
+          <td>
+            <a href="{% url 'formacompanhamento:ClienteUpdateView' cliente.pk %}"
+               class="btn btn-sm btn-warning custom-btn">Editar</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="24" class="text-center">Nenhum cliente encontrado.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-
+</div>
 {% endblock %}

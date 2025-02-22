@@ -68,7 +68,7 @@ class RegistroPagamentoForm(forms.ModelForm):
             'cliente', 'protocolo', 'solicitante', 'tipo_contato', 'operador',
             'modelo', 'cor', 'ano', 'placas', 'descricao',
             'ultima_posicao', 'latlong', 'ultima_posicao_isca', 'latlong_isca',
-            'id_isca', 'id_equipamento','motivo',
+            'id_isca', 'id_equipamento','motivo','endereco',
 
             # CAMPOS DE CONTROLE
             'quantidade_agentes', 'agentes', 'rastreador', 'isca', 'sla', 'previsa_chegada',
@@ -110,7 +110,7 @@ class RegistroPagamentoForm(forms.ModelForm):
             'cliente': forms.Select(attrs={'class': 'form-control'}),
             'protocolo': forms.TextInput(attrs={'class': 'form-control'}),
             'solicitante': forms.TextInput(attrs={'class': 'form-control'}),
-           
+            'endereco': forms.TextInput(attrs={'class': 'form-control'}),
             'tipo_contato': forms.Select(attrs={'class': 'form-control'}),
             'operador': forms.TextInput(attrs={'class': 'form-control'}),
             'modelo': forms.TextInput(attrs={'class': 'form-control'}),

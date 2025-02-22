@@ -155,7 +155,7 @@ class RegistroPagamento(models.Model):
     previsa_chegada = models.DateTimeField(null=True, blank=True)
     protocolo = models.CharField(max_length=100,null=True,blank=True)
     solicitante = models.CharField(max_length=100, null=True,blank=True)
-    
+    endereco = models.CharField(max_length=100, null=True,blank=True)
     tipo_contato = models.CharField(choices=contato, max_length=100, null=True,blank=True)
     operador = models.CharField(max_length=100,null=True,blank=True)
     modelo = models.CharField(max_length=100, null=True,blank=True)
