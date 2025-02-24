@@ -59,12 +59,12 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="id_tipo" class="form-label">Tipo</label>
-                        {{ form.tipo }}
-                    </div>
-                    <div class="col-md-6">
                         <label for="id_quantidade_agentes" class="form-label">Quantidade de Agentes</label>
                         {{ form.quantidade_agentes }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_endereco" class="form-label">Endereço</label>
+                        {{ form.endereco }}
                     </div>
                 </div>
                 <h3>_________________________________________________________________________________</h3>
@@ -212,7 +212,13 @@
                                 <label for="id_valor_total_km_excedente1" class="form-label">Valor KM Excedente 1</label>
                                 {{ form.valor_km_excedente1 }}
                             </div>
-                        
+                            <div class="col-md-2">
+                                <label for="id_motivo1" class="form-label">Motivo</label>
+                                <div class="input-group">
+                                  {# Campo individual para o motivo do agente adicional 1 #}
+                                  {{ form.motivo1|add_class:"form-control border-danger" }}
+                                </div>
+                              </div>
                         </div>
                     </div>
                 </div>
@@ -292,7 +298,13 @@
                                 <label for="id_valor_total_km_excedente2" class="form-label">Valor KM Excedente 2</label>
                                 {{ form.valor_km_excedente2 }}
                             </div>
-                           
+                            <div class="col-md-2">
+                                <label for="id_motivo2" class="form-label">Motivo</label>
+                                <div class="input-group">
+                                  {# Campo individual para o motivo do agente adicional 2 #}
+                                  {{ form.motivo2|add_class:"form-control border-danger" }}
+                                </div>
+                              </div>
                         </div>
                     </div>
                 </div>
@@ -373,6 +385,13 @@
                                 {{ form.valor_km_excedente3 }}
                             </div>
                             
+                            <div class="col-md-2">
+                                <label for="id_motivo3" class="form-label">Motivo</label>
+                                <div class="input-group">
+                                  {# Campo individual para o motivo do agente adicional 3 #}
+                                  {{ form.motivo3|add_class:"form-control border-danger" }}
+                                </div>
+                              </div>
                         </div>
                     </div>
                 </div>
@@ -432,6 +451,11 @@
                         {{ form.latlong_isca }}
                     </div>
                 </div>
+
+                <div class="col-md-12">
+                    <label for="id_descricao" class="form-label">descricao</label>
+                    {{ form.descricao }}
+                </div>
                 <h3>_________________________________________________________________________________</h3>
                 <!-- IMAGENS -->
                 <h4 class="mt-4">Imagens</h4>
@@ -481,9 +505,12 @@
     </div>
 {% endif %}
 
-<!-- Script para exibir os blocos dos agentes adicionais e realizar os cálculos -->
+<!-- Script para exibir os blocos dos agentes adicionais e realizar os cálculos, incluindo a atualização automática dos campos via motivo -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+
+    // Variável para armazenar os dados do prestador retornados via AJAX
+    var lastPrestadorData = null;
 
     // ======================================================
     // 1. registrarDataHora: Preenche o campo com a data/hora atual e oculta o botão.
@@ -540,6 +567,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     })
                     .then(function(data) {
                         if (!data.error) {
+                            lastPrestadorData = data;
                             var acionamentoId = "id_acionamento" + block;
                             var franquiaHoraId = "id_franquia_hora" + block;
                             var kmFranquiaId = "id_km_franquia" + block;
@@ -581,7 +609,63 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
     // ======================================================
-    // 3. toggleFieldVisibility: Exibe/oculta campos com base no valor selecionado.
+    // 3. updateAcionamentoByMotivo: Atualiza os campos de acordo com o motivo selecionado.
+    // Se o motivo for "antenista", "pronta resposta armado" ou "pronta resposta desarmado", os campos serão atualizados conforme os valores do prestador.
+    function updateAcionamentoByMotivo(block) {
+        var motivoField = document.getElementById("id_motivo" + block);
+        var motivo = motivoField ? motivoField.value.trim().toLowerCase() : "";
+        console.log("Motivo selecionado:", motivo, "para block:", block);
+        
+        var acionamentoField = document.getElementById("id_acionamento" + block);
+        var franquiaHoraField = document.getElementById("id_franquia_hora" + block);
+        var kmFranquiaField = document.getElementById("id_km_franquia" + block);
+        var valorHoraExcedenteField = document.getElementById("id_valor_hora_excedente" + block);
+        var valorKmExcedenteField = document.getElementById("id_valor_km_excedente" + block);
+        
+        if (motivo === "antenista") {
+            if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_antenista || ""; }
+            if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_antenista || ""; }
+            if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_antenista || ""; }
+            if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_antenista || ""; }
+            if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_antenista || ""; }
+        } else if (motivo === "pronta resposta armado") {
+            if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_armado || ""; }
+            if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_armado || ""; }
+            if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_armado || ""; }
+            if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_armado || ""; }
+            if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_armado || ""; }
+        } else if (motivo === "pronta resposta desarmado") {
+            if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_desarmado || ""; }
+            if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_desarmado || ""; }
+            if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_desarmado || ""; }
+            if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_desarmado || ""; }
+            if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_desarmado || ""; }
+        } else {
+            if (acionamentoField) { acionamentoField.value = lastPrestadorData.acionamento || ""; }
+        }
+        console.log("Campo Acionamento atualizado para block", block, ":", acionamentoField ? acionamentoField.value : "não encontrado");
+    }
+    
+    // Atualiza o motivo para o agente principal
+    if (document.getElementById("id_motivo")) {
+        document.getElementById("id_motivo").addEventListener("change", function() {
+            updateAcionamentoByMotivo("");
+        });
+    }
+    // Atualiza para os agentes adicionais (ex: id_motivo1, id_motivo2, etc.)
+    var motivosAdicionais = document.querySelectorAll("[id^='id_motivo']");
+    motivosAdicionais.forEach(function(elem) {
+        if (elem.id !== "id_motivo") {
+            var block = elem.id.replace("id_motivo", "");
+            elem.addEventListener("change", function() {
+                updateAcionamentoByMotivo(block);
+            });
+        }
+    });
+    
+    
+    // ======================================================
+    // 4. toggleFieldVisibility: Exibe/oculta campos com base no valor selecionado.
     function toggleFieldVisibility(selectId, fieldIds, expectedValue="sim") {
         var selectElem = document.getElementById(selectId);
         if (!selectElem) return;
@@ -602,7 +686,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
     // ======================================================
-    // 4. calculatePrevisaoChegada: Calcula a previsão de chegada a partir do SLA e da data/hora de início.
+    // 5. calculatePrevisaoChegada: Calcula a previsão de chegada a partir do SLA e da data/hora de início.
     function formatDateTime(dateObj) {
         var ano = dateObj.getFullYear();
         var mes = ("0" + (dateObj.getMonth() + 1)).slice(-2);
@@ -644,7 +728,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
     // ======================================================
-    // 5. calculateHoraTotal: Calcula a diferença entre a data/hora final e de início e preenche o campo "Hora Total".
+    // 6. calculateHoraTotal: Calcula a diferença entre a data/hora final e de início e preenche o campo "Hora Total".
     function parseDateTimeGeneric(dateTimeStr) {
         if (!dateTimeStr) return NaN;
         var isoStr = dateTimeStr.indexOf("T") === -1 ? dateTimeStr.replace(" ", "T") : dateTimeStr;
@@ -739,7 +823,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
     // ======================================================
-    // 6. calculateHoraExcedente: Calcula a "Hora Excedente" como a diferença entre a duração total (em minutos)
+    // 7. calculateHoraExcedente: Calcula a "Hora Excedente" como a diferença entre a duração total (em minutos)
     // e a franquia de hora (convertida para minutos). O resultado é exibido no formato H.MM.
     function calculateHoraExcedente(block) {
         var inicioId = "id_data_hora_inicial" + block;
@@ -787,7 +871,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
     // ======================================================
-    // 7. calculateKmTotal: Calcula o KM Total e o KM Excedente.
+    // 8. calculateKmTotal: Calcula o KM Total e o KM Excedente.
     //     KM Total = Km Final - Km Inicial
     //     KM Excedente = KM Total - Franquia de KM
     function calculateKmTotal(block) {
@@ -853,8 +937,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
     // ======================================================
-    // 8. Evento para exibir os blocos dos agentes adicionais.
-    // Certifique-se de que cada bloco tenha um ID único (por exemplo, "agente1", "agente2", "agente3")
+    // 9. Evento para exibir os blocos dos agentes adicionais.
     var btnAdicionarAgente = document.getElementById("btnAdicionarAgente");
     if (btnAdicionarAgente) {
         btnAdicionarAgente.addEventListener("click", function() {
