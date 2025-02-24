@@ -232,8 +232,7 @@ class RegistroPagamentoForm(forms.ModelForm):
         }
 
         
-        
-        
+ 
         
         
 from decimal import Decimal, InvalidOperation

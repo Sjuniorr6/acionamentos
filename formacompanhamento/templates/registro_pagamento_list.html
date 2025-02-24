@@ -4,24 +4,12 @@
 <main class="container my-4">
     {% now "U" as current_time %}
 
-    {# Alerta de atraso para cada registro atrasado #}
+    {# Exibe alerta somente se o registro estiver Pendente, sem data_hora_chegada e previsa_chegada menor que a hora atual #}
     {% for registro in registros %}
-        {% if registro.status == "Pendente" %}
-            {% if registro.data_hora_chegada %}
-                {# Se data_hora_chegada estiver preenchido, compara com previsa_chegada #}
-                {% if registro.data_hora_chegada|date:"U" > registro.previsa_chegada|date:"U" %}
-                    <div class="alert alert-danger" role="alert">
-                        O acionamento com id {{ registro.id }} está com atraso. Favor verificar.
-                    </div>
-                {% endif %}
-            {% else %}
-                {# Se data_hora_chegada não estiver preenchido, compara com hora atual e previsa_chegada #}
-                {% if current_time > registro.previsa_chegada|date:"U" %}
-                    <div class="alert alert-danger" role="alert">
-                        O acionamento com id {{ registro.id }} está com atraso. Favor verificar.
-                    </div>
-                {% endif %}
-            {% endif %}
+        {% if registro.status == "Pendente" and not registro.data_hora_chegada and current_time > registro.previsa_chegada|date:"U" %}
+            <div class="alert alert-danger" role="alert">
+                O acionamento com id {{ registro.id }} está com atraso. Favor verificar.
+            </div>
         {% endif %}
     {% endfor %}
 
@@ -67,6 +55,7 @@
                 <th>Cliente</th>
                 <th>Data/Hora Inicial</th>
                 <th>Previsão de Chegada</th>
+                <th>Chegada</th>
                 <th>Data/Hora Final</th>
                 <th>Prestador</th>
                 <th>Solicitante</th>
@@ -78,13 +67,23 @@
         <tbody>
         {% for registro in registros %}
             {% if registro.status != "A Faturar" and registro.status != "Pago" %}
-                <!-- Determina cor de fundo da linha conforme o status -->
-                <tr style=" 
-                    {% if registro.status == 'Pendente' and registro.previsa_chegada|date:'U' < current_time %}
-                        background-color: #FF0000;
-                    {% elif registro.status == 'Pendente' %}
-                        background-color: #FFF3CD;
-                        color: #000;
+                <tr style="
+                    {% if registro.status == 'Pendente' %}
+                        {% if registro.data_hora_chegada %}
+                            {% if registro.data_hora_chegada|date:'U' > registro.previsa_chegada|date:'U' %}
+                                background-color: #FF0000;
+                            {% else %}
+                                background-color: #FFF3CD;
+                                color: #000;
+                            {% endif %}
+                        {% else %}
+                            {% if current_time > registro.previsa_chegada|date:'U' %}
+                                background-color: #FF0000;
+                            {% else %}
+                                background-color: #FFF3CD;
+                                color: #000;
+                            {% endif %}
+                        {% endif %}
                     {% elif registro.status == 'A Faturar' %}
                         background-color: #F8D7DA;
                     {% elif registro.status == 'Concluído' %}
@@ -101,7 +100,7 @@
                     {% endif %}
                 ">
                     <td>
-                        <!-- Bolinha (dot) vermelho/verde -->
+                        <!-- Bolinha de status -->
                         <span class="status-dot"
                               style="
                                 display: inline-block;
@@ -118,7 +117,7 @@
                                                 green;
                                             {% endif %}
                                         {% else %}
-                                            {% if current_time > registro.previsa_chegada|date:"U" %}
+                                            {% if current_time > registro.previsa_chegada|date:'U' %}
                                                 red;
                                             {% else %}
                                                 green;
@@ -130,7 +129,7 @@
                               ">
                         </span>
 
-                        <!-- Ícone clicável para Google Maps, somente se registro.endereco estiver preenchido -->
+                        <!-- Ícone do Google Maps se houver endereço -->
                         {% if registro.endereco %}
                             <a href="https://www.google.com/maps?q={{ registro.endereco|urlencode }}"
                                target="_blank"
@@ -146,6 +145,7 @@
                     <td>{{ registro.cliente }} </td>
                     <td>{{ registro.data_hora_inicial|date:"d/m/Y H:i" }}</td>
                     <td>{{ registro.previsa_chegada|date:"d/m/Y H:i" }}</td>
+                    <td>{{ registro.data_hora_chegada|date:"d/m/Y H:i" }}</td>
                     <td>{{ registro.data_hora_final|date:"d/m/Y H:i" }}</td>
                     <td>{{ registro.prestador }}</td>
                     <td>{{ registro.solicitante }}</td>
@@ -191,7 +191,7 @@
             {% endif %}
         {% empty %}
             <tr>
-                <td colspan="9" class="text-center text-white">Nenhum registro encontrado.</td>
+                <td colspan="11" class="text-center text-white">Nenhum registro encontrado.</td>
             </tr>
         {% endfor %}
         </tbody>

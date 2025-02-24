@@ -286,6 +286,7 @@ from .models import RegistroPagamento, prestadores  # ajuste conforme sua organi
 from .forms import RegistroPagamentoForm
 
 logger = logging.getLogger(__name__)
+
 class RegistroPagamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = RegistroPagamento
     form_class = RegistroPagamentoForm
@@ -294,27 +295,33 @@ class RegistroPagamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, C
     permission_required = "formacompanhamento.view_agentes"
 
     def form_valid(self, form):
-        print("POST RECEBIDO:", self.request.POST)  # Debug para verificar os valores enviados
+        # Debug: imprimir os dados recebidos no POST
+        print("POST RECEBIDO:", self.request.POST)
+        
+        # Cria a instância sem salvar imediatamente
         instance = form.save(commit=False)
 
-        # Adicionar os valores dos campos motivo1, motivo2, motivo3 antes de salvar
+        # Adiciona os valores dos campos adicionais de motivo
         instance.motivo1 = form.cleaned_data.get("motivo1")
         instance.motivo2 = form.cleaned_data.get("motivo2")
         instance.motivo3 = form.cleaned_data.get("motivo3")
 
-        # Preencher previsa_chegada com base em data_hora_inicial e sla
-        if instance.data_hora_inicial and instance.sla:
-            try:
-                if isinstance(instance.sla, timedelta):
-                    instance.previsa_chegada = instance.data_hora_inicial + instance.sla
-                else:
-                    instance.previsa_chegada = instance.data_hora_inicial + timedelta(minutes=int(instance.sla))
-            except (ValueError, TypeError) as e:
-                logger.error("Erro ao calcular previsa_chegada: %s", e)
-                instance.previsa_chegada = None
-                form.add_error('sla', 'SLA inválido ou mal formatado.')
+        # Se o formulário já enviou um valor para previsa_chegada (preenchido via JavaScript),
+        # usa-o; caso contrário, calcula com base em data_hora_inicial e sla.
+        if not form.cleaned_data.get("previsa_chegada"):
+            if instance.data_hora_inicial and instance.sla:
+                try:
+                    if isinstance(instance.sla, timedelta):
+                        instance.previsa_chegada = instance.data_hora_inicial + instance.sla
+                    else:
+                        instance.previsa_chegada = instance.data_hora_inicial + timedelta(minutes=int(instance.sla))
+                except (ValueError, TypeError) as e:
+                    logger.error("Erro ao calcular previsa_chegada: %s", e)
+                    instance.previsa_chegada = None
+                    form.add_error('sla', 'SLA inválido ou mal formatado.')
+        # Caso contrário, o valor vindo do formulário (preenchido pelo JavaScript) é mantido.
 
-        # Calcular hora_total (em horas)
+        # Cálculo de hora_total (em horas), se os campos necessários estiverem preenchidos
         if instance.data_hora_inicial and instance.data_hora_final:
             try:
                 duration = instance.data_hora_final - instance.data_hora_inicial
@@ -323,7 +330,7 @@ class RegistroPagamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, C
                 logger.error("Erro ao calcular hora_total: %s", e)
                 instance.hora_total = 0
 
-        # Calcular km_total e km_excedente
+        # Cálculo de km_total e km_excedente, se os campos de quilometragem estiverem preenchidos
         if instance.km_inicial is not None and instance.km_final is not None:
             try:
                 instance.km_total = max(instance.km_final - instance.km_inicial, 0)
@@ -336,7 +343,7 @@ class RegistroPagamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, C
                 instance.km_total = 0
                 instance.km_excedente = 0
 
-        # Salvar a instância modificada
+        # Salva a instância modificada
         try:
             instance.save()
             self.object = instance
@@ -355,7 +362,6 @@ class RegistroPagamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, C
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
         # Gerar os nomes dos campos dinamicamente para os agentes
         quantidade_agentes = 4  # Exemplo de quantidade de agentes
         agentes_lista = list(range(1, quantidade_agentes + 1))
@@ -366,14 +372,12 @@ class RegistroPagamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, C
             'data_hora_final',
             'km_inicial',
             'km_final',
-            'motivo'  # Adicionado motivo para cada agente
+            'motivo'  # Inclui o motivo para cada agente
         ]
-        
         campos = {}
         for i in agentes_lista:
             for campo in campos_dinamicos:
                 campos[f'{campo}{i}'] = f'{campo}{i}'
-        
         context['agentes_lista'] = agentes_lista
         context['campos'] = campos
         return context
