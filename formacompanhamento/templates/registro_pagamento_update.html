@@ -56,6 +56,12 @@
                         <label for="id_tipo_contato" class="form-label">Tipo de Contato</label>
                         {{ form.tipo_contato }}
                     </div>
+                    <div class="col-md-2">
+                        <label for="id_motivo" class="form-label">Motivo</label>
+                        <div class="input-group">
+                          {# Campo individual para o motivo do agente adicional 1 #}
+                          {{ form.motivo|add_class:"form-control border-danger" }}
+                        </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
