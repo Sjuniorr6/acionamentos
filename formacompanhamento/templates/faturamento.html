@@ -62,6 +62,7 @@
     </thead>
     <tbody>
       {% for reg in registros %}
+        {% if reg.status == "A Faturar" %}
         <tr>
           <td>{{ reg.pk }}</td>
           <td>{{ reg.cliente }}</td>
@@ -94,6 +95,7 @@
             {% endif %}
           </td>
         </tr>
+        {% endif %}
       {% empty %}
         <tr>
           <td colspan="9" class="text-center">Nenhum registro encontrado.</td>

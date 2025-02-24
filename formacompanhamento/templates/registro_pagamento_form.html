@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
+
 {% load widget_tweaks %}
+
 {% block content %}
 <div class="container mt-4">
   <h3 class="text-white">
@@ -25,11 +27,12 @@
           <div class="col-md-4">
             <label for="id_endereco" class="form-label">Endereço</label>
             {{ form.endereco }}
+            <!-- Botão para visualizar mapa -->
+            <button type="button" class="btn btn-info mt-2" onclick="openMap()">Ver Mapa</button>
           </div>
           <div></div>
           <br>
           <br>
-
           <hr>
         
         <!-- DADOS DO ACIONAMENTO -->
@@ -50,7 +53,6 @@
                 {# Agente principal: campo "id_motivo" #}
                 {{ form.motivo|add_class:"form-control border-danger" }}
               </div>
-             
             </div>
             <div class="col-md-2">
               <label for="id_quantidade_agentes" class="form-label">Quantidade de Agentes</label>
@@ -152,7 +154,7 @@
         </div>
         <hr>
         <!-- Botão de adicionar agentes (não alterado) -->
-<button type="button" id="btnAdicionarAgente" class="btn btn-secondary mb-3">Adicionar Agente</button>
+        <button type="button" id="btnAdicionarAgente" class="btn btn-secondary mb-3">Adicionar Agente</button>
 
         <!-- CAMPOS DINÂMICOS PARA AGENTES ADICIONAIS -->
         <h5>Agentes Adicionais</h5>
@@ -238,7 +240,6 @@
               <div class="col-md-2">
                 <label for="id_motivo1" class="form-label">Motivo</label>
                 <div class="input-group">
-                  {# Campo individual para o motivo do agente adicional 1 #}
                   {{ form.motivo1|add_class:"form-control border-danger" }}
                 </div>
               </div>
@@ -473,15 +474,14 @@
             <label for="id_latlong_isca" class="form-label">Latitude - Longitude</label>
             {{ form.latlong_isca }}
           </div>
-         
         </div>
     
         <hr>
        
-<div class="col-md-12" id="descricao">
-    <label for="{{ form.descricao.id_for_label }}" class="form-label"><h5>Descrição</h5></label>
-    {{ form.descricao|add_class:"form-control" }}
-</div>
+        <div class="col-md-12" id="descricao">
+            <label for="{{ form.descricao.id_for_label }}" class="form-label"><h5>Descrição</h5></label>
+            {{ form.descricao|add_class:"form-control" }}
+        </div>
         <h4 class="mt-4">Imagens</h4>
         <div class="row mb-3">
           <div class="col-md-2">
@@ -943,7 +943,20 @@
           }
         });
       }
+      
+      // ======================================================
+      // 10. Função para abrir o mapa em uma nova janela com base no endereço.
+      function openMap() {
+  var endereco = document.getElementById("id_endereco").value;
+  if (endereco) {
+    var url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(endereco);
+    window.open(url, "_blank", "width=800,height=600");
+  } else {
+    alert("Por favor, preencha o campo de endereço para visualizar o mapa.");
+  }
+}
+window.openMap = openMap;
+
     });
-    </script>
-    {% endblock %}
-    
+</script>
+{% endblock %}
