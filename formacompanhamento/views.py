@@ -73,7 +73,6 @@ from django.views.generic import ListView
 from formacompanhamento.models import RegistroPagamento
 from .forms import AgentePagamentoForm
 
-
 class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = RegistroPagamento
     template_name = 'registro_pagamento_list.html'
@@ -90,6 +89,7 @@ class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, Lis
         filtro_id = self.request.GET.get('id', '').strip()
         filtro_cliente = self.request.GET.get('cliente', '').strip()
         filtro_prestador = self.request.GET.get('prestador', '').strip()
+        filtro_status = self.request.GET.get('status', '').strip()
 
         # Se o campo "id" for um número, filtra por ID exato
         if filtro_id.isdigit():
@@ -103,6 +103,10 @@ class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, Lis
         if filtro_prestador:
             queryset = queryset.filter(prestador__Nome__icontains=filtro_prestador)
 
+        # Aplica o filtro por status (case-insensitive)
+        if filtro_status:
+            queryset = queryset.filter(status__iexact=filtro_status)
+
         # Mantém a lógica de atributos calculados dinamicamente
         for registro in queryset:
             registro.hora_total = registro.calcular_hora_total()
@@ -113,6 +117,13 @@ class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, Lis
             registro.total_acionamento = registro.calcular_total_acionamento()
 
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Define as opções de status para o filtro no template
+        context['status_choices'] = ["Início de Operação", "Em Operação", "Pendente"]
+        return context
+
 
 
 class RegistroPagamentohListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -1330,7 +1341,6 @@ def faturar(request, pk):
     registro.save()
     return redirect('formacompanhamento:registro_pagamento_list')  # ou onde preferir
 
-
 class FaturamentoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = RegistroPagamento
     template_name = 'faturamento.html'
@@ -1353,27 +1363,24 @@ class FaturamentoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView)
             queryset = queryset.filter(id=filtro_id)
 
         # 2) Filtra por Cliente
-        # Se "cliente" for um ForeignKey para um modelo que tenha "nome" ou "Nome",
-        # use "cliente__nome__icontains" (ajuste conforme seu models.py).
-        # Se for um CharField no mesmo model, use "cliente__icontains".
         if filtro_cliente:
-            # Exemplo: se RegistroPagamento tem "cliente" como ForeignKey para "clientes_acionamento" e lá o campo for "nome":
             queryset = queryset.filter(cliente__nome__icontains=filtro_cliente)
 
         # 3) Filtra por intervalo de data (Data/Hora Inicial)
-        #   Usando __date__ se data_hora_inicial for um DateTimeField
-        #   e queremos comparar só a parte da data.
-        #   Caso contrário, poderíamos usar __gte e __lte diretamente.
         if filtro_data_inicio:
             queryset = queryset.filter(data_hora_inicial__date__gte=filtro_data_inicio)
         if filtro_data_fim:
             queryset = queryset.filter(data_hora_inicial__date__lte=filtro_data_fim)
 
-        # 4) Filtra por Status (iexact = case-insensitive, mas precisa ser igual)
+        # 4) Filtra por Status (case-insensitive)
+        # Se nenhum filtro for informado, por padrão, filtra para "A Faturar"
         if filtro_status:
             queryset = queryset.filter(status__iexact=filtro_status)
+        else:
+            queryset = queryset.filter(status__iexact="A Faturar")
 
         return queryset
+
 
     
 def marcar_pago(request, pk):

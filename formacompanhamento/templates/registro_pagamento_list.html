@@ -3,8 +3,7 @@
 {% block content %}
 <main class="container my-4">
     {% now "U" as current_time %}
-
-    {# Exibe alerta somente se o registro estiver Pendente, sem data_hora_chegada e previsa_chegada menor que a hora atual #}
+    {# Exibe alerta para registros pendentes com atraso #}
     {% for registro in registros %}
         {% if registro.status == "Pendente" and not registro.data_hora_chegada and current_time > registro.previsa_chegada|date:"U" %}
             <div class="alert alert-danger" role="alert">
@@ -23,182 +22,154 @@
     <!-- Formulário de Filtro -->
     <form method="GET" class="row g-3 mb-3">
         <div class="col-md-3">
-            <input class="form-control"
-                   type="text"
-                   name="id"
-                   placeholder="Filtrar por ID"
-                   value="{{ request.GET.id }}">
+            <input class="form-control" type="text" name="id" placeholder="Filtrar por ID" value="{{ request.GET.id }}">
         </div>
         <div class="col-md-3">
-            <input class="form-control"
-                   type="text"
-                   name="cliente"
-                   placeholder="Filtrar por Cliente"
-                   value="{{ request.GET.cliente }}">
+            <input class="form-control" type="text" name="cliente" placeholder="Filtrar por Cliente" value="{{ request.GET.cliente }}">
         </div>
         <div class="col-md-3">
-            <input class="form-control"
-                   type="text"
-                   name="prestador"
-                   placeholder="Filtrar por Prestador"
-                   value="{{ request.GET.prestador }}">
+            <input class="form-control" type="text" name="prestador" placeholder="Filtrar por Prestador" value="{{ request.GET.prestador }}">
         </div>
         <div class="col-md-3">
+            <select class="form-control" name="status">
+                <option value="">Filtrar por Status</option>
+                {% for status in status_choices %}
+                    <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 mt-2">
             <button class="btn btn-primary w-100" type="submit">Filtrar</button>
         </div>
     </form>
 
-    <table class="table table-bordered table-striped text-white">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Data/Hora Inicial</th>
-                <th>Previsão de Chegada</th>
-                <th>Chegada</th>
-                <th>Data/Hora Final</th>
-                <th>Prestador</th>
-                <th>Solicitante</th>
-                <th>Qtd. Agentes</th>
-                <th>Status</th>
-                <th class="text-center">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for registro in registros %}
-            {% if registro.status != "A Faturar" and registro.status != "Pago" %}
-                <tr style="
-                    {% if registro.status == 'Pendente' %}
-                        {% if registro.data_hora_chegada %}
-                            {% if registro.data_hora_chegada|date:'U' > registro.previsa_chegada|date:'U' %}
-                                background-color: #FF0000;
-                            {% else %}
-                                background-color: #FFF3CD;
-                                color: #000;
-                            {% endif %}
-                        {% else %}
-                            {% if current_time > registro.previsa_chegada|date:'U' %}
-                                background-color: #FF0000;
-                            {% else %}
-                                background-color: #FFF3CD;
-                                color: #000;
-                            {% endif %}
-                        {% endif %}
-                    {% elif registro.status == 'A Faturar' %}
-                        background-color: #F8D7DA;
-                    {% elif registro.status == 'Concluído' %}
-                        background-color: #D4EDDA;
-                        color: #000;
-                    {% elif registro.status == 'Validado' %}
-                        background-color: #D1ECF1;
-                        color: #000;
-                    {% elif registro.status == 'Faturado' %}
-                        background-color: #F0E68C;
-                        color: #000;
-                    {% else %}
-                        background-color: #83b9a2;
-                    {% endif %}
-                ">
-                    <td>
-                        <!-- Bolinha de status -->
-                        <span class="status-dot"
-                              style="
-                                display: inline-block;
-                                width: 12px;
-                                height: 12px;
-                                margin-right: 6px;
-                                border-radius: 50%;
-                                background-color:
-                                    {% if registro.status == 'Pendente' %}
-                                        {% if registro.data_hora_chegada %}
-                                            {% if registro.data_hora_chegada|date:'U' > registro.previsa_chegada|date:'U' %}
-                                                red;
-                                            {% else %}
-                                                green;
-                                            {% endif %}
-                                        {% else %}
-                                            {% if current_time > registro.previsa_chegada|date:'U' %}
-                                                red;
-                                            {% else %}
-                                                green;
-                                            {% endif %}
-                                        {% endif %}
-                                    {% else %}
-                                        green;
-                                    {% endif %}
-                              ">
-                        </span>
-
-                        <!-- Ícone do Google Maps se houver endereço -->
-                        {% if registro.endereco %}
-                            <a href="https://www.google.com/maps?q={{ registro.endereco|urlencode }}"
-                               target="_blank"
-                               style="margin-right: 10px; vertical-align: middle;">
-                                <img src="{% static 'images/map_marker.png' %}"
-                                     alt=""
-                                     style="width:24px; height:24px;">
-                            </a>
-                        {% endif %}
-
-                        #{{ registro.id }}
-                    </td>
-                    <td>{{ registro.cliente }} </td>
-                    <td>{{ registro.data_hora_inicial|date:"d/m/Y H:i" }}</td>
-                    <td>{{ registro.previsa_chegada|date:"d/m/Y H:i" }}</td>
-                    <td>{{ registro.data_hora_chegada|date:"d/m/Y H:i" }}</td>
-                    <td>{{ registro.data_hora_final|date:"d/m/Y H:i" }}</td>
-                    <td>{{ registro.prestador }}</td>
-                    <td>{{ registro.solicitante }}</td>
-                    <td>{{ registro.quantidade_agentes }}</td>
-                    <td>
-                        {% if registro.status == 'Pendente' %}
-                            <span class="badge" style="background-color: #FFF3CD; color: #000;">
-                                {{ registro.status }}
-                            </span>
-                        {% elif registro.status == 'A Faturar' %}
-                            <span class="badge" style="background-color: #F8D7DA; color: #000;">
-                                {{ registro.status }}
-                            </span>
-                        {% elif registro.status == 'Concluído' %}
-                            <span class="badge" style="background-color: #D4EDDA; color: #000;">
-                                {{ registro.status }}
-                            </span>
-                        {% elif registro.status == 'Validado' %}
-                            <span class="badge" style="background-color: #D1ECF1; color: #000;">
-                                {{ registro.status }}
-                            </span>
-                        {% elif registro.status == 'Faturado' %}
-                            <span class="badge" style="background-color: #F0E68C; color: #000;">
-                                {{ registro.status }}
-                            </span>
-                        {% else %}
-                            <span class="badge" style="background-color: #E2E3E5; color: #000;">
-                                {{ registro.status }}
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td class="text-center">
-                        <a href="{% url 'formacompanhamento:registro_pagamento_update' registro.pk %}" class="my-btn my-btn-warning my-btn-sm">Editar</a>
-                        {% if registro.status != "Pago" and registro.status != "A Faturar" %}
-                            <a href="{% url 'formacompanhamento:validar' registro.pk %}" class="my-btn my-btn-info my-btn-sm">Validar</a>
-                        {% endif %}
-                        {% if registro.status == 'A Faturar' or registro.status == 'Pago' %}
-                            <a href="{% url 'formacompanhamento:download_pdf' registro.pk %}" class="my-btn my-btn-danger my-btn-sm">Download</a>
-                        {% endif %}
-                        <a href="{% url 'formacompanhamento:detalhar_acionamento' registro.pk %}" class="my-btn my-btn-primary my-btn-sm">Resumo</a>
-                    </td>
+    <div class="table-container">
+        <table class="table table-bordered table-striped text-white" style="white-space: nowrap;">
+            <thead>
+                <tr>
+                    <th>Protocolo</th>
+                    <th>Cliente</th>
+                    <th>Data/Hora Inicial</th>
+                    <th>Previsão de Chegada</th>
+                    <th>Chegada</th>
+                    <th>Data/Hora Final</th>
+                    <th>Prestador</th>
+                    <th>Solicitante</th>
+                    <th>Qtd. Agentes</th>
+                    <th>Status</th>
+                    <th class="text-center">Ações</th>
                 </tr>
-            {% endif %}
-        {% empty %}
-            <tr>
-                <td colspan="11" class="text-center text-white">Nenhum registro encontrado.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for registro in registros %}
+                    <tr style="
+                        {% if registro.status == 'Pendente' %}
+                            {% if registro.data_hora_chegada %}
+                                {% if registro.data_hora_chegada|date:'U' > registro.previsa_chegada|date:'U' %}
+                                    background-color: #FF0000;
+                                {% else %}
+                                    background-color: #FFF3CD; color: #000;
+                                {% endif %}
+                            {% else %}
+                                {% if current_time > registro.previsa_chegada|date:'U' %}
+                                    background-color: #FF0000;
+                                {% else %}
+                                    background-color: #FFF3CD; color: #000;
+                                {% endif %}
+                            {% endif %}
+                        {% elif registro.status == 'A Faturar' %}
+                            background-color: #F8D7DA;
+                        {% elif registro.status == 'Concluído' %}
+                            background-color: #D4EDDA; color: #000;
+                        {% elif registro.status == 'Validado' %}
+                            background-color: #D1ECF1; color: #000;
+                        {% elif registro.status == 'Faturado' %}
+                            background-color: #F0E68C; color: #000;
+                        {% else %}
+                            background-color: #83b9a2;
+                        {% endif %}
+                    ">
+                        <td>
+                            <span class="status-dot" style="display: inline-block; width: 12px; height: 12px; margin-right: 6px; border-radius: 50%; background-color: 
+                                {% if not registro.data_hora_inicial %}
+                                    gray;
+                                {% elif registro.data_hora_inicial and not registro.data_hora_chegada %}
+                                    blue;
+                                {% elif registro.data_hora_chegada and not registro.data_hora_final %}
+                                    green;
+                                {% elif registro.data_hora_final %}
+                                    orange;
+                                {% else %}
+                                    #83b9a2;
+                                {% endif %}">
+                            </span>
+                            {% if registro.endereco %}
+                                <a href="https://www.google.com/maps?q={{ registro.endereco|urlencode }}" target="_blank" style="margin-right: 10px; vertical-align: middle;">
+                                    <img src="{% static 'images/map_marker.png' %}" alt="" style="width:24px; height:24px;">
+                                </a>
+                            {% endif %}
+                            #{{ registro.id }}
+                        </td>
+                        <td>{{ registro.cliente }}</td>
+                        <td>{{ registro.data_hora_inicial|date:"d/m/Y H:i" }}</td>
+                        <td>{{ registro.previsa_chegada|date:"d/m/Y H:i" }}</td>
+                        <td>{{ registro.data_hora_chegada|date:"d/m/Y H:i" }}</td>
+                        <td>{{ registro.data_hora_final|date:"d/m/Y H:i" }}</td>
+                        <td>{{ registro.prestador }}</td>
+                        <td>{{ registro.solicitante }}</td>
+                        <td>{{ registro.quantidade_agentes }}</td>
+                        <td>
+                            {% if not registro.data_hora_inicial %}
+                                <span class="badge" style="background-color: #6c757d; color: #fff;">Aguardando Início</span>
+                            {% elif registro.data_hora_inicial and not registro.data_hora_chegada %}
+                                <span class="badge" style="background-color: #007bff; color: #fff;">Início de Operação</span>
+                            {% elif registro.data_hora_chegada and not registro.data_hora_final %}
+                                <span class="badge" style="background-color: #28a745; color: #fff;">Em Operação</span>
+                            {% elif registro.data_hora_final %}
+                                <span class="badge" style="background-color: #ffc107; color: #000;">Pendente</span>
+                            {% else %}
+                                <span class="badge" style="background-color: #E2E3E5; color: #000;">Status Desconhecido</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'formacompanhamento:registro_pagamento_update' registro.pk %}" class="my-btn my-btn-warning my-btn-sm">
+                                <i class="bi bi-pencil-square fs-6"></i>
+                            </a>
+                            {% if registro.status != "Pago" and registro.status != "A Faturar" %}
+                                <a href="{% url 'formacompanhamento:validar' registro.pk %}" class="my-btn my-btn-info my-btn-sm">
+                                    <i class="bi bi-check-square fs-6"></i>
+                                </a>
+                            {% endif %}
+                            {% if registro.status == 'A Faturar' or registro.status == 'Pago' %}
+                                <a href="{% url 'formacompanhamento:download_pdf' registro.pk %}" class="my-btn my-btn-danger my-btn-sm">
+                                    <i class="bi bi-box-arrow-down fs-6"></i>
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'formacompanhamento:detalhar_acionamento' registro.pk %}" class="my-btn my-btn-primary my-btn-sm">
+                                <i class="bi bi-card-list fs-6"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="11" class="text-center text-white">Nenhum registro encontrado.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </main>
 
 <style>
+    /* CSS para editar a posição da tabela */
+    .table-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 0 auto;
+        position: relative;
+        top: 0;
+    }
     .my-btn {
         display: inline-block;
         padding: 6px 12px;
@@ -220,4 +191,7 @@
     .my-btn:hover { opacity: 0.9; }
 </style>
 
+<script>
+    setTimeout(function(){ window.location.reload(); }, 60000);
+</script>
 {% endblock %}

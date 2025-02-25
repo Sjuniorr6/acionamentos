@@ -21,7 +21,7 @@
     <div class="card-body">
       <form method="post" action="{% url 'formacompanhamento:registro_pagamento_create' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        
+
         <!-- CAMPOS CLIENTE E PRESTADOR -->
         <h4 class="mt-2">Dados do Cliente</h4>
         <div class="row mb-3">
@@ -42,7 +42,7 @@
           </div>
         </div>
         <hr>
-        
+
         <!-- DADOS DO ACIONAMENTO -->
         <h4 class="text-white">Dados do Acionamento</h4>
         <div class="row mb-3">
@@ -92,7 +92,7 @@
           </div>
         </div>
         <hr>
-        
+
         <!-- DADOS DA OPERAÇÃO -->
         <h4 class="mt-4">Dados da Operação</h4>
         <!-- Bloco do Agente Principal (block = "") -->
@@ -154,10 +154,10 @@
           </div>
         </div>
         <hr>
-        
+
         <!-- Botão de adicionar agentes -->
         <button type="button" id="btnAdicionarAgente" class="btn btn-secondary mb-3">Adicionar Agente</button>
-        
+
         <!-- CAMPOS DINÂMICOS PARA AGENTES ADICIONAIS -->
         <h5>Agentes Adicionais</h5>
         <div id="agentes-container">
@@ -173,7 +173,7 @@
           </div>
         </div>
         <hr>
-        
+
         <!-- DADOS GERAIS E IMAGENS -->
         <div class="row mb-3">
           <div class="col-md-4">
@@ -226,7 +226,7 @@
           </div>
         </div>
         <hr>
-        
+
         <div class="col-md-12" id="descricao">
           <label for="{{ form.descricao.id_for_label }}" class="form-label"><h5>Descrição</h5></label>
           {{ form.descricao|add_class:"form-control" }}
@@ -301,17 +301,17 @@ document.addEventListener("DOMContentLoaded", function() {
     var minutos = ("0" + agora.getMinutes()).slice(-2);
     var segundos = ("0" + agora.getSeconds()).slice(-2);
     var dataHoraFormatada = ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
-    
+
     var inputField = document.getElementById(inputId);
     if (inputField) {
       inputField.value = dataHoraFormatada;
     }
-    
+
     var botao = document.getElementById(btnId);
     if (botao) {
       botao.style.display = "none";
     }
-    
+
     if (inputId.indexOf("id_data_hora_inicial") === 0 || inputId.indexOf("id_data_hora_final") === 0) {
       var block = inputId.replace(/id_data_hora_(inicial|final)/, "");
       calculateHoraTotal(block);
@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
   window.registrarDataHora = registrarDataHora;
-  
+
   // ======================================================
   // 2) Atualiza os campos do prestador via AJAX
   var lastPrestadorData = null;
@@ -360,19 +360,19 @@ document.addEventListener("DOMContentLoaded", function() {
   if (mainSelect && !mainSelect.classList.contains("prestador-select")) {
     attachPrestadorChangeListener(mainSelect);
   }
-  
+
   // ======================================================
   // 3) Atualiza os campos de acionamento conforme o motivo selecionado
   function updateAcionamentoByMotivo(block) {
     var motivoField = document.getElementById("id_motivo" + block);
     var motivo = motivoField ? motivoField.value.trim().toLowerCase() : "";
-    
+
     var acionamentoField = document.getElementById("id_acionamento" + block);
     var franquiaHoraField = document.getElementById("id_franquia_hora" + block);
     var kmFranquiaField = document.getElementById("id_km_franquia" + block);
     var valorHoraExcedenteField = document.getElementById("id_valor_hora_excedente" + block);
     var valorKmExcedenteField = document.getElementById("id_valor_km_excedente" + block);
-    
+
     // Exemplos de motivos
     if (motivo === "antenista") {
       if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_antenista || ""; }
@@ -410,7 +410,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     }
   });
-  
+
   // ======================================================
   // 4) Exibe/oculta campos conforme seleção
   function toggleFieldVisibility(selectId, fieldIds, expectedValue="sim") {
@@ -430,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   toggleFieldVisibility("id_rastreador", ["id_equipamento_field", "ultima_posicao_field", "latlong_field"], "sim");
   toggleFieldVisibility("id_isca", ["id_isca_field", "ultima_posicao_isca_field", "latlong_isca_field"], "sim");
-  
+
   // ======================================================
   // 5) Calcula a previsão de chegada
   function formatDateTime(dateObj) {
@@ -467,7 +467,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("id_data_hora_inicial").addEventListener("change", calculatePrevisaoChegada);
     document.getElementById("id_data_hora_inicial").addEventListener("blur", calculatePrevisaoChegada);
   }
-  
+
   // ======================================================
   // 6) Calcula a Hora Total
   function parseDateTimeGeneric(dateTimeStr) {
@@ -508,31 +508,31 @@ document.addEventListener("DOMContentLoaded", function() {
     var inicioElem = document.getElementById(inicioId);
     var finalElem = document.getElementById(finalId);
     if (inicioElem) {
-      inicioElem.addEventListener("change", function() { 
-        calculateHoraTotal(block); 
+      inicioElem.addEventListener("change", function() {
+        calculateHoraTotal(block);
         calculateHoraExcedente(block);
       });
-      inicioElem.addEventListener("blur", function() { 
-        calculateHoraTotal(block); 
+      inicioElem.addEventListener("blur", function() {
+        calculateHoraTotal(block);
         calculateHoraExcedente(block);
       });
     }
     if (finalElem) {
-      finalElem.addEventListener("change", function() { 
-        calculateHoraTotal(block); 
+      finalElem.addEventListener("change", function() {
+        calculateHoraTotal(block);
         calculateHoraExcedente(block);
       });
-      finalElem.addEventListener("blur", function() { 
-        calculateHoraTotal(block); 
+      finalElem.addEventListener("blur", function() {
+        calculateHoraTotal(block);
         calculateHoraExcedente(block);
       });
     }
     var franquiaElem = document.getElementById("id_franquia_hora" + block);
     if (franquiaElem) {
-      franquiaElem.addEventListener("change", function() { 
+      franquiaElem.addEventListener("change", function() {
         calculateHoraExcedente(block);
       });
-      franquiaElem.addEventListener("blur", function() { 
+      franquiaElem.addEventListener("blur", function() {
         calculateHoraExcedente(block);
       });
     }
@@ -541,7 +541,7 @@ document.addEventListener("DOMContentLoaded", function() {
   attachHoraTotalCalculation("1");
   attachHoraTotalCalculation("2");
   attachHoraTotalCalculation("3");
-  
+
   // ======================================================
   // 7) Calcula a Hora Excedente
   function calculateHoraExcedente(block) {
@@ -578,7 +578,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
   }
-  
+
   // ======================================================
   // 8) Calcula o KM Total e o KM Excedente
   function calculateKmTotal(block) {
@@ -628,7 +628,7 @@ document.addEventListener("DOMContentLoaded", function() {
   attachKmCalculation("1");
   attachKmCalculation("2");
   attachKmCalculation("3");
-  
+
   // ======================================================
   // 9) Exibe os blocos dos agentes adicionais
   var btnAdicionarAgente = document.getElementById("btnAdicionarAgente");
@@ -643,7 +643,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   }
-  
+
   // ======================================================
   // 10) INTEGRAÇÃO DO MAPA COM MAPBOX
   // Substitua 'YOUR_MAPBOX_ACCESS_TOKEN' pela sua chave do Mapbox
@@ -654,7 +654,7 @@ document.addEventListener("DOMContentLoaded", function() {
     center: [-47.9292, -15.7801],
     zoom: 4
   });
-  
+
   // Função para adicionar um marcador azul com popup
   function addMarker(lng, lat, msg) {
     new mapboxgl.Marker({ color: 'blue' })
@@ -662,7 +662,7 @@ document.addEventListener("DOMContentLoaded", function() {
       .setPopup(new mapboxgl.Popup().setHTML(msg))
       .addTo(map);
   }
-  
+
   // Para cada prestador, tenta pesquisar o endereço e adicionar um marcador
   fetch("http://gsacionamento.com/formacompanhamento/api/prestadores/enderecos/")
     .then(response => response.json())
