@@ -1,0 +1,150 @@
+<!-- mapa_mapbox.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mapa Mapbox</title>
+  <!-- CSS do Mapbox -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    /* Ajuste o tamanho conforme sua necessidade */
+    #map {
+      width: 100%;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+  <h3>Visualizando endereço: {{ endereco }}</h3>
+  <div id="map"></div>
+
+  <!-- JS do Mapbox -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js"></script>
+  <script>
+    // Substitua 'YOUR_MAPBOX_ACCESS_TOKEN' pela sua chave do Mapbox
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZ3NhY2lvbmFtZW50b3MiLCJhIjoiY203a2tkNjExMDFleDJrb29wbm92Nnc5diJ9.QzvtI6KjWcUe0bwVOBjcAA';
+
+    // Pega o endereço do contexto Django (endereço do usuário)
+    var enderecoUsuario = "{{ endereco|escapejs }}";
+
+    // Inicializa o mapa
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-47.9292, -15.7801], // Centro do Brasil
+      zoom: 4
+    });
+
+    // Função auxiliar para verificar se a string é lat,lon
+    function parseLatLon(value) {
+      const parts = value.split(",");
+      if (parts.length !== 2) return null;
+
+      // Remove espaços e converte em float
+      const lat = parseFloat(parts[0].trim());
+      const lng = parseFloat(parts[1].trim());
+
+      // Se for NaN, retorna null
+      if (isNaN(lat) || isNaN(lng)) return null;
+
+      // Retorna objeto com lat/lng
+      return { lat, lng };
+    }
+
+    // -------------------------------------------------------
+    // (1) Se houver um valor para enderecoUsuario
+    if (enderecoUsuario) {
+      // Tenta interpretar como lat/lon
+      const parsed = parseLatLon(enderecoUsuario);
+
+      if (parsed) {
+        // Se for lat/lon, cria marcador diretamente
+        map.setCenter([parsed.lng, parsed.lat]);
+        map.setZoom(14);
+
+        new mapboxgl.Marker({ color: 'blue' })
+          .setLngLat([parsed.lng, parsed.lat])
+          .setPopup(new mapboxgl.Popup().setHTML("<strong>Coordenadas:</strong> " + enderecoUsuario))
+          .addTo(map);
+      } else {
+        // Caso contrário, tentamos geocodificar como endereço
+        fetch("https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURIComponent(enderecoUsuario) + ".json?access_token=" + mapboxgl.accessToken)
+          .then(response => response.json())
+          .then(data => {
+            if (data.features && data.features.length > 0) {
+              var lng = data.features[0].center[0];
+              var lat = data.features[0].center[1];
+
+              map.setCenter([lng, lat]);
+              map.setZoom(14);
+
+              new mapboxgl.Marker({ color: 'blue' })
+                .setLngLat([lng, lat])
+                .setPopup(new mapboxgl.Popup().setHTML("<strong>Endereço do Usuário:</strong> " + enderecoUsuario))
+                .addTo(map);
+            } else {
+              alert("Não foi possível localizar o endereço do usuário: " + enderecoUsuario);
+            }
+          })
+          .catch(err => {
+            console.error("Erro ao geocodificar o endereço do usuário:", err);
+          });
+      }
+    }
+
+    // -------------------------------------------------------
+    // (2) Função para criar o "card" de popup dos prestadores
+    function createCard(prestador) {
+      return `
+        <div style="border:1px solid #ccc; padding:10px; border-radius:5px;">
+          <h4 style="margin:0 0 10px 0;">${prestador.nome}</h4>
+          <p style="margin:4px 0;"><strong>ID:</strong> ${prestador.id}</p>
+          <p style="margin:4px 0;"><strong>Endereço:</strong> ${prestador.endereco || "Não informado"}</p>
+        </div>
+      `;
+    }
+
+    // -------------------------------------------------------
+    // (3) Buscar a lista de prestadores e adicionar marcadores vermelhos
+    fetch("http://gsacionamento/formacompanhamento/api/prestadores/enderecos/")
+      .then(response => response.json())
+      .then(prestadores => {
+        prestadores.forEach(function(item) {
+          // Verifica se há lat/long
+          if (item.lat && item.lng) {
+            // Usa diretamente as coordenadas
+            new mapboxgl.Marker({ color: 'red' })
+              .setLngLat([item.lng, item.lat])
+              .setPopup(new mapboxgl.Popup().setHTML(createCard(item)))
+              .addTo(map);
+          }
+          // Se não houver lat/long, mas tiver endereço, faz geocodificação
+          else if (item.endereco) {
+            fetch("https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURIComponent(item.endereco) + ".json?access_token=" + mapboxgl.accessToken)
+              .then(res => res.json())
+              .then(geoData => {
+                if (geoData.features && geoData.features.length > 0) {
+                  var lng = geoData.features[0].center[0];
+                  var lat = geoData.features[0].center[1];
+                  // Adiciona marcador vermelho com popup
+                  new mapboxgl.Marker({ color: 'red' })
+                    .setLngLat([lng, lat])
+                    .setPopup(new mapboxgl.Popup().setHTML(createCard(item)))
+                    .addTo(map);
+                } else {
+                  console.warn("Endereço não localizado para:", item);
+                }
+              })
+              .catch(err => {
+                console.error("Erro ao geocodificar o endereço do prestador:", item.endereco, err);
+              });
+          }
+          // Caso não tenha endereço nem lat/long, não faz nada
+        });
+      })
+      .catch(err => {
+        console.error("Erro ao buscar os prestadores:", err);
+      });
+  </script>
+</body>
+</html>

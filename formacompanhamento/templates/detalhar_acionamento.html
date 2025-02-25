@@ -266,51 +266,57 @@ document.addEventListener("DOMContentLoaded", function() {
   //  Calcular Total do Cliente (soma de todos os agentes)
   // ---------------------------------------------------------
   function calcularTotalCliente(cliente, agentes) {
-    let total = 0.0;
-    agentes.forEach(ag => {
-      const motivo = ag.motivo || "";
-      const kmTotal = parseDecimal(ag.km_total);
-      const horasDecimais = diferencaHoras(ag.data_hora_inicial, ag.data_hora_final);
+  let total = 0.0;
+  agentes.forEach(ag => {
+    const motivo = ag.motivo || "";
+    const kmTotal = parseDecimal(ag.km_total);
+    const horasDecimais = diferencaHoras(ag.data_hora_inicial, ag.data_hora_final);
+    let custoExcedente = 0.0;
+    let fixedActivation = 0.0;
 
-      if (motivo === "Antenista") {
-        let kmExced = kmTotal - parseDecimal(cliente.franquia_km_antenista);
-        if (kmExced < 0) kmExced = 0;
-        let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_antenista);
-        if (horaExced < 0) horaExced = 0;
+    if (motivo === "Antenista") {
+      let kmExced = kmTotal - parseDecimal(cliente.franquia_km_antenista);
+      if (kmExced < 0) kmExced = 0;
+      let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_antenista);
+      if (horaExced < 0) horaExced = 0;
 
-        let valKm = parseDecimal(cliente.valorkm_antenista);
-        let valHora = parseDecimal(cliente.valorh_antenista);
-        let valFixo = parseDecimal(cliente.valor_antenista);
+      let valKm = parseDecimal(cliente.valorkm_antenista);
+      let valHora = parseDecimal(cliente.valorh_antenista);
+      fixedActivation = parseDecimal(cliente.valor_antenista);
 
-        total += (kmExced * valKm) + (horaExced * valHora) + valFixo;
-      }
-      else if (motivo === "Pronta Resposta Armado") {
-        let kmExced = kmTotal - parseDecimal(cliente.franquia_km_armado);
-        if (kmExced < 0) kmExced = 0;
-        let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_armado);
-        if (horaExced < 0) horaExced = 0;
+      custoExcedente = (kmExced * valKm) + (horaExced * valHora);
+    }
+    else if (motivo === "Pronta Resposta Armado") {
+      let kmExced = kmTotal - parseDecimal(cliente.franquia_km_armado);
+      if (kmExced < 0) kmExced = 0;
+      let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_armado);
+      if (horaExced < 0) horaExced = 0;
 
-        let valKm = parseDecimal(cliente.valorkm_armado);
-        let valHora = parseDecimal(cliente.valorh_armado);
-        let valAcion = parseDecimal(cliente.valor_prontaresposta_armado);
+      let valKm = parseDecimal(cliente.valorkm_armado);
+      let valHora = parseDecimal(cliente.valorh_armado);
+      fixedActivation = parseDecimal(cliente.valor_prontaresposta_armado);
 
-        total += (horaExced * valHora) + (kmExced * valKm) + valAcion;
-      }
-      else if (motivo === "Pronta Resposta Desarmado") {
-        let kmExced = kmTotal - parseDecimal(cliente.franquia_km_desarmado);
-        if (kmExced < 0) kmExced = 0;
-        let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_desarmado);
-        if (horaExced < 0) horaExced = 0;
+      custoExcedente = (kmExced * valKm) + (horaExced * valHora);
+    }
+    else if (motivo === "Pronta Resposta Desarmado") {
+      let kmExced = kmTotal - parseDecimal(cliente.franquia_km_desarmado);
+      if (kmExced < 0) kmExced = 0;
+      let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_desarmado);
+      if (horaExced < 0) horaExced = 0;
 
-        let valKm = parseDecimal(cliente.valorkm_desarmado);
-        let valHora = parseDecimal(cliente.valorh_desarmado);
-        let valAcion = parseDecimal(cliente.valor_prontaresposta_desarmado);
+      let valKm = parseDecimal(cliente.valorkm_desarmado);
+      let valHora = parseDecimal(cliente.valorh_desarmado);
+      fixedActivation = parseDecimal(cliente.valor_prontaresposta_desarmado);
 
-        total += (kmExced * valKm) + (horaExced * valHora) + valAcion;
-      }
-    });
-    return total;
-  }
+      custoExcedente = (kmExced * valKm) + (horaExced * valHora);
+    }
+
+    // Soma o custo excedente e o custo fixo de acionamento para cada agente
+    total += custoExcedente + fixedActivation;
+  });
+  return total;
+}
+
 
   // ---------------------------------------------------------
   //  Criar HTML do Cliente (colocamos <span> para total)

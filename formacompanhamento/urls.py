@@ -38,6 +38,7 @@ from .views import (
     marcar_pago,
     RegistroPagamentohListView,
     all_prestadores_addresses,
+    mapa_mapbox_view,
 )
 
 # Definindo o namespace do app
@@ -49,6 +50,7 @@ urlpatterns = [
     path('formacompanhamento/lista/', AcompanhamentoListView.as_view(), name='facomp'),
     path('faturamento/lista/', FaturamentoListView.as_view(), name='faturamento_lista'),
     path('registro/<int:pk>/pago/', marcar_pago, name='marcar_pago'),
+    path("mapa_mapbox/", mapa_mapbox_view, name="mapa_mapbox"),
 
 
 

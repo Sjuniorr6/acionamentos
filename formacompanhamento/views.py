@@ -1406,3 +1406,15 @@ def all_prestadores_addresses(request):
         })
     
     return JsonResponse(data, safe=False)
+
+
+# views.py
+
+from django.shortcuts import render
+
+def mapa_mapbox_view(request):
+    # Captura o endereço que veio por GET
+    endereco = request.GET.get("endereco", "")
+    # Renderiza um template (ex: 'mapa_mapbox.html') com esse endereço
+    return render(request, "mapa_mapbox.html", {"endereco": endereco})
+
