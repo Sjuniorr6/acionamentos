@@ -11,7 +11,6 @@
     <div class="col-md-8 offset-md-2">
       <div class="card card-header" style="background-color: transparent; border: none;">
         <div class="card-header bg-info text-white text-center">Dados do Acionamento</div>
-        <!-- Removemos "overflow-x: auto;" para não ter barra de rolagem -->
         <div class="p-0">
           <div id="acionamento-body" style="background-color: transparent;">
             <p class="text-warning text-center">Carregando dados do acionamento...</p>
@@ -72,367 +71,427 @@
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const endpointAcionamento = "{% url 'formacompanhamento:detalhar_acionamento_endpoint' pk=registro.pk %}";
-  
-    // Captura as colunas dos agentes adicionais para ocultar caso não existam
-    const adicional1Col = document.getElementById("adicional1-col");
-    const adicional2Col = document.getElementById("adicional2-col");
-    // Por padrão, ocultamos
-    adicional1Col.style.display = "none";
-    adicional2Col.style.display = "none";
-  
-    fetch(endpointAcionamento)
-      .then(resp => {
-        if (!resp.ok) {
-          throw new Error("Erro ao requisitar o acionamento: " + resp.status);
-        }
-        return resp.json();
-      })
-      .then(data => {
-        // Dados do cliente
-        const cliente = data.cliente || {};
-        // Agente principal
-        const agentePrincipal = data.agente_principal || {};
-        // Agentes adicionais
-        const adicionais = data.agentes_adicionais || [];
-  
-        // 1) Renderiza o card do Cliente
-        const clienteBody = document.getElementById("cliente-body");
-        clienteBody.innerHTML = criarClienteHTML(cliente);
-  
-        // Array para armazenar as promessas dos fetch dos agentes
-        const promises = [];
-  
-        // 2) Renderiza o Agente Principal
-        const principalBody = document.getElementById("principal-body");
-        if (!agentePrincipal.id_prestador) {
-          principalBody.innerHTML = "<p class='text-danger'>Agente principal não definido ou sem ID de prestador.</p>";
+document.addEventListener("DOMContentLoaded", function() {
+  const endpointAcionamento = "{% url 'formacompanhamento:detalhar_acionamento_endpoint' pk=registro.pk %}";
+
+  const adicional1Col = document.getElementById("adicional1-col");
+  const adicional2Col = document.getElementById("adicional2-col");
+  // Ocultamos por padrão
+  adicional1Col.style.display = "none";
+  adicional2Col.style.display = "none";
+
+  fetch(endpointAcionamento)
+    .then(resp => {
+      if (!resp.ok) {
+        throw new Error("Erro ao requisitar o acionamento: " + resp.status);
+      }
+      return resp.json();
+    })
+    .then(data => {
+      const cliente = data.cliente || {};
+      const agentePrincipal = data.agente_principal || {};
+      const adicionais = data.agentes_adicionais || [];
+
+      // 1) Renderiza o card do Cliente
+      const clienteBody = document.getElementById("cliente-body");
+      clienteBody.innerHTML = criarClienteHTML(cliente);
+
+      // Array para armazenar as promessas dos fetch dos agentes
+      const promises = [];
+
+      // 2) Renderiza o Agente Principal
+      const principalBody = document.getElementById("principal-body");
+      if (!agentePrincipal.id_prestador) {
+        principalBody.innerHTML = "<p class='text-danger'>Agente principal não definido ou sem ID de prestador.</p>";
+      } else {
+        const urlPrestadorPrincipal = "{% url 'formacompanhamento:prestador_detail' %}?id=" + agentePrincipal.id_prestador;
+        let p = fetch(urlPrestadorPrincipal)
+          .then(r => r.json())
+          .then(dadosPrestador => {
+            const totalAgente = calcularTotalAgente(agentePrincipal.motivo || 'Sem motivo', agentePrincipal, dadosPrestador);
+            agentePrincipal.total = totalAgente;
+            principalBody.innerHTML = criarAgenteHTML(dadosPrestador, agentePrincipal.motivo || 'Sem motivo', agentePrincipal);
+          })
+          .catch(err => {
+            principalBody.innerHTML = "<p class='text-danger'>Erro ao carregar prestador do agente principal.</p>";
+          });
+        promises.push(p);
+      }
+
+      // 3) Renderiza cada Agente Adicional
+      adicionais.forEach((adicional, idx) => {
+        const containerId = "adicional" + (idx + 1) + "-body";
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (!adicional.id_prestador) {
+          container.innerHTML = `<p class='text-danger'>ID do prestador não definido para o agente adicional ${idx + 1}.</p>`;
         } else {
-          const urlPrestadorPrincipal = "{% url 'formacompanhamento:prestador_detail' %}?id=" + agentePrincipal.id_prestador;
-          let p = fetch(urlPrestadorPrincipal)
+          const urlPrestadorAdicional = "{% url 'formacompanhamento:prestador_detail' %}?id=" + adicional.id_prestador;
+          let p = fetch(urlPrestadorAdicional)
             .then(r => r.json())
             .then(dadosPrestador => {
-              const totalAgente = calcularTotalAgente(agentePrincipal.motivo || 'Sem motivo', agentePrincipal, dadosPrestador);
-              agentePrincipal.total = totalAgente;
-              principalBody.innerHTML = criarAgenteHTML(dadosPrestador, agentePrincipal.motivo || 'Sem motivo', agentePrincipal);
+              const totalAgente = calcularTotalAgente(adicional.motivo || 'Sem motivo', adicional, dadosPrestador);
+              adicional.total = totalAgente;
+              container.innerHTML = criarAgenteHTML(dadosPrestador, adicional.motivo || 'Sem motivo', adicional);
             })
             .catch(err => {
-              principalBody.innerHTML = "<p class='text-danger'>Erro ao carregar prestador do agente principal.</p>";
+              container.innerHTML = `<p class='text-danger'>Erro ao carregar prestador do agente adicional ${idx + 1}.</p>`;
             });
           promises.push(p);
         }
-  
-        // 3) Renderiza cada Agente Adicional
-        adicionais.forEach((adicional, idx) => {
-          const containerId = "adicional" + (idx + 1) + "-body";
-          const container = document.getElementById(containerId);
-          if (!container) return;
-  
-          if (!adicional.id_prestador) {
-            container.innerHTML = `<p class='text-danger'>ID do prestador não definido para o agente adicional ${idx + 1}.</p>`;
-          } else {
-            const urlPrestadorAdicional = "{% url 'formacompanhamento:prestador_detail' %}?id=" + adicional.id_prestador;
-            let p = fetch(urlPrestadorAdicional)
-              .then(r => r.json())
-              .then(dadosPrestador => {
-                const totalAgente = calcularTotalAgente(adicional.motivo || 'Sem motivo', adicional, dadosPrestador);
-                adicional.total = totalAgente;
-                container.innerHTML = criarAgenteHTML(dadosPrestador, adicional.motivo || 'Sem motivo', adicional);
-              })
-              .catch(err => {
-                container.innerHTML = `<p class='text-danger'>Erro ao carregar prestador do agente adicional ${idx + 1}.</p>`;
-              });
-            promises.push(p);
-          }
-        });
-  
-        // Mostra as colunas de agentes adicionais, se houver
-        if (adicionais.length > 0) {
-          adicional1Col.style.display = "";
-        }
-        if (adicionais.length > 1) {
-          adicional2Col.style.display = "";
-        }
-  
-        // Aguarda que todas as requisições dos agentes sejam concluídas
-        Promise.all(promises).then(() => {
-          // 4) Renderiza os dados do Acionamento somente após obter os totais dos agentes
-          const todosAgentes = [agentePrincipal, ...adicionais];
-          const totalCliente = calcularTotalCliente(cliente, todosAgentes);
-          const acionamentoBody = document.getElementById("acionamento-body");
-          acionamentoBody.innerHTML = criarAcionamentoHTML(agentePrincipal, todosAgentes, totalCliente);
-  
-          // 5) Atualiza o TOTAL do CLIENTE no card do cliente
-          const clienteTotalElem = document.getElementById("cliente-total");
-          if (clienteTotalElem) {
-            clienteTotalElem.textContent = `R$ ${totalCliente.toFixed(2)}`;
-          }
-        });
-      })
-      .catch(error => {
-        console.error(error);
       });
-  
-    // ---------------------------------------------------------
-    //  Função: formata datas
-    // ---------------------------------------------------------
+
+      // Mostra as colunas de agentes adicionais, se houver
+      if (adicionais.length > 0) {
+        adicional1Col.style.display = "";
+      }
+      if (adicionais.length > 1) {
+        adicional2Col.style.display = "";
+      }
+
+      // Aguarda que todas as requisições dos agentes sejam concluídas
+      Promise.all(promises).then(() => {
+        // 4) Renderiza os dados do Acionamento somente após obter os totais dos agentes
+        const todosAgentes = [agentePrincipal, ...adicionais];
+        const totalCliente = calcularTotalCliente(cliente, todosAgentes);
+
+        // Agora calculamos a hora total e hora excedente do CLIENTE
+        // Soma da hora total e excedente de cada agente
+        const { horaTotalCliente, horaExcedenteCliente } = calcularHorasCliente(todosAgentes, cliente);
+
+        const acionamentoBody = document.getElementById("acionamento-body");
+        acionamentoBody.innerHTML = criarAcionamentoHTML(agentePrincipal, todosAgentes, totalCliente, horaTotalCliente, horaExcedenteCliente);
+
+        // 5) Atualiza o TOTAL do CLIENTE no card do cliente
+        const clienteTotalElem = document.getElementById("cliente-total");
+        if (clienteTotalElem) {
+          clienteTotalElem.textContent = `R$ ${totalCliente.toFixed(2)}`;
+        }
+      });
+    })
+    .catch(error => {
+      console.error(error);
+    });
+
+  // ---------------------------------------------------------
+  //  Função: formata datas
+  // ---------------------------------------------------------
+  function formatDateTime(dtString) {
+    if (!dtString) return "Não informado";
+    return new Date(dtString).toLocaleString("pt-BR");
+  }
+
+  // ---------------------------------------------------------
+  //  Função: parseDecimal (string -> float)
+  // ---------------------------------------------------------
+  function parseDecimal(value) {
+    if (!value || value === "Não informado") return 0.0;
+    let v = value.replace(",", ".");
+    let f = parseFloat(v);
+    return isNaN(f) ? 0.0 : f;
+  }
+
+  // ---------------------------------------------------------
+  //  Função: diferença em horas (decimal)
+  // ---------------------------------------------------------
+  function diferencaHoras(inicio, fim) {
+    if (!inicio || !fim) return 0.0;
+    const i = new Date(inicio);
+    const f = new Date(fim);
+    if (isNaN(i) || isNaN(f) || f < i) return 0.0;
+    return (f - i) / (1000 * 60 * 60);
+  }
+
+  // ---------------------------------------------------------
+  //  Calcular Total do Agente (exibido no card do agente)
+  // ---------------------------------------------------------
+  function calcularTotalAgente(motivo, agenteData, dadosPrestador) {
+    const horaExc = parseDecimal(agenteData.hora_excedente);
+    const kmExc = parseDecimal(agenteData.km_excedente);
+
+    let total = 0.0;
+    if (motivo === "Antenista") {
+      const valorHora = parseDecimal(dadosPrestador.valorh_antenista);
+      const valorKm = parseDecimal(dadosPrestador.valorkm_antenista);
+      const valorFixo = parseDecimal(dadosPrestador.valor_antenista);
+      total = (horaExc * valorHora) + (kmExc * valorKm) + valorFixo;
+    }
+    else if (motivo === "Pronta Resposta Armado") {
+      const valorHora = parseDecimal(dadosPrestador.valorh_armado);
+      const valorKm = parseDecimal(dadosPrestador.valorkm_armado);
+      const valorFixo = parseDecimal(dadosPrestador.valor_prontaresposta_armado);
+      total = (horaExc * valorHora) + (kmExc * valorKm) + valorFixo;
+    }
+    else if (motivo === "Pronta Resposta Desarmado") {
+      const valorHora = parseDecimal(dadosPrestador.valorh_desarmado);
+      const valorKm = parseDecimal(dadosPrestador.valorkm_desarmado);
+      const valorFixo = parseDecimal(dadosPrestador.valor_prontaresposta_desarmado);
+      total = (horaExc * valorHora) + (kmExc * valorKm) + valorFixo;
+    }
+    return total;
+  }
+
+  // ---------------------------------------------------------
+  //  Calcular Horas Totais e Excedentes do Cliente
+  // ---------------------------------------------------------
+  // Soma da hora total e excedente de cada agente, conforme o motivo e a franquia do CLIENTE
+  function calcularHorasCliente(agentes, cliente) {
+    let horaTotalCliente = 0.0;
+    let horaExcedenteCliente = 0.0;
+
+    agentes.forEach(ag => {
+      const horasDecimais = diferencaHoras(ag.data_hora_inicial, ag.data_hora_final);
+      horaTotalCliente += horasDecimais; // soma todas as horas
+
+      // Verifica a franquia do cliente para cada motivo
+      let franquiaHoraCliente = 0;
+      if (ag.motivo === "Antenista") {
+        franquiaHoraCliente = parseDecimal(cliente.franquia_hora_antenista);
+      } else if (ag.motivo === "Pronta Resposta Armado") {
+        franquiaHoraCliente = parseDecimal(cliente.franquia_hora_armado);
+      } else if (ag.motivo === "Pronta Resposta Desarmado") {
+        franquiaHoraCliente = parseDecimal(cliente.franquia_hora_desarmado);
+      }
+      let horaExcedenteDecimal = horasDecimais - franquiaHoraCliente;
+      if (horaExcedenteDecimal < 0) horaExcedenteDecimal = 0;
+
+      horaExcedenteCliente += horaExcedenteDecimal;
+    });
+
+    return { horaTotalCliente, horaExcedenteCliente };
+  }
+
+  // ---------------------------------------------------------
+  //  Calcular Total do Cliente (soma de todos os agentes)
+  // ---------------------------------------------------------
+  function calcularTotalCliente(cliente, agentes) {
+    let total = 0.0;
+    agentes.forEach(ag => {
+      const motivo = ag.motivo || "";
+      const kmTotal = parseDecimal(ag.km_total);
+      const horasDecimais = diferencaHoras(ag.data_hora_inicial, ag.data_hora_final);
+
+      if (motivo === "Antenista") {
+        let kmExced = kmTotal - parseDecimal(cliente.franquia_km_antenista);
+        if (kmExced < 0) kmExced = 0;
+        let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_antenista);
+        if (horaExced < 0) horaExced = 0;
+
+        let valKm = parseDecimal(cliente.valorkm_antenista);
+        let valHora = parseDecimal(cliente.valorh_antenista);
+        let valFixo = parseDecimal(cliente.valor_antenista);
+
+        total += (kmExced * valKm) + (horaExced * valHora) + valFixo;
+      }
+      else if (motivo === "Pronta Resposta Armado") {
+        let kmExced = kmTotal - parseDecimal(cliente.franquia_km_armado);
+        if (kmExced < 0) kmExced = 0;
+        let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_armado);
+        if (horaExced < 0) horaExced = 0;
+
+        let valKm = parseDecimal(cliente.valorkm_armado);
+        let valHora = parseDecimal(cliente.valorh_armado);
+        let valAcion = parseDecimal(cliente.valor_prontaresposta_armado);
+
+        total += (horaExced * valHora) + (kmExced * valKm) + valAcion;
+      }
+      else if (motivo === "Pronta Resposta Desarmado") {
+        let kmExced = kmTotal - parseDecimal(cliente.franquia_km_desarmado);
+        if (kmExced < 0) kmExced = 0;
+        let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_desarmado);
+        if (horaExced < 0) horaExced = 0;
+
+        let valKm = parseDecimal(cliente.valorkm_desarmado);
+        let valHora = parseDecimal(cliente.valorh_desarmado);
+        let valAcion = parseDecimal(cliente.valor_prontaresposta_desarmado);
+
+        total += (kmExced * valKm) + (horaExced * valHora) + valAcion;
+      }
+    });
+    return total;
+  }
+
+  // ---------------------------------------------------------
+  //  Criar HTML do Cliente (colocamos <span> para total)
+  // ---------------------------------------------------------
+  function criarClienteHTML(cliente, horaTotalCliente, horaExcedenteCliente) {
+  return `
+    <p><strong>Nome:</strong> ${cliente.nome || "Não informado"}</p>
+    <p><strong>CNPJ:</strong> ${cliente.cnpj || "Não informado"}</p>
+    <p><strong>Telefone:</strong> ${cliente.telefone || "Não informado"}</p>
+    <p><strong>Banco:</strong> ${cliente.banco || "Não informado"}</p>
+    <p><strong>Agência:</strong> ${cliente.agencia || "Não informado"}</p>
+    <p><strong>Conta:</strong> ${cliente.conta || "Não informado"}</p>
+    
+    <hr>
+    <p><strong>Valor Pronta Resp. Armado:</strong> R$ ${cliente.valor_prontaresposta_armado || "0"}</p>
+    <p><strong>Franquia Hora Armado:</strong> ${cliente.franquia_hora_armado || "0"} h</p>
+    <p><strong>Franquia KM Armado:</strong> ${cliente.franquia_km_armado || "0"} km</p>
+    <p><strong>Valor KM Armado:</strong> R$ ${cliente.valorkm_armado || "0"}</p>
+    <p><strong>Valor Hora Armado:</strong> R$ ${cliente.valorh_armado || "0"}</p>
+    
+    <hr>
+    <p><strong>Valor Pronta Resp. Desarmado:</strong> R$ ${cliente.valor_prontaresposta_desarmado || "0"}</p>
+    <p><strong>Franquia Hora Desarmado:</strong> ${cliente.franquia_hora_desarmado || "0"} h</p>
+    <p><strong>Franquia KM Desarmado:</strong> ${cliente.franquia_km_desarmado || "0"} km</p>
+    <p><strong>Valor KM Desarmado:</strong> R$ ${cliente.valorkm_desarmado || "0"}</p>
+    <p><strong>Valor Hora Desarmado:</strong> R$ ${cliente.valorh_desarmado || "0"}</p>
+    
+    <hr>
+    <p><strong>Valor Antenista:</strong> R$ ${cliente.valor_antenista || "0"}</p>
+    <p><strong>Franquia Hora Antenista:</strong> ${cliente.franquia_hora_antenista || "0"} h</p>
+    <p><strong>Franquia KM Antenista:</strong> ${cliente.franquia_km_antenista || "0"} km</p>
+    <p><strong>Valor KM Antenista:</strong> R$ ${cliente.valorkm_antenista || "0"}</p>
+    <p><strong>Valor Hora Antenista:</strong> R$ ${cliente.valorh_antenista || "0"}</p>
+    
+    <hr>
+    <p><strong>Total do Cliente:</strong> <span id="cliente-total">R$ 0,00</span></p>
+    
+    
+  `;
+}
+
+
+  // ---------------------------------------------------------
+  //  Criar HTML do Agente (mostramos o total do agente)
+  // ---------------------------------------------------------
+  function criarAgenteHTML(dadosPrestador, motivo, agenteData = null) {
+    // Formata horas decimais -> "hh:mm:ss"
+    function formatDecimalHours(decimalHours) {
+      const totalSeconds = Math.round(decimalHours * 3600);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Formata datas
     function formatDateTime(dtString) {
       if (!dtString) return "Não informado";
       return new Date(dtString).toLocaleString("pt-BR");
     }
-  
-    // ---------------------------------------------------------
-    //  Função: parseDecimal (string -> float)
-    // ---------------------------------------------------------
-    function parseDecimal(value) {
-      if (!value || value === "Não informado") return 0.0;
-      let v = value.replace(",", ".");
-      let f = parseFloat(v);
-      return isNaN(f) ? 0.0 : f;
-    }
-  
-    // ---------------------------------------------------------
-    //  Função: diferença em horas (decimal)
-    // ---------------------------------------------------------
-    function diferencaHoras(inicio, fim) {
-      if (!inicio || !fim) return 0.0;
-      const i = new Date(inicio);
-      const f = new Date(fim);
-      if (isNaN(i) || isNaN(f) || f < i) return 0.0;
-      return (f - i) / (1000 * 60 * 60);
-    }
-  
-    // ---------------------------------------------------------
-    //  Calcular Total do Agente (exibido no card do agente)
-    // ---------------------------------------------------------
-    function calcularTotalAgente(motivo, agenteData, dadosPrestador) {
-      const horaExc = parseDecimal(agenteData.hora_excedente);
-      const kmExc = parseDecimal(agenteData.km_excedente);
-  
-      let total = 0.0;
-      if (motivo === "Antenista") {
-        const valorHora = parseDecimal(dadosPrestador.valorh_antenista);
-        const valorKm = parseDecimal(dadosPrestador.valorkm_antenista);
-        const valorFixo = parseDecimal(dadosPrestador.valor_antenista);
-        total = (horaExc * valorHora) + (kmExc * valorKm) + valorFixo;
-      }
-      else if (motivo === "Pronta Resposta Armado") {
-        const valorHora = parseDecimal(dadosPrestador.valorh_armado);
-        const valorKm = parseDecimal(dadosPrestador.valorkm_armado);
-        const valorFixo = parseDecimal(dadosPrestador.valor_prontaresposta_armado);
-        total = (horaExc * valorHora) + (kmExc * valorKm) + valorFixo;
-      }
-      else if (motivo === "Pronta Resposta Desarmado") {
-        const valorHora = parseDecimal(dadosPrestador.valorh_desarmado);
-        const valorKm = parseDecimal(dadosPrestador.valorkm_desarmado);
-        const valorFixo = parseDecimal(dadosPrestador.valor_prontaresposta_desarmado);
-        total = (horaExc * valorHora) + (kmExc * valorKm) + valorFixo;
-      }
-      return total;
-    }
-  
-    // ---------------------------------------------------------
-    //  Calcular Total do Cliente (soma de todos os agentes)
-    // ---------------------------------------------------------
-    function calcularTotalCliente(cliente, agentes) {
-      let total = 0.0;
-      agentes.forEach(ag => {
-        const motivo = ag.motivo || "";
-        const kmTotal = parseDecimal(ag.km_total);
-        const horasDecimais = diferencaHoras(ag.data_hora_inicial, ag.data_hora_final);
-  
-        if (motivo === "Antenista") {
-          let kmExced = kmTotal - parseDecimal(cliente.franquia_km_antenista);
-          if (kmExced < 0) kmExced = 0;
-          let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_antenista);
-          if (horaExced < 0) horaExced = 0;
-  
-          let valKm = parseDecimal(cliente.valorkm_antenista);
-          let valHora = parseDecimal(cliente.valorh_antenista);
-          let valFixo = parseDecimal(cliente.valor_antenista);
-  
-          total += (kmExced * valKm) + (horaExced * valHora) + valFixo;
-        }
-        else if (motivo === "Pronta Resposta Armado") {
-          let kmExced = kmTotal - parseDecimal(cliente.franquia_km_armado);
-          if (kmExced < 0) kmExced = 0;
-          let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_armado);
-          if (horaExced < 0) horaExced = 0;
-  
-          let valKm = parseDecimal(cliente.valorkm_armado);
-          let valHora = parseDecimal(cliente.valorh_armado);
-          let valAcion = parseDecimal(cliente.valor_prontaresposta_armado);
-  
-          total += (horaExced * valHora) + (kmExced * valKm) + valAcion;
-        }
-        else if (motivo === "Pronta Resposta Desarmado") {
-          let kmExced = kmTotal - parseDecimal(cliente.franquia_km_desarmado);
-          if (kmExced < 0) kmExced = 0;
-          let horaExced = horasDecimais - parseDecimal(cliente.franquia_hora_desarmado);
-          if (horaExced < 0) horaExced = 0;
-  
-          let valKm = parseDecimal(cliente.valorkm_desarmado);
-          let valHora = parseDecimal(cliente.valorh_desarmado);
-          let valAcion = parseDecimal(cliente.valor_prontaresposta_desarmado);
-  
-          total += (kmExced * valKm) + (horaExced * valHora) + valAcion;
-        }
-      });
-      return total;
-    }
-  
-    // ---------------------------------------------------------
-    //  Criar HTML do Cliente (colocamos <span> para total)
-    // ---------------------------------------------------------
-    function criarClienteHTML(cliente) {
-      return `
-        <p><strong>Nome:</strong> ${cliente.nome || "Não informado"}</p>
-        <p><strong>CNPJ:</strong> ${cliente.cnpj || "Não informado"}</p>
-        <p><strong>Telefone:</strong> ${cliente.telefone || "Não informado"}</p>
-        <p><strong>Banco:</strong> ${cliente.banco || "Não informado"}</p>
-        <p><strong>Agência:</strong> ${cliente.agencia || "Não informado"}</p>
-        <p><strong>Conta:</strong> ${cliente.conta || "Não informado"}</p>
-  
-        <hr>
-        <p><strong>Valor Pronta Resp. Armado:</strong> R$ ${cliente.valor_prontaresposta_armado || "0.00"}</p>
-        <p><strong>Franquia Hora Armado:</strong> ${cliente.franquia_hora_armado || "0"} h</p>
-        <p><strong>Franquia KM Armado:</strong> ${cliente.franquia_km_armado || "0"} km</p>
-        <p><strong>Valor KM Armado:</strong> R$ ${cliente.valorkm_armado || "0.00"}</p>
-        <p><strong>Valor Hora Armado:</strong> R$ ${cliente.valorh_armado || "0.00"}</p>
-        <hr>
-        <p><strong>Valor Pronta Resp. Desarmado:</strong> R$ ${cliente.valor_prontaresposta_desarmado || "0.00"}</p>
-        <p><strong>Franquia Hora Desarmado:</strong> ${cliente.franquia_hora_desarmado || "0"} h</p>
-        <p><strong>Franquia KM Desarmado:</strong> ${cliente.franquia_km_desarmado || "0"} km</p>
-        <p><strong>Valor KM Desarmado:</strong> R$ ${cliente.valorkm_desarmado || "0.00"}</p>
-        <p><strong>Valor Hora Desarmado:</strong> R$ ${cliente.valorh_desarmado || "0.00"}</p>
-        <hr>
-        <p><strong>Valor Antenista:</strong> R$ ${cliente.valor_antenista || "0.00"}</p>
-        <p><strong>Franquia Hora Antenista:</strong> ${cliente.franquia_hora_antenista || "0"} h</p>
-        <p><strong>Franquia KM Antenista:</strong> ${cliente.franquia_km_antenista || "0"} km</p>
-        <p><strong>Valor KM Antenista:</strong> R$ ${cliente.valorkm_antenista || "0.00"}</p>
-        <p><strong>Valor Hora Antenista:</strong> R$ ${cliente.valorh_antenista || "0.00"}</p>
-  
-        <hr>
-        <p><strong>Total do Cliente:</strong> <span id="cliente-total">R$ 0.00</span></p>
+
+    let htmlBase = `
+      <p><strong>Nome:</strong> ${dadosPrestador.Nome || "Não informado"}</p>
+      <p><strong>CPF/CNPJ:</strong> ${dadosPrestador.cpf_cnpj || "Não informado"}</p>
+      <p><strong>Telefone:</strong> ${dadosPrestador.telefone || "Não informado"}</p>
+      <p><strong>Banco:</strong> ${dadosPrestador.banco || "Não informado"}</p>
+      <p><strong>Agência:</strong> ${dadosPrestador.agencia || "Não informado"}</p>
+      <p><strong>Conta:</strong> ${dadosPrestador.conta || "Não informado"}</p>
+      <p><strong>Serviços:</strong> ${dadosPrestador.servicos || "Não informado"}</p>
+      <p><strong>Motivo:</strong> ${motivo}</p>
+      <hr>
+    `;
+
+    // Exibe parâmetros específicos do motivo
+    let htmlMotivo = "";
+    if (motivo === "Antenista") {
+      htmlMotivo = `
+        <p><strong>Valor Antenista:</strong> R$ ${dadosPrestador.valor_antenista || "0.00"}</p>
+        <p><strong>Franquia Hora Antenista:</strong> ${dadosPrestador.franquia_hora_antenista || "0"} h</p>
+        <p><strong>Franquia KM Antenista:</strong> ${dadosPrestador.franquia_km_antenista || "0"} km</p>
+        <p><strong>Valor KM Antenista:</strong> R$ ${dadosPrestador.valorkm_antenista || "0.00"}</p>
+        <p><strong>Valor Hora Antenista:</strong> R$ ${dadosPrestador.valorh_antenista || "0.00"}</p>
       `;
-    }
-  
-    // ---------------------------------------------------------
-    //  Criar HTML do Agente (mostramos o total do agente)
-    // ---------------------------------------------------------
-    function criarAgenteHTML(dadosPrestador, motivo, agenteData = null) {
-      let htmlBase = `
-        <p><strong>Nome:</strong> ${dadosPrestador.Nome || "Não informado"}</p>
-        <p><strong>CPF/CNPJ:</strong> ${dadosPrestador.cpf_cnpj || "Não informado"}</p>
-        <p><strong>Telefone:</strong> ${dadosPrestador.telefone || "Não informado"}</p>
-        <p><strong>Banco:</strong> ${dadosPrestador.banco || "Não informado"}</p>
-        <p><strong>Agência:</strong> ${dadosPrestador.agencia || "Não informado"}</p>
-        <p><strong>Conta:</strong> ${dadosPrestador.conta || "Não informado"}</p>
-        <p><strong>Serviços:</strong> ${dadosPrestador.servicos || "Não informado"}</p>
-        <p><strong>Motivo:</strong> ${ motivo }</p>
-        <hr>
+    } else if (motivo === "Pronta Resposta Armado") {
+      htmlMotivo = `
+        <p><strong>Valor Pronta Resp. Armado:</strong> R$ ${dadosPrestador.valor_prontaresposta_armado || "0.00"}</p>
+        <p><strong>Franquia Hora Armado:</strong> ${dadosPrestador.franquia_hora_armado || "0"} h</p>
+        <p><strong>Franquia KM Armado:</strong> ${dadosPrestador.franquia_km_armado || "0"} km</p>
+        <p><strong>Valor KM Armado:</strong> R$ ${dadosPrestador.valorkm_armado || "0.00"}</p>
+        <p><strong>Valor Hora Armado:</strong> R$ ${dadosPrestador.valorh_armado || "0.00"}</p>
       `;
-  
-      let htmlMotivo = "";
-      if (motivo === "Antenista") {
-        htmlMotivo = `
-          <p><strong>Valor Antenista:</strong> R$ ${dadosPrestador.valor_antenista || "0.00"}</p>
-          <p><strong>Franquia Hora Antenista:</strong> ${dadosPrestador.franquia_hora_antenista || "0"} h</p>
-          <p><strong>Franquia KM Antenista:</strong> ${dadosPrestador.franquia_km_antenista || "0"} km</p>
-          <p><strong>Valor KM Antenista:</strong> R$ ${dadosPrestador.valorkm_antenista || "0.00"}</p>
-          <p><strong>Valor Hora Antenista:</strong> R$ ${dadosPrestador.valorh_antenista || "0.00"}</p>
-        `;
-      } else if (motivo === "Pronta Resposta Armado") {
-        htmlMotivo = `
-          <p><strong>Valor Pronta Resp. Armado:</strong> R$ ${dadosPrestador.valor_prontaresposta_armado || "0.00"}</p>
-          <p><strong>Franquia Hora Armado:</strong> ${dadosPrestador.franquia_hora_armado || "0"} h</p>
-          <p><strong>Franquia KM Armado:</strong> ${dadosPrestador.franquia_km_armado || "0"} km</p>
-          <p><strong>Valor KM Armado:</strong> R$ ${dadosPrestador.valorkm_armado || "0.00"}</p>
-          <p><strong>Valor Hora Armado:</strong> R$ ${dadosPrestador.valorh_armado || "0.00"}</p>
-        `;
-      } else if (motivo === "Pronta Resposta Desarmado") {
-        htmlMotivo = `
-          <p><strong>Valor Pronta Resp. Desarmado:</strong> R$ ${dadosPrestador.valor_prontaresposta_desarmado || "0.00"}</p>
-          <p><strong>Franquia Hora Desarmado:</strong> ${dadosPrestador.franquia_hora_desarmado || "0"} h</p>
-          <p><strong>Franquia KM Desarmado:</strong> ${dadosPrestador.franquia_km_desarmado || "0"} km</p>
-          <p><strong>Valor KM Desarmado:</strong> R$ ${dadosPrestador.valorkm_desarmado || "0.00"}</p>
-          <p><strong>Valor Hora Desarmado:</strong> R$ ${dadosPrestador.valorh_desarmado || "0.00"}</p>
-        `;
-      } else {
-        htmlMotivo = `<p class="text-muted">Nenhum campo específico para o motivo: ${motivo}</p>`;
-      }
-  
-      let htmlExcedentes = `<hr>`;
-      let totalAgente = 0.0;
-  
-      if (agenteData) {
-        const horaTotalDecimal = diferencaHoras(agenteData.data_hora_inicial, agenteData.data_hora_final);
-        const kmTotal = agenteData.km_total || "0";
-        htmlExcedentes += `
-          <p><strong>Data/Hora Inicial:</strong> ${formatDateTime(agenteData.data_hora_inicial)}</p>
-          <p><strong>Data/Hora Final:</strong> ${formatDateTime(agenteData.data_hora_final)}</p>
-          <p><strong>Agentes:</strong> ${kmTotal}</p>
-          <p><strong>KM Excedente:</strong> ${agenteData.km_excedente || "0"}</p>
-          <p><strong>Hora Excedente:</strong> ${agenteData.hora_excedente || "0"}</p>
-          <p><strong>Hora Total (decimal):</strong> ${horaTotalDecimal.toFixed(2)}</p>
-        `;
-        totalAgente = calcularTotalAgente(motivo, agenteData, dadosPrestador);
-      }
-  
-      const htmlTotal = `
-        <hr>
-        <p><strong>Total do Agente:</strong> R$ ${totalAgente.toFixed(2)}</p>
+    } else if (motivo === "Pronta Resposta Desarmado") {
+      htmlMotivo = `
+        <p><strong>Valor Pronta Resp. Desarmado:</strong> R$ ${dadosPrestador.valor_prontaresposta_desarmado || "0.00"}</p>
+        <p><strong>Franquia Hora Desarmado:</strong> ${dadosPrestador.franquia_hora_desarmado || "0"} h</p>
+        <p><strong>Franquia KM Desarmado:</strong> ${dadosPrestador.franquia_km_desarmado || "0"} km</p>
+        <p><strong>Valor KM Desarmado:</strong> R$ ${dadosPrestador.valorkm_desarmado || "0.00"}</p>
+        <p><strong>Valor Hora Desarmado:</strong> R$ ${dadosPrestador.valorh_desarmado || "0.00"}</p>
       `;
-      
-      return htmlBase + htmlMotivo + htmlExcedentes + htmlTotal;
+    } else {
+      htmlMotivo = `<p class="text-muted">Nenhum campo específico para o motivo: ${motivo}</p>`;
     }
-  
-    // ---------------------------------------------------------
-    //  Criar HTML do Acionamento (tabela horizontal)
-    // ---------------------------------------------------------
-    // O custo de acionamento é a soma do total de todos os agentes.
-    // A função recebe: agentePrincipal, o array de todos os agentes e o totalCliente.
-    function criarAcionamentoHTML(agentePrincipal, todosAgentes, totalCliente) {
-      // Verifica se agentePrincipal está definido para evitar erros
-      if (!agentePrincipal || !agentePrincipal.data_hora_inicial || !agentePrincipal.data_hora_final) {
-        return `<p class="text-danger">Erro: Dados do acionamento não encontrados.</p>`;
-      }
-  
-      // Calcula a diferença de horas em formato decimal (usando dados do agente principal)
-      const horaTotalDecimal = diferencaHoras(
-        agentePrincipal.data_hora_inicial,
-        agentePrincipal.data_hora_final
-      );
-  
-      // Calcula o custo de acionamento como a soma do total de todos os agentes
-      const custoAcionamento = todosAgentes.reduce((acc, ag) => acc + (ag.total || 0), 0);
-  
-      return `
-        <table class="table table-bordered table-sm text-white">
-          <thead>
-            <tr>
-              <th>Data/Hora Inicial</th>
-              <th>Data/Hora Final</th>
-             
-             
-              <th>Total Cliente</th>
-              <th>Custo de agentes</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>${formatDateTime(agentePrincipal.data_hora_inicial)}</td>
-              <td>${formatDateTime(agentePrincipal.data_hora_final)}</td>
-             
-             
-              <td>${totalCliente ?? "0"}</td>
-              <td>${custoAcionamento.toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
+
+    // Exibe horários e excedentes do agente
+    let htmlExcedentes = `<hr>`;
+    let totalAgente = 0.0;
+    if (agenteData) {
+      const horaTotalDecimal = diferencaHoras(agenteData.data_hora_inicial, agenteData.data_hora_final);
+
+      htmlExcedentes += `
+        <p><strong>Data/Hora Inicial:</strong> ${formatDateTime(agenteData.data_hora_inicial)}</p>
+        <p><strong>Data/Hora Final:</strong> ${formatDateTime(agenteData.data_hora_final)}</p>
+        <p><strong>KM Total:</strong> ${agenteData.km_total || "0"}</p>
+        <p><strong>KM Excedente:</strong> ${agenteData.km_excedente || "0"}</p>
+        <p><strong>Hora Total (Agente):</strong> ${formatDecimalHours(horaTotalDecimal)}</p>
+        <p><strong>Hora Excedente (Agente):</strong> ${formatDecimalHours(parseDecimal(agenteData.hora_excedente || "0"))}</p>
       `;
+
+      totalAgente = agenteData.total || 0.0;
     }
-  });
+
+    const htmlTotal = `
+      <hr>
+      <p><strong>Total do Agente:</strong> R$ ${totalAgente.toFixed(2)}</p>
+    `;
+
+    return htmlBase + htmlMotivo + htmlExcedentes + htmlTotal;
+  }
+
+  // ---------------------------------------------------------
+  //  Criar HTML do Acionamento (tabela horizontal)
+  // ---------------------------------------------------------
+  function criarAcionamentoHTML(agentePrincipal, todosAgentes, totalCliente, horaTotalCliente, horaExcedenteCliente) {
+    if (!agentePrincipal || !agentePrincipal.data_hora_inicial || !agentePrincipal.data_hora_final) {
+      return `<p class="text-danger">Erro: Dados do acionamento não encontrados.</p>`;
+    }
+
+    // Calcula o custo de acionamento como a soma do total de todos os agentes
+    const custoAcionamento = todosAgentes.reduce((acc, ag) => acc + (ag.total || 0), 0);
+
+    return `
+      <table class="table table-bordered table-sm text-white">
+        <thead>
+          <tr>
+            <th>Data/Hora Inicial (Principal)</th>
+            <th>Data/Hora Final (Principal)</th>
+            <th>Total Cliente</th>
+            <th>Custo de agentes</th>
+            <th>Hora Total (Cliente)</th>
+            <th>Hora Excedente (Cliente)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>${formatDateTime(agentePrincipal.data_hora_inicial)}</td>
+            <td>${formatDateTime(agentePrincipal.data_hora_final)}</td>
+            <td>R$ ${totalCliente.toFixed(2)}</td>
+            <td>R$ ${custoAcionamento.toFixed(2)}</td>
+            <td>${formatDecimalHours(horaTotalCliente)}</td>
+            <td>${formatDecimalHours(horaExcedenteCliente)}</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+  }
+
+  // ---------------------------------------------------------
+  //  Funções Auxiliares
+  // ---------------------------------------------------------
+  function formatDecimalHours(decimalHours) {
+    const totalSeconds = Math.round(decimalHours * 3600);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function formatDateTime(dtString) {
+    if (!dtString) return "Não informado";
+    return new Date(dtString).toLocaleString("pt-BR");
+  }
+});
 </script>
 {% endblock %}

@@ -37,6 +37,7 @@ from .views import (
     FaturamentoListView,
     marcar_pago,
     RegistroPagamentohListView,
+    all_prestadores_addresses,
 )
 
 # Definindo o namespace do app
@@ -100,7 +101,7 @@ urlpatterns = [
     # Edição de prestadores
     path("prestadores/editar/<int:pk>/", prestadoresupdate.as_view(), name="editar_prestador"),
     path('registro_pagamento/<int:pk>/detalhes/', views.detalhar_acionamento, name='detalhar_acionamento'),
-
+path('api/prestadores/enderecos/', all_prestadores_addresses, name='all_prestadores_addresses'),
      path('api/registro_pagamento/<int:pk>/detalhes/', detalhar_acionamento_endpoint, name='detalhar_acionamento_endpoint'),
 ]
 

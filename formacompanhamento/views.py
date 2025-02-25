@@ -1381,3 +1381,28 @@ def marcar_pago(request, pk):
     reg.status = "Pago"
     reg.save()
     return redirect('formacompanhamento:faturamento_lista') # ou outra rota que liste os registros
+
+
+
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from .models import prestadores
+
+@require_GET
+def all_prestadores_addresses(request):
+    # Consulta todos os prestadores
+    prestadores_list = prestadores.objects.all()
+    
+    # Cria uma lista de dicionários com os dados desejados
+    data = []
+    for p in prestadores_list:
+        data.append({
+            "id": p.pk,
+            "nome": p.Nome,
+            "endereco": p.endereco,
+        })
+    
+    return JsonResponse(data, safe=False)
