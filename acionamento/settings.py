@@ -82,7 +82,7 @@ DATABASES = {
         'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
          'OPTIONS': {
-            'sslmode': 'require',  # ou 'require', dependendo da necessidade
+            'sslmode': 'verify-ca',  # ou 'require', dependendo da necessidade
             'sslrootcert': '/etc/ssl/postgresql.crt',
         },
     }
