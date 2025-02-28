@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  
   <!-- Charset e Viewport -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +31,7 @@
       margin: 0;
       font-family: sans-serif;
       /* Imagem de fundo e cor */
-      background: #5e5d5d url("{% static 'core/images/background.png' %}") no-repeat center center fixed;
+      background-color: #2a2a2a;
       background-size: 50% auto;  /* ajuste se quiser maior/menor */
       
       /* Animação de fade-in (1s) */
@@ -47,9 +48,9 @@
       position: fixed;
       top: 0;
       left: 0;
-      height: 100vh;
-      width: 120px; /* Largura quando fechada */
-      background: linear-gradient(160deg, #3d3d3d, #2a2a2a);
+      height: 200vh;
+      width: 150px; /* Largura quando fechada */
+      background: linear-gradient(160deg, #f5c87b, #2a2a2a);
       box-shadow: 2px 0 8px rgba(0, 0, 0, 0.6);
       overflow-x: hidden;
       transition: width 0.1s ease;
@@ -85,12 +86,16 @@
       list-style: none;
       padding: 0;
       margin: 0;
+      justify-content: center;
+      flex-grow: 1;
     }
+
     .sidebar-menu li {
       padding: 5px 10px;
       text-align: left;
       transition: transform 0.1s ease;
     }
+    
     .sidebar-menu li:hover {
       transform: scale(1.02);
     }
@@ -101,7 +106,7 @@
       align-items: center;
       justify-content: flex-start;
       white-space: nowrap;
-      font-size: 16px;
+      font-size: 20px;
       padding: 10px;
       border-radius: 6px;
       transition: background-color 0.3s ease, color 0.3s ease;
@@ -111,7 +116,7 @@
       color: #ffffff;
     }
     .sidebar-menu li a i {
-      font-size: 1.8rem;
+      font-size: 2.2rem;
       margin-right: 0;
       transition: transform 0.1s ease;
     }
@@ -153,22 +158,87 @@
       height: 100vh;
       margin: 0;
     }
+/* HEADER / NAVBAR */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Mantém o nome centralizado */
+    height: 60px;
+    background: linear-gradient(160deg, #f5c87b, #2a2a2a);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    position: fixed;
+    width: calc(100% - 150px); /* Desconta a largura do menu lateral */
+    left: 150px; /* Move a navbar para alinhar corretamente */
+    top: 0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+  .gs-link {
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .gs-link:hover {
+    color: #ffd700;
+  }
+
+/* Ajuste do conteúdo para não ficar atrás do header */
+  .content-container {
+    padding-top: 50px;
+    margin-left: 150px; /* Ajuste conforme a largura do menu lateral */
+  } 
+  @keyframes scrollText {
+    0% { transform: translateX(0); } /* Aparece normal */
+    10% { transform: translateX(0); } /* Mantém visível por um tempo */
+    100% { transform: translateX(-100%); } /* Inicia o scroll */
+}
+
+.scroll-container {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    text-align: center; /* Centraliza o texto antes do scroll */
+}
+
+.scroll-text {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    animation: scrollText 5s linear infinite; /* Tempo do scroll (era 10s, agora 5s) */
+    animation-delay: 1s; /* Espera 3 segundos antes de iniciar */
+}
+
+
   </style>
   
   {% block extra_head %}{% endblock %}
 </head>
+
+
 <body>
   {% comment %}
     Se o usuário estiver logado, mostramos a sidebar;
     senão, mostramos apenas a div .content-container.not-logged-in
   {% endcomment %}
   
+
   {% if user.is_authenticated %}
+
+  </header></div>
     <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="sidebar-header">
         <!-- Ajuste aqui para a logo do seu projeto -->
-        <img src="{% static 'core/images/background.png' %}" alt="Logo" class="sidebar-logo">
+        <img src="{% static 'core/images/favicon.ico' %}" alt="Logo" class="sidebar-logo">
       </div>
       <ul class="sidebar-menu">
         <li>

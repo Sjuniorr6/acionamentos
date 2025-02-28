@@ -2,6 +2,7 @@
 {% load widget_tweaks %}
 
 {% block content %}
+{% include "components/_header.html" %}
 <!-- Inclua o CSS do Mapbox -->
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" rel="stylesheet" />
 
@@ -11,6 +12,19 @@
     height: 500px;
     margin-top: 20px;
   }
+
+  .container {
+    max-width: 80%; /* Adjust as needed */
+}
+
+.card {
+    width: 100%;
+}
+
+form input, form select, form textarea {
+    width: 100% !important;
+}
+
 </style>
 
 <div class="container mt-4">

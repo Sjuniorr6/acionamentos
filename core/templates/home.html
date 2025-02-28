@@ -6,8 +6,7 @@
 <style>
   /* Ajuste do body para ocupar a tela inteira e centralizar o conteúdo */
   body {
-    background-color: #555758;
-    background: #5e5d5d url("{% static 'core/images/background.png' %}") no-repeat center center;
+    background-color: #2a2a2a;
     background-size: 50% auto;
     min-height: 90vh;
     margin: 0;
@@ -96,6 +95,7 @@
 {% endblock %}
 
 {% block content %}
+{% include "components/_header.html" %}
 <div class="home-container">
   <h1>Bem-vindo, {{ user.username }}!</h1>
   

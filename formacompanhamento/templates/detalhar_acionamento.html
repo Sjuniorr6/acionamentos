@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% include "components/_header.html" %}
 <div class="container my-2"> <!-- Alterado de my-4 para my-2, reduzindo a distância do topo -->
   <h2 id="registro-id" class="text-center text-white mb-4">
     Detalhes do Acionamento #{{ registro.pk }}

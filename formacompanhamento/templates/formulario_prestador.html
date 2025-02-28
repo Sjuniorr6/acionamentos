@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% include "components/_header.html" %}
+<style>
+    .container {
+    max-width: 80%; /* Adjust as needed */
+}
+
+.card {
+    width: 100%;
+}
+
+form input, form select, form textarea {
+    width: 100% !important;
+}
+</style>
+
 <div class="container mt-5">
   <h2 class="text-white">Cadastro de Prestador</h2>
   <div class="card shadow-lg">

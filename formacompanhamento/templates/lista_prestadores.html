@@ -1,132 +1,351 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block content %}
-    <style>
-        .card-status {
-            position: relative;
-            transition: transform 0.3s ease;
-            width: 25rem;
-            border-radius: 10px;
-            overflow: hidden;
+{% include "components/_header.html" %}
+<style>
+/* ========== ESTILIZAÇÃO GERAL ========== */
+body {
+    background-color: #2c2c2c;
+    font-family: Arial, sans-serif;
+    }
+        
+/* ========== CONTAINER GERAL ========== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    }
+        
+/* ========== TÍTULO PRINCIPAL ========== */
+h1 {
+    text-align: center;
+    color: white;
+    font-size: 28px;
+    margin-bottom: 20px;
+    }
+        
+/* ========== GRID DE CARDS ========== */
+.lista-prestadores {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Define 4 colunas */
+    gap: 20px; /* Espaçamento entre os cards */
+    justify-content: center;
+    }
+        
+        
+/* ========== CARD PRINCIPAL ========== */
+    .card-prestador {
+    position: relative;
+    width: 380px;  
+    min-height: 520px; 
+    background: #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    padding: 10px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    }
+
+/* Ajusta para expandir quando exibe os detalhes */
+.card-prestador.expandido {
+    min-height: auto; /* Permite que cresça conforme o conteúdo */
+    }
+        
+.card-prestador:hover {
+    transform: scale(1.05);
+    }
+        
+/* ========== ÍCONE DE STATUS ========== */
+    .card-status-icone {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;  /* Aumente este valor para deixar maior */
+    height: 40px; /* Aumente este valor para deixar maior */
+    background-color: rgb(26, 221, 26);
+    border-radius: 50%;
+    border: 2px solid white; /* Adiciona um contorno branco para mais destaque */
+    }
+
+        
+/* Verde para "Ativo" */
+.card-status-icone.ativo {
+    background-color: rgb(26, 221, 26);
+    }
+
+/* Vermelho para "Inativo" */
+.card-status-icone.inativo {
+    background-color: rgb(221, 26, 26);
+    }
+
+/* Amarelo para "Pendente" */
+.card-status-icone.pendente {
+    background-color: rgb(221, 221, 26);
+    }
+
+/* ========== BOTÃO EDITAR ========== */
+.btn-editar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 20px;
+    }
+        
+.btn-editar:hover {
+    background: rgba(255, 255, 255, 1);
+    color: #000;
+    }
+        
+/* ========== IMAGEM DO PRESTADOR (TOPO) ========== */
+.card-imagem {
+    width: 120px;  /* Tamanho ajustado */
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d4a55d;
+    margin-top: 15px;
+    }
+        
+/* ========== CONTEÚDO DO CARD ========== */
+.card-conteudo {
+    padding: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+        
+.card-nome {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+    }
+        
+.card-status {
+    color: white;
+    font-size: 20px; /* "PRONTA RESPOSTA" mais legível */
+    font-weight: bold;
+    }
+
+.card-status-text {
+    font-size: 20px;
+    color: #d4d4d4;
+    margin-bottom: 10px;
+    }
+        
+/* ========== RODAPÉ DO CARD ========== */
+.card-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    }
+        
+/* Botão INFORMAÇÕES */
+.card-informacoes {
+    padding:  8px 14px;
+    background: #d4a55d;
+    color: white;
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+    min-width: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container do ícone do WhatsApp */
+.whatsapp-container {
+    display: flex;
+    align-items: center;
+}
+        
+        .card-informacoes:hover {
+            background: #b2844d;
         }
+        
+/* Ícone do WhatsApp */
+.whatsapp-icon {
+    width: 40px;
+    height: 40px;
+    transition: transform 0.3s ease;
+}
 
-        /* Estilização por status */
-        .card-status.Ativo,
-        .card-status.ativo {
-            background: linear-gradient(to bottom, #a0f0a0 0%, #ffffff 100%);
-            border: 2px solid #28a745;
-        }
+.whatsapp-icon:hover {
+    transform: scale(1.2);
+}
 
-        .card-status.Inativo,
-        .card-status.inativo {
-            background: linear-gradient(to bottom, #f0a0a0 0%, #ffffff 100%);
-            border: 2px solid #dc3545;
-        }
+/* Os detalhes devem ser visíveis dentro do card */
+.card-detalhes {
+    display: none;
+    padding: 10px;
+    background: #1e1e1e;
+    border-top: 1px solid #d4a55d;
+    border-radius: 0 0 10px 10px;
+    font-size: 18px;
+    color: white;
+    text-align: left;
+    width: 100%;
+    flex-grow: 1; /* Faz com que o conteúdo ocupe o espaço necessário */
+}
 
-        .card-status.Pendente,
-        .card-status.pendente {
-            background: linear-gradient(to bottom, #d0d0d0 0%, #ffffff 100%);
-            border: 2px solid #6c757d;
-        }
+/* Quando o card estiver ativo, mostrar os detalhes */
+.card-detalhes.ativo {
+    display: block;
+}
 
-        .card-status:hover {
-            transform: scale(1.05);
-        }
+/* Container do rodapé */
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaço entre o botão e o WhatsApp */
+    width: 100%;
+    padding: 10px;
+    position: relative; /* Ajuste para evitar sobreposição */
+    margin-top: auto; /* Empurra o rodapé para baixo */
+}
 
-        .card-img-top {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-bottom: 2px solid #ddd;
-        }
+.card-imagem {
+    width: 200px;  
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d4a55d;
+    margin: 15px auto 0 auto; /* Centraliza a imagem */
+    display: block;
+}
 
-        .card-body {
-            padding: 20px;
-        }
+.titulo-lista {
+    color: white !important;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
 
-        .card-body p {
-            margin: 0 0 0.5rem;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
+.container-titulo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
 
-        .card-body p:hover {
-            transform: translateY(-3px);
-            color: #007bff;
-        }
+/* Expande os filtros para preencher a largura */
+form {
+    width: 100%;
+    padding: 15px;
+    
+}
 
-        .badge.Ativo,
-        .badge.ativo {
-            background-color: #28a745;
-        }
+.form-control {
+    width: 100%; /* Ocupa toda a largura da coluna */
+    height: 45px; /* Ajuste de altura */
+    font-size: 16px; /* Tamanho do texto */
+    padding: 10px; /* Ajusta o espaçamento interno */
+}
 
-        .badge.Inativo,
-        .badge.inativo {
-            background-color: #dc3545;
-        }
 
-        .badge.Pendente,
-        .badge.pendente {
-            background-color: #6c757d;
-            color: #ffffff;
-        }
+.row {
+    justify-content: center;
+    gap: 10px;
+}
 
-        /* Estilização para o botão de editar */
-        .btn-editar {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 11;
-            background: rgba(255, 255, 255, 0.8);
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
+.form-control, .btn {
+    max-width: 100%;
+    margin-bottom: 25px; /* Ajuste o valor conforme necessário */
+}
+</style>
 
-        .btn-editar:hover {
-            background: rgba(255, 255, 255, 1);
-            color: #000;
-        }
+        <div class="container mt-5">
+                <h2 class="titulo-lista">Lista de Prestadores</h2>
 
-        /* Estilização para a imagem do WhatsApp */
-        .whatsapp-icon {
-            position: absolute;
-            bottom: 45px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-            z-index: 10;
-            transition: transform 0.3s ease;
-        }
+            <!-- Formulário de filtros -->
+            <form method="GET" class="row mb-3">
+            <!-- Filtro por ID -->
+            <!-- Filtro por Serviço -->
+        <div class="col-md-3">
+            <select name="servico" class="form-control">
+                <option value="" {% if not request.GET.servico %}selected{% endif %}>Todos os Serviços</option>
+                <option value="Pronta Resposta Armado" {% if request.GET.servico == "Pronta Resposta Armado" %}selected{% endif %}>Pronta Resposta Armado</option>
+                <option value="Pronta Resposta Desarmado" {% if request.GET.servico == "Pronta Resposta Desarmado" %}selected{% endif %}>Pronta Resposta Desarmado</option>
+                <option value="Antenista" {% if request.GET.servico == "Antenista" %}selected{% endif %}>Antenista</option>
+            </select>
+        </div>
+    
+            <!-- Filtro por Cliente -->
+            <div class="col-md-3">
+              <input type="text" name="cliente" value="{{ request.GET.cliente }}" placeholder="AGENTE" class="form-control">
+            </div>
+    
+            <!-- Filtro por Agente -->
+            <div class="col-md-3">
+              <input type="text" name="agente" value="{{ request.GET.agente }}" placeholder="REGIÃO" class="form-control">
+            </div>
 
-        .whatsapp-icon:hover {
-            transform: scale(1.2);
-        }
-    </style>
+            <!-- Botão de Filtrar -->
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100">FILTRAR</button>
+            </div>
 
-    <div class="container mt-5">
-        <h1 class="text-white">Lista de Prestadores</h1>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {% for prestador in prestadores %}
-            <div class="col">
-                <div class="card h-100 shadow card-status {{ prestador.status_prestador|title }}">
-                    {% if prestador.foto %}
-                        <img src="{{ prestador.foto.url }}" class="card-img-top" alt="Foto de {{ prestador.Nome }}">
-                    {% else %}
-                        <img src="{% static 'images/default-avatar.png' %}" class="card-img-top" alt="Foto não disponível">
-                    {% endif %}
+             <div class="lista-prestadores">
+                {% for prestador in prestadores %}
+                <div class="card-prestador">
+                
+                <!-- Ícone de status -->
+                <div class="card-status-icone 
+                {% if prestador.status_prestador == 'ATIVO' %}ativo
+                {% elif prestador.status_prestador == 'INATIVO' %}inativo
+                {% elif prestador.status_prestador == 'PENDENTE' %}pendente
+                {% endif %}">
+            </div>
+            
 
-                    <!-- Botão Editar posicionado no canto superior direito -->
-                    <a href="{% url 'formacompanhamento:editar_prestador' prestador.pk %}" class="btn-editar">
-                        <i class="fas fa-edit"></i> Editar
-                    </a>
+                <!-- Botão de editar -->
+                <a href="{% url 'formacompanhamento:editar_prestador' prestador.pk %}" class="btn-editar">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
 
-                    <div class="card-body">
-                        <h5 class="card-title">{{ prestador.Nome }}</h5>
-                        <p class="card-text">
+                <!-- Foto do prestador -->
+                {% if prestador.foto %}
+                    <img src="{{ prestador.foto.url }}" class="card-imagem" alt="Foto de {{ prestador.Nome }}">
+                {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" class="card-imagem" alt="Foto não disponível">
+                {% endif %}
+
+                <div class="card-conteudo">
+                    <h5 class="card-nome">{{ prestador.Nome }}</h5>
+                    <p class="card-status">{{ prestador.servicos }}</p>
+
+                    <!-- Botão para exibir informações -->
+                    <div class="card-footer">
+                        <button class="card-informacoes">INFORMAÇÕES</button>
+                        <a href="https://wa.me/{{ prestador.telefone }}" target="_blank">
+                            <img src="{% static 'images/whatsapp.png' %}" class="whatsapp-icon" alt="WhatsApp">
+                        </a>
+                    </div>
+                    
+
+                    <!-- Área de detalhes oculta inicialmente -->
+                    <div class="card-detalhes">
+                        <p>
                             <strong>CPF/CNPJ:</strong> {{ prestador.cpf_cnpj }}<br>
                             <strong>E-mail:</strong> {{ prestador.email }}<br>
                             <strong>Telefone:</strong> {{ prestador.telefone }}<br>
@@ -144,22 +363,40 @@
                             <strong>Vencimento CNH:</strong> {{ prestador.vencimento_cnh }}<br>
                         </p>
                     </div>
-
-                    <div class="card-footer text-center">
-                        <span class="badge {{ prestador.status_prestador|title }}">{{ prestador.status_prestador|title }}</span>
-                    </div>
-
-                    <!-- Ícone do WhatsApp -->
-                    <a href="https://wa.me/{{ prestador.telefone }}" target="_blank">
-                        <img src="{% static 'images/whatsapp.png' %}" class="whatsapp-icon" alt="WhatsApp">
-                    </a>
                 </div>
+
+                
             </div>
             {% empty %}
             <div class="col-12">
-                <p class="text-center">Nenhum prestador cadastrado.</p>
+                <p class="text-center text-white">Nenhum prestador cadastrado.</p>
             </div>
             {% endfor %}
         </div>
     </div>
+
+    <!-- Script para alternar a exibição das informações -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Seleciona todos os botões de informações
+            var botoes = document.querySelectorAll(".card-informacoes");
+    
+            botoes.forEach(function (botao) {
+                botao.addEventListener("click", function () {
+                    // Encontra o próximo elemento irmão do botão que é a div de detalhes
+                    var detalhes = this.closest(".card-conteudo").querySelector(".card-detalhes");
+    
+                    // Alterna a visibilidade da seção de detalhes
+                    if (detalhes.classList.contains("ativo")) {
+                        detalhes.classList.remove("ativo");
+                        this.textContent = "INFORMAÇÕES";
+                    } else {
+                        detalhes.classList.add("ativo");
+                        this.textContent = "FECHAR";
+                    }
+                });
+            });
+        });
+    </script>
+    
 {% endblock %}

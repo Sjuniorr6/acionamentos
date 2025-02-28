@@ -1,16 +1,65 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% include "components/_header.html" %}
+
+<style>
+  /* Faz o container principal ocupar quase toda a largura da tela */
+.container {
+    max-width: 98%;
+    width: 100%;
+}
+
+/* Ajusta a tabela para ocupar mais espaço */
+.table {
+    width: 100%;
+    font-size: 14px; /* Mantém o tamanho do texto legível */
+}
+
+/* Aumenta a altura das células para melhor leitura */
+.table th, 
+.table td {
+    padding: 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Expande os filtros para preencher a largura */
+form .form-control {
+    font-size: 14px;
+    padding: 10px;
+    width: 100%;
+}
+
+/* Ajusta os botões de ação para um tamanho maior */
+.table td .btn {
+    width: 80px;
+    font-size: 14px;
+}
+
+/* Se necessário, permite rolagem horizontal na tabela */
+.table-container {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .table th, 
+    .table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .table td .btn {
+        width: 70px;
+        font-size: 12px;
+    }
+}
+
+</style>
 <div class="container my-4">
   <h2 class="text-center text-white mb-4">Lista de Faturamento (Todos os Registros)</h2>
-  
-  <!-- Estilo para evitar que as células quebrem a linha -->
-  <style>
-    .table th,
-    .table td {
-      white-space: nowrap;
-    }
-  </style>
 
   <!-- Formulário de filtros -->
   <form method="GET" class="row mb-3">
