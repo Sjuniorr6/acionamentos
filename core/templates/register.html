@@ -4,126 +4,177 @@
 {% block title %}Cadastro{% endblock %}
 
 {% block extra_head %}
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #555758;
-      background: #5e5d5d url("{% static 'core/images/background.png' %}") no-repeat center center;
-      background-size: 50% auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    
-    .register-container {
-      position: relative;
-      width: 100%;
-      max-width: 400px;
-      background: rgba(39, 39, 39, 0.15);
-      border-radius: 15px;
-      padding: 40px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
-      text-align: center;
-    }
-    
-    .register-logo {
-      width: 100%;
-      max-width: 200px;
-      height: auto;
-      margin-bottom: 20px;
-    }
-    
-    .form-control {
-      background: rgba(255, 255, 255, 0.3);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      padding: 10px;
-      margin-bottom: 15px;
-    }
-    .form-control::placeholder {
-      color: rgba(255, 255, 255, 0.7);
-    }
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    .register-btn {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.3);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      text-transform: uppercase;
-      padding: 10px;
-      font-weight: bold;
-    }
-    .register-btn:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
-    
-    .back-login {
-      margin-top: 15px;
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .back-login:hover {
-      text-decoration: underline;
-    }
-    
-    .error {
-      color: red;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-  </style>
+<!-- Particles.js -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+<style>
+/* MANTIVE O FUNDO ORIGINAL DO CADASTRO */
+body {
+  background-color: #2a2a2a;
+  background-size: 50% auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Fundo de partículas */
+#particles-js {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: transparent;
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* Estilização do container (IGUAL AO LOGIN) */
+.register-container {
+  position: relative;
+  background: linear-gradient(160deg, #f5c87b, #2a2a2a); /* Mesma cor do login */
+  border-radius: 15px;
+  padding: 50px 60px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  color: white;
+  animation: fadeIn 1.5s ease-in-out;
+  
+  width: 500px !important;
+  height: auto !important;
+  min-height: 650px !important;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Animação de fadeIn */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo centralizada */
+.register-logo {
+  width: 80%;
+  max-width: 200px;
+  margin-bottom: 15px;
+}
+
+/* Campos de input */
+.form-control {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 12px;
+  font-size: 20px;
+}
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Botão de cadastro */
+.register-btn {
+  width: 100%;
+  background: linear-gradient(160deg, #f5c87b, #2a2a2a); /* Mesmo estilo do login */
+  border: none;
+  border-radius: 10px;
+  color: white;
+  text-transform: uppercase;
+  padding: 12px;
+  margin-top: 15px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+.register-btn:hover {
+  background: #cc5200;
+}
+
+/* Link para voltar ao login */
+.back-login {
+  margin-top: 15px;
+  color: #f5c87b;
+  text-decoration: underline;
+  font-size: 19px;
+}
+.back-login:hover {
+  color: #ffaa00;
+}
+
+/* Mensagens de erro */
+.errorlist {
+  color: #ffcc00; /* Altere esta cor para a que preferir */
+  font-size: 16px;
+  font-weight: bold;
+  list-style-type: none; /* Remove os marcadores da lista */
+  padding: 5px;
+  margin-top:5px;
+}
+
+/* Caixa de erro personalizada */
+.error {
+  background: rgba(255, 204, 0, 0.2); /* Fundo amarelo transparente */
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
+<div id="particles-js"></div>
+
 <div class="register-container">
-  <img src="{% static 'core/images/favicon.ico' %}" alt="Logo" class="register-logo">
-  <h4 class="text-white mb-4">Cadastre-se</h4>
+  <img src="{% static 'core/images/background.png' %}" alt="Logo" class="register-logo">
+  <h3 class="mt-3">Cadastre-se</h3>
 
   <form method="post">
     {% csrf_token %}
 
     <!-- Exibir mensagens de erro -->
     {% if form.non_field_errors %}
-      <div class="error">{{ form.non_field_errors }}</div>
+      <div class="error text-danger">{{ form.non_field_errors }}</div>
     {% endif %}
 
     <!-- Campo de Usuário -->
     <div class="mb-3">
-      <label class="text-white">Nome:</label>
-      {{ form.username }}
-      {% if form.username.errors %}
-        <div class="error">{{ form.username.errors }}</div>
-      {% endif %}
+      <input type="text" class="form-control" name="username" placeholder="Nome" required>
     </div>
 
     <!-- Campo de Senha -->
     <div class="mb-3">
-      <label class="text-white">Senha:</label>
-      {{ form.password1 }}
-      {% if form.password1.errors %}
-        <div class="error">{{ form.password1.errors }}</div>
-      {% endif %}
+      <input type="password" class="form-control" name="password1" placeholder="Senha" required>
     </div>
 
-    <!-- Campo de Confirmação de Senha -->
-    <div class="mb-3">
-      <label class="text-white">Confirme a Senha:</label>
-      {{ form.password2 }}
-      {% if form.password2.errors %}
-        <div class="error">{{ form.password2.errors }}</div>
-      {% endif %}
-    </div>
+<!-- Campo de Confirmação de Senha -->
+<div class="mb-3">
+  <label class="text-white"></label>
+  <input type="password" class="form-control" name="password2" placeholder="Confirme sua senha" required>
+  {% if form.password2.errors %}
+    <div class="error text-danger">{{ form.password2.errors }}</div>
+  {% endif %}
+</div>
 
-    <button type="submit" class="register-btn">Cadastrar</button>
+<button type="submit" class="register-btn">Cadastrar</button>
   </form>
 
-  <a href="{% url 'login' %}" class="back-login">Login</a>
+  <a href="{% url 'login' %}" class="back-login">Já tem conta? Faça login</a>
 </div>
+
 {% endblock %}
