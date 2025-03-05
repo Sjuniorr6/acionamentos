@@ -425,45 +425,48 @@ form {
 
     <!-- Script para alternar a exibição das informações -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Seleciona todos os botões de informações
-            var botoes = document.querySelectorAll(".card-informacoes");
+       document.addEventListener("DOMContentLoaded", function () {
+    // Seleciona todos os botões de informações
+    var botoes = document.querySelectorAll(".card-informacoes");
     
-            botoes.forEach(function (botao) {
-                botao.addEventListener("click", function () {
-                    // Encontra o próximo elemento irmão do botão que é a div de detalhes
-                    var detalhes = this.closest(".card-conteudo").querySelector(".card-detalhes");
-    
-                    // Alterna a visibilidade da seção de detalhes
-                    if (detalhes.classList.contains("ativo")) {
-                        detalhes.classList.remove("ativo");
-                        this.textContent = "INFORMAÇÕES";
-                    } else {
-                        detalhes.classList.add("ativo");
-                        this.textContent = "FECHAR";
-                    }
-                });
-            });
-        });
+    botoes.forEach(function (botao) {
+        botao.addEventListener("click", function (event) {
+            event.preventDefault(); // Impede comportamento padrão (como submit)
+            // Encontra o próximo elemento irmão do botão que é a div de detalhes
+            var detalhes = this.closest(".card-conteudo").querySelector(".card-detalhes");
 
-
-        document.addEventListener("DOMContentLoaded", function () {
-        var botaoAlternar = document.getElementById("toggle-layout");
-        var listaPrestadores = document.querySelector(".lista-prestadores");
-        var tabelaPrestadores = document.getElementById("tabela-prestadores");
-
-        botaoAlternar.addEventListener("click", function () {
-            if (listaPrestadores.style.display === "none") {
-                listaPrestadores.style.display = "grid";
-                tabelaPrestadores.style.display = "none";
-                botaoAlternar.textContent = "Mudar para Tabela";
+            // Alterna a visibilidade da seção de detalhes
+            if (detalhes.classList.contains("ativo")) {
+                detalhes.classList.remove("ativo");
+                this.textContent = "INFORMAÇÕES";
             } else {
-                listaPrestadores.style.display = "none";
-                tabelaPrestadores.style.display = "block";
-                botaoAlternar.textContent = "Mudar para Cards";
+                detalhes.classList.add("ativo");
+                this.textContent = "FECHAR";
             }
         });
     });
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    var botaoAlternar = document.getElementById("toggle-layout");
+    var listaPrestadores = document.querySelector(".lista-prestadores");
+    var tabelaPrestadores = document.getElementById("tabela-prestadores");
+
+    botaoAlternar.addEventListener("click", function (event) {
+        event.preventDefault(); // Impede comportamento padrão
+        if (listaPrestadores.style.display === "none") {
+            listaPrestadores.style.display = "grid";
+            tabelaPrestadores.style.display = "none";
+            botaoAlternar.textContent = "Mudar para Tabela";
+        } else {
+            listaPrestadores.style.display = "none";
+            tabelaPrestadores.style.display = "block";
+            botaoAlternar.textContent = "Mudar para Cards";
+        }
+    });
+});
+
     </script>
     
 {% endblock %}

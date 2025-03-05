@@ -562,7 +562,7 @@ def prestador_detail(request):
         'email': prestador.email,
         'conta': prestador.conta,
         'disponibilidade': prestador.disponibilidade,
-        'regiao_atuacao': prestador.regiao_atuacao,
+        'lat_long': prestador.lat_long,
         'status_prestador': prestador.status_prestador,
         'agencia': prestador.agencia,
         'tipo_de_conta': prestador.tipo_de_conta,
@@ -621,7 +621,7 @@ def get_prestador_data(request):
         'email': prestador.email,
         'conta': prestador.conta,
         'disponibilidade': prestador.disponibilidade,
-        'regiao_atuacao': prestador.regiao_atuacao,
+        'lat_long': prestador.lat_long,
         'status_prestador': prestador.status_prestador,
         'agencia': prestador.agencia,
         'tipo_de_conta': prestador.tipo_de_conta,
@@ -904,7 +904,7 @@ def prestador_detail(request):
         'email': prestador.email,
         'conta': prestador.conta,
         'disponibilidade': prestador.disponibilidade,
-        'regiao_atuacao': prestador.regiao_atuacao,
+        'lat_long': prestador.lat_long,
         'status_prestador': prestador.status_prestador,
         'agencia': prestador.agencia,
         'tipo_de_conta': prestador.tipo_de_conta,
@@ -933,34 +933,32 @@ def prestador_detail(request):
 
 
 from django.views.generic import ListView
-from django.db.models import Q
-from .models import prestadores
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from .models import prestadores  # Substitua "prestadores" pelo nome correto do seu modelo, se necessário
 
-class PrestadorListView(LoginRequiredMixin,PermissionRequiredMixin,ListView):
+class PrestadorListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = prestadores
     template_name = 'lista_prestadores.html'
     context_object_name = 'prestadores'
-    permission_required = "formacompanhamento.view_agentes" 
+    permission_required = "formacompanhamento.view_agentes"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        query = self.request.GET.get('q', '').strip()
-        disponibilidade = self.request.GET.get('disponibilidade', '').strip()
-        regiao_atuacao = self.request.GET.get('regiao_atuacao', '').strip()
-        status = self.request.GET.get('status', '').strip()
+        qs = super().get_queryset()
+        # Obtém os filtros enviados via GET
+        servico = self.request.GET.get('servico', '')
+        cliente = self.request.GET.get('cliente', '')
+        agente = self.request.GET.get('agente', '')
 
-        # Aplica os filtros somente se houver valores nos campos
-        if query:
-            queryset = queryset.filter(Nome__icontains=query)  # __icontains para busca case-insensitive
-        if disponibilidade:
-            queryset = queryset.filter(disponibilidade__icontains=disponibilidade)  # __icontains
-        if regiao_atuacao:
-            queryset = queryset.filter(regiao_atuacao__icontains=regiao_atuacao)  # __icontains
-        if status:
-            queryset = queryset.filter(status_prestador__iexact=status)  # __iexact é para igualdade exata, mas case-insensitive
+        # Filtra por serviço (campo "servicos" do modelo)
+        if servico:
+            qs = qs.filter(servicos__icontains=servico)
+        # Filtra por cliente (neste caso, usamos o campo "Nome")
+        if cliente:
+            qs = qs.filter(Nome__icontains=cliente)
+        # Filtra por agente (neste exemplo, usamos o campo "regiao_atuacao")
+        
 
-        return queryset
-
+        return qs
 
 
     from django.views.generic.edit import CreateView
@@ -1409,7 +1407,7 @@ def all_prestadores_addresses(request):
         data.append({
             "id": p.pk,
             "nome": p.Nome,
-            "endereco": p.endereco,
+            "latlong": p.lat_long,
         })
     
     return JsonResponse(data, safe=False)

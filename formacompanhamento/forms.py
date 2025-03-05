@@ -345,7 +345,7 @@ class PrestadoresForm(forms.ModelForm):
             'email', 
             'conta', 
             'disponibilidade', 
-            'regiao_atuacao', 
+            'lat_long', 
             'status_prestador', 
             'agencia', 
             'tipo_de_conta', 
@@ -408,7 +408,7 @@ class PrestadoresForm(forms.ModelForm):
                 'class': 'form-control', 
                 'placeholder': 'Disponibilidade'
             }),
-            'regiao_atuacao': forms.TextInput(attrs={
+            'lat_long': forms.TextInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'Região de atuação'
             }),

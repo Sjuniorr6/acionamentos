@@ -370,7 +370,7 @@ class prestadores(models.Model):
     email = models.CharField(max_length=50, null=True, blank=True)
     conta = models.CharField(max_length=50, null=True, blank=True)
     disponibilidade = models.CharField(max_length=50, null=True, blank=True)
-    regiao_atuacao = models.CharField(max_length=50, null=True, blank=True)
+    lat_long = models.CharField(max_length=50, null=True, blank=True)
     status_prestador = models.CharField(choices=status,max_length=50, null=True, blank=True)
     agencia= models.CharField(max_length=50, null=True, blank=True)
     tipo_de_conta= models.CharField(max_length=50, null=True, blank=True)
