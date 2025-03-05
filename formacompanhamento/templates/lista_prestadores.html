@@ -272,10 +272,19 @@ form {
     max-width: 100%;
     margin-bottom: 25px; /* Ajuste o valor conforme necessário */
 }
-</style>
 
+.d-flex.justify-content-end {
+    margin-right: 20px; /* Ajusta a distância da borda direita */
+    margin-top: 100px; /* Adiciona espaço acima */
+}
+
+</style>
+            
         <div class="container mt-5">
                 <h2 class="titulo-lista">Lista de Prestadores</h2>
+                <div class="d-flex justify-content-end mt-4 me-3">
+                    <button id="toggle-layout" type="button" class="btn btn-secondary">Mudar para Tabela</button>
+                </div>
 
             <!-- Formulário de filtros -->
             <form method="GET" class="row mb-3">
@@ -304,6 +313,7 @@ form {
             <div class="col-md-2">
               <button type="submit" class="btn btn-primary w-100">FILTRAR</button>
             </div>
+
 
              <div class="lista-prestadores">
                 {% for prestador in prestadores %}
@@ -374,6 +384,44 @@ form {
             {% endfor %}
         </div>
     </div>
+<!-- Estrutura da Tabela (inicialmente oculta) -->
+<div id="tabela-prestadores" class="table-container" style="display: none;">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Serviço</th>
+                <th>CPF/CNPJ</th>
+                <th>Telefone</th>
+                <th>Banco</th>
+                <th>Agência</th>
+                <th>Conta</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prestador in prestadores %}
+            <tr>
+                <td>{{ prestador.Nome }}</td>
+                <td>{{ prestador.servicos }}</td>
+                <td>{{ prestador.cpf_cnpj }}</td>
+                <td>{{ prestador.telefone }}</td>
+                <td>{{ prestador.banco }}</td>
+                <td>{{ prestador.agencia }}</td>
+                <td>{{ prestador.conta }}</td>
+                <td>
+                    <a href="{% url 'formacompanhamento:editar_prestador' prestador.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="https://wa.me/{{ prestador.telefone }}" target="_blank" class="btn btn-success btn-sm">WhatsApp</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center">Nenhum prestador cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
     <!-- Script para alternar a exibição das informações -->
     <script>
@@ -397,6 +445,25 @@ form {
                 });
             });
         });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+        var botaoAlternar = document.getElementById("toggle-layout");
+        var listaPrestadores = document.querySelector(".lista-prestadores");
+        var tabelaPrestadores = document.getElementById("tabela-prestadores");
+
+        botaoAlternar.addEventListener("click", function () {
+            if (listaPrestadores.style.display === "none") {
+                listaPrestadores.style.display = "grid";
+                tabelaPrestadores.style.display = "none";
+                botaoAlternar.textContent = "Mudar para Tabela";
+            } else {
+                listaPrestadores.style.display = "none";
+                tabelaPrestadores.style.display = "block";
+                botaoAlternar.textContent = "Mudar para Cards";
+            }
+        });
+    });
     </script>
     
 {% endblock %}

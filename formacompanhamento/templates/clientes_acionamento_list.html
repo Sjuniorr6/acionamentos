@@ -4,63 +4,70 @@
 {% include "components/_header.html" %}
 <!-- Bloco de CSS customizado -->
 <style>
-  /* Container principal */
-  .custom-container {
-    margin-top: 50px;
-  }
-  
-  /* Título centralizado */
-  .custom-title {
+/* Define a largura máxima da tabela */
+.container {
+    max-width: 98%;
+    width: 100%;
+}
+
+/* Ajusta a tabela para ocupar toda a largura e melhora a legibilidade */
+.table {
+    width: 100%;
+    font-size: 16px;
+}
+
+/* Estiliza as células da tabela */
+.table th, 
+.table td {
+    padding: 12px;
     text-align: center;
-    margin-bottom: 30px;
-    font-size: 2rem;
-    font-weight: bold;
-  }
-  
-  /* Card que envolve a tabela */
-  .custom-card {
-    max-width: 100%;
-    margin: auto;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    background-color: #fff; /* Apenas para destacar a tabela no fundo cinza */
-  }
-  
-  /* Tabela customizada com margem à esquerda de 20px */
-  .custom-table {
-    width: calc(100% - 20px);
-    margin-left: -570px;
-    border-collapse: collapse;
-    font-size: 1rem;
-  }
-  
-  .custom-table th, 
-  .custom-table td {
-    padding: 12px 15px;
-    text-align: center;
-    border: 1px solid #dee2e6;
-  }
-  
-  .custom-table thead {
-    background-color: #343a40;
-    color: #ffffff;
-  }
-  
-  /* Linhas com cor alternada */
-  .custom-table tbody tr:nth-of-type(odd) {
+    white-space: nowrap;
+}
+
+/* Estilo do cabeçalho da tabela */
+.table thead th {
+    background-color: #5daa3f !important; /* Fundo azul */
+    color: white !important; /* Texto branco */
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Linhas alternadas para facilitar a leitura */
+.table tbody tr:nth-of-type(odd) {
     background-color: #f8f9fa;
-  }
-  
-  /* Botão de ação */
-  .custom-btn {
-    padding: 5px 10px;
-    font-size: 0.9rem;
-  }
+}
+
+/* Estiliza os botões dentro da tabela */
+.table td .btn {
+    width: 80px;
+    font-size: 14px;
+}
+
+/* Permite rolagem horizontal quando necessário */
+.table-container {
+    overflow-x: auto;
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 768px) {
+    .table th, 
+    .table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .table td .btn {
+        width: 70px;
+        font-size: 12px;
+    }
+}
+
 </style>
 
-<div class="container custom-container">
-  <h2 class="text-white">Lista de Clientes Acionamento</h2>
-  <div class="card custom-card">
-    <table class="custom-table">
+<div class="container my-4">
+  <h2 class="text-center text-white mb-4">Lista de Clientes Acionamento</h2>
+  <div class="table-container">
+    <table class="table table-bordered table-striped">
+
       <thead>
         <tr>
           <th>ID</th>
@@ -117,7 +124,7 @@
           <td>{{ cliente.valorh_antenista|default:"NAO CONTRATADO" }}</td>
           <td>
             <a href="{% url 'formacompanhamento:ClienteUpdateView' cliente.pk %}"
-               class="btn btn-sm btn-warning custom-btn">Editar</a>
+                class="btn btn-sm btn-warning">Editar</a>
           </td>
         </tr>
         {% empty %}
