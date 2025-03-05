@@ -107,6 +107,10 @@ class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, Lis
         if filtro_status:
             queryset = queryset.filter(status__iexact=filtro_status)
 
+        # Exclui registros cujo status contenha "A Faturar" ou "Pago"
+        queryset = queryset.exclude(status__icontains="A Faturar") \
+                           .exclude(status__icontains="Pago")
+
         # Mantém a lógica de atributos calculados dinamicamente
         for registro in queryset:
             registro.hora_total = registro.calcular_hora_total()
@@ -117,6 +121,7 @@ class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, Lis
             registro.total_acionamento = registro.calcular_total_acionamento()
 
         return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -936,6 +941,7 @@ from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .models import prestadores  # Substitua "prestadores" pelo nome correto do seu modelo, se necessário
 
+
 class PrestadorListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = prestadores
     template_name = 'lista_prestadores.html'
@@ -944,18 +950,17 @@ class PrestadorListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Obtém os filtros enviados via GET
+        # Exclui registros com status "A Faturar" (ou "Pago", se necessário)
+       
+        # Aplica os filtros enviados via GET
         servico = self.request.GET.get('servico', '')
         cliente = self.request.GET.get('cliente', '')
         agente = self.request.GET.get('agente', '')
 
-        # Filtra por serviço (campo "servicos" do modelo)
         if servico:
             qs = qs.filter(servicos__icontains=servico)
-        # Filtra por cliente (neste caso, usamos o campo "Nome")
         if cliente:
             qs = qs.filter(Nome__icontains=cliente)
-        # Filtra por agente (neste exemplo, usamos o campo "regiao_atuacao")
         
 
         return qs
