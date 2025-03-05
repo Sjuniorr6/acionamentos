@@ -1,3 +1,9 @@
-# Ignorar arquivos Python gerados automaticamente
+# Python
 *.pyc
 __pycache__/
+
+# Virtual environment
+venv/
+
+# Static files coletados
+staticfiles/
