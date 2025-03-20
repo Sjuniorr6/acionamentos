@@ -5,72 +5,71 @@
 
 <style>
   /* Faz o container principal ocupar quase toda a largura da tela */
-.container {
-    max-width: 98%;
-    width: 100%;
-}
+  .container {
+      max-width: 98%;
+      width: 100%;
+  }
 
-/* Ajusta a tabela para ocupar mais espaço */
-.table {
-    width: 100%;
-    font-size: 16px; /* Mantém o tamanho do texto legível */
-}
+  /* Ajusta a tabela para ocupar mais espaço */
+  .table {
+      width: 100%;
+      font-size: 16px; /* Mantém o tamanho do texto legível */
+  }
 
-/* Aumenta a altura das células para melhor leitura */
-.table th, 
-.table td {
-    padding: 12px;
-    text-align: center;
-    white-space: nowrap;
-}
+  /* Aumenta a altura das células para melhor leitura */
+  .table th, 
+  .table td {
+      padding: 12px;
+      text-align: center;
+      white-space: nowrap;
+  }
 
-/* Expande os filtros para preencher a largura */
-form .form-control {
-    font-size: 14px;
-    padding: 10px;
-    width: 100%;
-}
+  /* Expande os filtros para preencher a largura */
+  form .form-control {
+      font-size: 14px;
+      padding: 10px;
+      width: 100%;
+  }
 
-.table thead th {
-    background-color: #5daa3f !important; /* Fundo azul */
-    color: white !important; /* Texto branco */
-    font-family: 'Montserrat', sans-serif;
-}
+  .table thead th {
+      background-color: #5daa3f !important; /* Fundo azul */
+      color: white !important; /* Texto branco */
+      font-family: 'Montserrat', sans-serif;
+  }
 
-/* Ajusta os botões de ação para um tamanho maior */
-.table td .btn {
-    width: 80px;
-    font-size: 14px;
-}
+  /* Ajusta os botões de ação para um tamanho maior */
+  .table td .btn {
+      width: 80px;
+      font-size: 14px;
+  }
 
-/* Se necessário, permite rolagem horizontal na tabela */
-.table-container {
-    overflow-x: auto;
-    max-width: 100%;
-}
+  /* Se necessário, permite rolagem horizontal na tabela */
+  .table-container {
+      overflow-x: auto;
+      max-width: 100%;
+  }
 
-/* Responsividade para telas menores */
-@media (max-width: 768px) {
-    .table th, 
-    .table td {
-        font-size: 12px;
-        padding: 8px;
-    }
+  /* Responsividade para telas menores */
+  @media (max-width: 768px) {
+      .table th, 
+      .table td {
+          font-size: 12px;
+          padding: 8px;
+      }
 
-    .table td .btn {
-        width: 70px;
-        font-size: 12px;
-    }
-}
-
+      .table td .btn {
+          width: 70px;
+          font-size: 12px;
+      }
+  }
 </style>
+
 <div class="container my-4">
   <h2 class="text-center text-white mb-4">Lista de Faturamento (Todos os Registros)</h2>
 
-  <!-- Formulário de filtros -->
   <form method="GET" class="row mb-3">
     <!-- Filtro por ID -->
-    <div class="col-md-2">
+    <div class="col-md-1">
       <input type="text" name="id" value="{{ request.GET.id }}" placeholder="ID" class="form-control">
     </div>
     
@@ -83,22 +82,33 @@ form .form-control {
     <div class="col-md-2">
       <input type="date" name="data_inicial" value="{{ request.GET.data_inicial }}" placeholder="Data Inicial" class="form-control">
     </div>
-
+  
     <!-- Filtro por Data Final -->
     <div class="col-md-2">
       <input type="date" name="data_final" value="{{ request.GET.data_final }}" placeholder="Data Final" class="form-control">
     </div>
     
-    <!-- Filtro por Agente -->
+    <!-- Filtro por Prestador -->
     <div class="col-md-2">
       <input type="text" name="prestador" value="{{ request.GET.prestador }}" placeholder="Prestador" class="form-control">
     </div>
-
-    <!-- Botão de Filtrar -->
+    
+    <!-- Filtro por Status -->
     <div class="col-md-2">
+      <select name="status" id="id_status" class="form-control">
+        <option value="">Status</option>
+        <option value="A Faturar" {% if request.GET.status == "A Faturar" %}selected{% endif %}>A Faturar</option>
+        <option value="Pendente" {% if request.GET.status == "Pendente" %}selected{% endif %}>Pendente</option>
+        <option value="Pago" {% if request.GET.status == "Pago" %}selected{% endif %}>Pago</option>
+      </select>
+    </div>
+    
+    <!-- Botão de Filtrar -->
+    <div class="col-md-1">
       <button type="submit" class="btn btn-primary w-100">Filtrar</button>
     </div>
   </form>
+ 
 
   <!-- Tabela sem container de scroll -->
   <table class="table table-bordered table-striped">

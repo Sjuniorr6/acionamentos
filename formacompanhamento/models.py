@@ -7,46 +7,132 @@ from .models_agentes import agentes
 
 
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.core.validators import FileExtensionValidator
 
 class clientes_acionamento(models.Model):
-    
-    servicos_options = [ 
-                        
-               
-        ("Antenista","Antenista"),
-        ("Ponta Resposta Armado","Ponta Resposta Armado"),
-        ("Pronta Resposta Desarmado","Pronta Resposta Desarmado"),         
-        ("Todos os serviços"," Todos os servicos"),         
-             
-               
-                        ]
+    servicos_options = [
+        ("Antenista", "Antenista"),
+        ("Ponta Resposta Armado", "Ponta Resposta Armado"),
+        ("Pronta Resposta Desarmado", "Pronta Resposta Desarmado"),
+        ("Todos os serviços", " Todos os servicos"),
+    ]
+
+    estados_br = [
+        ("AC", "Acre"),
+        ("AP", "Amapá"),
+        ("AM", "Amazonas"),
+        ("PA", "Pará"),
+        ("RO", "Rondônia"),
+        ("RR", "Roraima"),
+        ("TO", "Tocantins"),
+        ("AL", "Alagoas"),
+        ("BA", "Bahia"),
+        ("CE", "Ceará"),
+        ("MA", "Maranhão"),
+        ("PB", "Paraíba"),
+        ("PE", "Pernambuco"),
+        ("PI", "Piauí"),
+        ("RN", "Rio Grande do Norte"),
+        ("SE", "Sergipe"),
+        ("DF", "Distrito Federal"),
+        ("GO", "Goiás"),
+        ("MT", "Mato Grosso"),
+        ("MS", "Mato Grosso do Sul"),
+        ("ES", "Espírito Santo"),
+        ("MG", "Minas Gerais"),
+        ("RJ", "Rio de Janeiro"),
+        ("SP", "São Paulo"),
+        ("PR", "Paraná"),
+        ("RS", "Rio Grande do Sul"),
+        ("SC", "Santa Catarina"),
+    ]
+
     nome = models.CharField(max_length=100, null=True, blank=True)
-    cnpj= models.CharField(max_length=100, null=True, blank=True)
+    cnpj = models.CharField(max_length=100, null=True, blank=True)
     telefone = models.CharField(max_length=100, null=True, blank=True)
     banco = models.CharField(max_length=100, null=True, blank=True)
     agencia = models.CharField(max_length=100, null=True, blank=True)
     conta = models.CharField(max_length=100, null=True, blank=True)
-    servicos = models.CharField(choices=servicos_options,max_length=50, null=True, blank=True)
-    valor_prontaresposta_armado = models.CharField(max_length=50, null=True, blank=True)
-    franquia_hora_armado  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    franquia_km_armado  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valorkm_armado = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valorh_armado  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valor_prontaresposta_desarmado = models.CharField(max_length=50, null=True, blank=True)
-    franquia_hora_desarmado  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    franquia_km_desarmado  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valorkm_desarmado = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valorh_desarmado  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valor_antenista = models.CharField(max_length=50, null=True, blank=True)
-    franquia_hora_antenista  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    franquia_km_antenista  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valorkm_antenista = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    valorh_antenista  = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
 
+    servicos = models.CharField(
+        choices=servicos_options,
+        max_length=50,
+        null=True,
+        blank=True
+    )
+
+    valor_prontaresposta_armado = models.CharField(max_length=50, null=True, blank=True)
+    franquia_hora_armado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    franquia_km_armado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    valorkm_armado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    valorh_armado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    valor_prontaresposta_desarmado = models.CharField(max_length=50, null=True, blank=True)
+    franquia_hora_desarmado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    franquia_km_desarmado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    valorkm_desarmado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    valorh_desarmado = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    valor_antenista = models.CharField(max_length=50, null=True, blank=True)
+    franquia_hora_antenista = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    franquia_km_antenista = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    valorkm_antenista = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    valorh_antenista = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    razao_social = models.CharField(max_length=100, null=True, blank=True)
+    nome_fantasia = models.CharField(max_length=100, null=True, blank=True)
+    inscricao_estadual = models.CharField(max_length=100, null=True, blank=True)
+    inscricao_municipal = models.CharField(max_length=100, null=True, blank=True)
+    atividade_principal = models.CharField(max_length=100, null=True, blank=True)
+    cidade = models.CharField(max_length=100, null=True, blank=True)
+    estado = models.CharField(choices=estados_br, max_length=100, null=True, blank=True)
     
+    representante_legal = models.CharField(max_length=100, null=True, blank=True)
+    contato_legal = models.CharField(max_length=100, null=True, blank=True)
+    cpf_cnpj = models.CharField(max_length=100, null=True, blank=True)
+    email_legal = models.CharField(max_length=100, null=True, blank=True)
+   
+   
+    representante_financeiro = models.CharField(max_length=100, null=True, blank=True)
+    contato_financeiro = models.CharField(max_length=100, null=True, blank=True)
+    email_financeiro = models.CharField(max_length=100, null=True, blank=True)
+    
+    representante_operacional = models.CharField(max_length=100, null=True, blank=True)
+    contato_operacional = models.CharField(max_length=100, null=True, blank=True)
+    email_operacional = models.CharField(max_length=100, null=True, blank=True)
+    
+    
+    endereco = models.CharField(max_length=100, null=True, blank=True)
+    cep = models.CharField(max_length=100, null=True, blank=True)
+    dias_a_faturar = models.CharField(max_length=100, null=True, blank=True)
+
+    data_de_fechamento = models.DateField(
+        verbose_name="Data de Fechamento",
+        blank=True,
+        null=True,
+        help_text="Informe a data de fechamento, se aplicável."
+    )
+
+    # CAMPOS PARA UPLOAD DE PDFs
+    contrato_pdf = models.FileField(
+        upload_to='contratos_pdf/',            # Ajuste o path se desejar
+        validators=[FileExtensionValidator(['pdf'])],
+        null=True,
+        blank=True,
+        help_text="Faça upload do PDF do Contrato, se houver."
+    )
+    proposta_pdf = models.FileField(
+        upload_to='propostas_pdf/',            # Ajuste o path se desejar
+        validators=[FileExtensionValidator(['pdf'])],
+        null=True,
+        blank=True,
+        help_text="Faça upload do PDF da Proposta, se houver."
+    )
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome or 'Cliente sem nome'} (ID: {self.id})"
+
 class Formacompanhamento(models.Model):
     prestador2 = [
         ("Sombra armado", "Sombra armado")
@@ -116,6 +202,11 @@ class RegistroPagamento(models.Model):
         ('E-mail', 'E-mail'),
         ('Telefone', 'Telefone'),
     ]
+    services = [
+        ('Roubo', 'Roubo'),
+        ('Preservação', 'Preservação'),
+        
+    ]
     rastreador1 = [
         ('SIM', 'SIM'),
         ('NÃO', 'NÃO'),
@@ -131,6 +222,7 @@ class RegistroPagamento(models.Model):
         
     ]
 
+    tipo_servicos = models.CharField(choices=services,max_length=50, null=True, blank=True)
     cliente = models.ForeignKey(clientes_acionamento, on_delete=models.SET_NULL, null=True,blank=True)
     motivo = models.CharField(choices=motivo_options,max_length=50, null=True, blank=True)
     motivo1 = models.CharField(choices=motivo_options,max_length=50, null=True, blank=True)
@@ -186,7 +278,9 @@ class RegistroPagamento(models.Model):
     valor_hora_excedente1 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     valor_hora_excedente2 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     valor_hora_excedente3 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    placas = models.CharField(max_length=100,null=True,blank=True)
+    placas1 = models.CharField(max_length=100,null=True,blank=True)
+    placas2 = models.CharField(max_length=100,null=True,blank=True)
+    placas3 = models.CharField(max_length=100,null=True,blank=True)
     agentes = models.IntegerField(null=True, blank=True)
     sla = models.DurationField(null=True, blank=True)
     hora_excedente = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
@@ -238,6 +332,35 @@ class RegistroPagamento(models.Model):
     imagem14 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
     imagem15 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
     imagem16 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem17 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem18 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem19 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem20 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem21 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem22 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem23 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem24 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem25 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem26 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem27 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem28 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem29 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem30 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem31 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem32 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem33 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem34 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem35 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem36 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem37 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem38 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem39 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem40 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem41 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem42 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem43 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem44 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
+    imagem45 = models.ImageField(upload_to='imagens_registros/', null=True, blank=True)
 
     
     def calcular_hora_total(self):
@@ -359,6 +482,37 @@ class prestadores(models.Model):
                
                         
     ]
+    estados_br = [
+    ("AC", "Acre"),
+    ("AP", "Amapá"),
+    ("AM", "Amazonas"),
+    ("PA", "Pará"),
+    ("RO", "Rondônia"),
+    ("RR", "Roraima"),
+    ("TO", "Tocantins"),
+    ("AL", "Alagoas"),
+    ("BA", "Bahia"),
+    ("CE", "Ceará"),
+    ("MA", "Maranhão"),
+    ("PB", "Paraíba"),
+    ("PE", "Pernambuco"),
+    ("PI", "Piauí"),
+    ("RN", "Rio Grande do Norte"),
+    ("SE", "Sergipe"),
+    ("DF", "Distrito Federal"),
+    ("GO", "Goiás"),
+    ("MT", "Mato Grosso"),
+    ("MS", "Mato Grosso do Sul"),
+    ("ES", "Espírito Santo"),
+    ("MG", "Minas Gerais"),
+    ("RJ", "Rio de Janeiro"),
+    ("SP", "São Paulo"),
+    ("PR", "Paraná"),
+    ("RS", "Rio Grande do Sul"),
+    ("SC", "Santa Catarina"),
+]
+
+    
     
     
     Nome = models.CharField(max_length=50, null=True, blank=True)
@@ -366,6 +520,9 @@ class prestadores(models.Model):
     vencimento_cnh = models.DateField(null=True, blank=True)
     tipo_prestador = models.CharField(max_length=50, null=True, blank=True)
     endereco = models.CharField(max_length=50, null=True, blank=True)
+    cidade = models.CharField(max_length=50, null=True, blank=True)
+    estado = models.CharField(choices=estados_br ,max_length=50, null=True, blank=True)
+    
     telefone = models.CharField(max_length=50, null=True, blank=True)
     email = models.CharField(max_length=50, null=True, blank=True)
     conta = models.CharField(max_length=50, null=True, blank=True)

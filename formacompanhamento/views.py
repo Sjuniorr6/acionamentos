@@ -950,18 +950,17 @@ class PrestadorListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Exclui registros com status "A Faturar" (ou "Pago", se necessário)
-       
-        # Aplica os filtros enviados via GET
-        servico = self.request.GET.get('servico', '')
-        cliente = self.request.GET.get('cliente', '')
-        agente = self.request.GET.get('agente', '')
 
-        if servico:
-            qs = qs.filter(servicos__icontains=servico)
-        if cliente:
-            qs = qs.filter(Nome__icontains=cliente)
-        
+        servicos = self.request.GET.get('servicos', '')
+        nome = self.request.GET.get('nome', '')  # Corrigido aqui
+        estado = self.request.GET.get('estado', '').upper().strip()  # Corrigido aqui e padronizado para uppercase
+
+        if servicos:
+            qs = qs.filter(servicos__icontains=servicos)
+        if nome:
+            qs = qs.filter(Nome__icontains=nome)
+        if estado:
+            qs = qs.filter(estado__iexact=estado)
 
         return qs
 
@@ -1427,4 +1426,7 @@ def mapa_mapbox_view(request):
     endereco = request.GET.get("endereco", "")
     # Renderiza um template (ex: 'mapa_mapbox.html') com esse endereço
     return render(request, "mapa_mapbox.html", {"endereco": endereco})
+
+
+
 

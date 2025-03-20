@@ -75,7 +75,7 @@ def generate_pdf(instance):
 
     # Informações do Veículo
     vehicle_info = [
-        [Paragraph("<b>Placa:</b>", styles['BodyText']), instance.placas or "Não Informado",
+        [Paragraph("<b>Placa:</b>", styles['BodyText']), instance.placas1 or "Não Informado",
          Paragraph("<b>Modelo:</b>", styles['BodyText']), instance.modelo or "Não Informado"],
         [Paragraph("<b>Ano:</b>", styles['BodyText']), instance.ano or "Não Informado",
          Paragraph("<b>Cor:</b>", styles['BodyText']), instance.cor or "Não Informado"],
@@ -175,3 +175,9 @@ def add_footer(canvas, doc):
     # Desenha o texto
     canvas.drawString(x_position, y_position, footer_text)
     canvas.restoreState()
+
+
+
+
+
+

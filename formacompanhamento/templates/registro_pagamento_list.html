@@ -279,55 +279,93 @@ form .form-control {
      *  - Senão, utiliza Nominatim (tentando também com ", Brasil").
      *  - Decodifica sequências Unicode "\u002D" para hífen real.
      */
-    function geocodeOrLatLon(input) {
-        let decoded = input.replace(/\\u002D/g, '-');
-        let trimmed = decoded.trim();
-        console.log("Geocodificando:", trimmed);
-        if (!trimmed || trimmed.toLowerCase() === 'teste' || trimmed.toLowerCase() === 'none') {
-            return Promise.reject(new Error('Endereço inválido: ' + input));
-        }
-        let latLonMatch = trimmed.match(/^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/);
-        if (latLonMatch) {
-            console.log("Input reconhecido como coordenadas lat,lon.");
-            return Promise.resolve({
-                lat: parseFloat(latLonMatch[1]),
-                lon: parseFloat(latLonMatch[3])
-            });
-        } else {
-            let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(trimmed)}`;
-            console.log("Nominatim URL:", url);
-            return fetch(url)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.length > 0) {
-                        return {
-                            lat: parseFloat(data[0].lat),
-                            lon: parseFloat(data[0].lon)
-                        };
-                    } else {
-                        if (!trimmed.toLowerCase().includes("brasil")) {
-                            let newQuery = trimmed + ", Brasil";
-                            let newUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(newQuery)}`;
-                            console.log("Tentando com query ajustada:", newUrl);
-                            return fetch(newUrl)
-                                .then(resp => resp.json())
-                                .then(newData => {
-                                    if (newData.length > 0) {
-                                        return {
-                                            lat: parseFloat(newData[0].lat),
-                                            lon: parseFloat(newData[0].lon)
-                                        };
-                                    } else {
-                                        throw new Error('Endereço não encontrado: ' + input);
-                                    }
-                                });
-                        } else {
-                            throw new Error('Endereço não encontrado: ' + input);
-                        }
-                    }
-                });
-        }
+     function geocodeOrLatLon(input) {
+    // 1) Limpeza inicial: remover possíveis sequências Unicode de hífen
+    let cleaned = input
+        // Substitui hífen unicode (\u2013, \u2014, etc.) por hífen ASCII
+        .replace(/[\u2012\u2013\u2014\u2015]/g, '-')
+        // Substitui sequências "\u002D" por hífen ASCII
+        .replace(/\\u002D/g, '-')
+
+        // Remove parênteses, colchetes e palavras como 'lat:' ou 'lon:'
+        .replace(/[()[\]]/g, ' ')
+        .replace(/\blat\b\s*:\s*/gi, '')
+        .replace(/\blon(gitude)?\b\s*:\s*/gi, '')
+
+        // Padroniza vírgula/ ponto-e-vírgula. Ex.: "-18.8; -41.9" => "-18.8, -41.9"
+        .replace(/;/g, ',')
+
+        // Remove espaços repetidos
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    console.log("Geocodificando (após limpeza):", cleaned);
+
+    // 2) Verifica se é vazio, "teste", "none", etc.
+    if (!cleaned || cleaned.toLowerCase() === 'teste' || cleaned.toLowerCase() === 'none') {
+        return Promise.reject(new Error('Endereço/Coordenada inválido(a): ' + input));
     }
+
+    // 3) Tenta casar com regex "lat, lon"
+    //    -> -?d+(.\d+)? , -?d+(.\d+)? 
+    //    (ex.: -18.87857, -41.97541)
+    let latLonMatch = cleaned.match(/^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/);
+    if (latLonMatch) {
+        console.log("Input reconhecido como coordenadas (lat,lon).");
+
+        // Converte em float
+        let latNum = parseFloat(latLonMatch[1]);
+        let lonNum = parseFloat(latLonMatch[3]);
+
+        // Validação extra (faixa de latitude e longitude)
+        // Se quiser garantir que lat está entre -90 e 90 e lon entre -180 e 180
+        if (latNum < -90 || latNum > 90 || lonNum < -180 || lonNum > 180) {
+            return Promise.reject(new Error('Lat/Long fora da faixa válida: ' + cleaned));
+        }
+
+        return Promise.resolve({
+            lat: latNum,
+            lon: lonNum
+        });
+    } else {
+        // 4) Não casou como "lat, lon": tenta geocodificar como endereço via Nominatim
+        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleaned)}`;
+        console.log("Nominatim URL:", url);
+
+        return fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                if (data.length > 0) {
+                    return {
+                        lat: parseFloat(data[0].lat),
+                        lon: parseFloat(data[0].lon)
+                    };
+                } else {
+                    // Se não encontrou e não tem "Brasil", tenta acrescentar "Brasil" no final
+                    if (!cleaned.toLowerCase().includes("brasil")) {
+                        let newQuery = cleaned + ", Brasil";
+                        let newUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(newQuery)}`;
+                        console.log("Tentando com query ajustada:", newUrl);
+                        return fetch(newUrl)
+                            .then(resp => resp.json())
+                            .then(newData => {
+                                if (newData.length > 0) {
+                                    return {
+                                        lat: parseFloat(newData[0].lat),
+                                        lon: parseFloat(newData[0].lon)
+                                    };
+                                } else {
+                                    throw new Error('Endereço não encontrado (nem com "Brasil"): ' + input);
+                                }
+                            });
+                    } else {
+                        throw new Error('Endereço não encontrado: ' + input);
+                    }
+                }
+            });
+    }
+}
+
 
     // Função para desenhar rota com OSRM (opcional)
     function drawRoute(coord1, coord2) {

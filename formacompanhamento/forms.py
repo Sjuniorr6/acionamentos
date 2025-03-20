@@ -65,8 +65,8 @@ class RegistroPagamentoForm(forms.ModelForm):
         model = RegistroPagamento
         fields = [
             # CAMPOS GERAIS
-            'cliente', 'protocolo', 'solicitante', 'tipo_contato', 'operador',
-            'modelo', 'cor', 'ano', 'placas', 'descricao',
+            'tipo_servicos','cliente', 'protocolo', 'solicitante', 'tipo_contato', 'operador',
+            'modelo', 'cor', 'ano','placas1', 'descricao','placas2','placas3',
             'ultima_posicao', 'latlong', 'ultima_posicao_isca', 'latlong_isca',
             'id_isca', 'id_equipamento','motivo','endereco',
 
@@ -100,13 +100,23 @@ class RegistroPagamentoForm(forms.ModelForm):
 
             # IMAGENS
             'imagem1', 'imagem2', 'imagem3', 'imagem4',
-            'imagem5', 'imagem6', 'imagem7', 'imagem8',
-            'imagem9', 'imagem10', 'imagem11', 'imagem12',
-            'imagem13', 'imagem14', 'imagem15', 'imagem16',
+'imagem5', 'imagem6', 'imagem7', 'imagem8',
+'imagem9', 'imagem10', 'imagem11', 'imagem12',
+'imagem13', 'imagem14', 'imagem15', 'imagem16',
+'imagem17', 'imagem18', 'imagem19', 'imagem20',
+'imagem21', 'imagem22', 'imagem23', 'imagem24',
+'imagem25', 'imagem26', 'imagem27', 'imagem28',
+'imagem29', 'imagem30', 'imagem31', 'imagem32',
+'imagem33', 'imagem34', 'imagem35', 'imagem36',
+'imagem37', 'imagem38', 'imagem39', 'imagem40',
+'imagem41', 'imagem42', 'imagem43', 'imagem44',
+'imagem45'
+
         ]
         widgets = {
             # EXEMPLOS DE WIDGETS (Ajuste conforme necessário)
 
+            'tipo_servicos': forms.Select(attrs={'class': 'form-control'}),
             'cliente': forms.Select(attrs={'class': 'form-control'}),
             'protocolo': forms.TextInput(attrs={'class': 'form-control'}),
             'solicitante': forms.TextInput(attrs={'class': 'form-control'}),
@@ -116,7 +126,9 @@ class RegistroPagamentoForm(forms.ModelForm):
             'modelo': forms.TextInput(attrs={'class': 'form-control'}),
             'cor': forms.TextInput(attrs={'class': 'form-control'}),
             'ano': forms.TextInput(attrs={'class': 'form-control'}),
-            'placas': forms.TextInput(attrs={'class': 'form-control'}),
+            'placas1': forms.TextInput(attrs={'class': 'form-control'}),
+            'placas2': forms.TextInput(attrs={'class': 'form-control'}),
+            'placas3': forms.TextInput(attrs={'class': 'form-control'}),
             'descricao': forms.Textarea(attrs={'class': 'form-control'}),
 
             'ultima_posicao': forms.TextInput(attrs={'class': 'form-control'}),
@@ -214,21 +226,51 @@ class RegistroPagamentoForm(forms.ModelForm):
 
             # IMAGENS
             'imagem1': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem2': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem3': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem4': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem5': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem6': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem7': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem8': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem9': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem10': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem11': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem12': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem13': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem14': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem15': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'imagem16': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem2': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem3': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem4': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem5': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem6': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem7': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem8': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem9': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem10': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem11': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem12': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem13': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem14': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem15': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem16': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem17': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem18': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem19': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem20': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem21': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem22': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem23': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem24': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem25': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem26': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem27': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem28': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem29': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem30': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem31': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem32': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem33': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem34': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem35': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem36': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem37': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem38': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem39': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem40': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem41': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem42': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem43': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem44': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+'imagem45': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+
         }
 
         
@@ -341,6 +383,8 @@ class PrestadoresForm(forms.ModelForm):
             'vencimento_cnh', 
             'tipo_prestador', 
             'endereco', 
+            'cidade', 
+            'estado', 
             'telefone', 
             'email', 
             'conta', 
@@ -391,6 +435,14 @@ class PrestadoresForm(forms.ModelForm):
             'endereco': forms.TextInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'Endereço completo'
+            }),
+            'cidade': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Cidade'
+            }),
+            'estado': forms.Select(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Estado'
             }),
             'telefone': forms.TextInput(attrs={
                 'class': 'form-control', 
@@ -458,12 +510,10 @@ class PrestadoresForm(forms.ModelForm):
 
 
 
-from django import forms
-from .models import clientes_acionamento
+
 
 from django import forms
 from .models import clientes_acionamento
-
 from django import forms
 from .models import clientes_acionamento
 
@@ -471,29 +521,57 @@ class ClientesAcionamentoForm(forms.ModelForm):
     class Meta:
         model = clientes_acionamento
         fields = [
-            'nome', 
-            'cnpj', 
-            'telefone', 
-            'banco', 
-            'agencia', 
-            'conta', 
+            'nome',
+            'cnpj',
+            'telefone',
+            'banco',
+            'agencia',
+            'conta',
             'servicos',
-            'valor_prontaresposta_armado', 
-            'franquia_hora_armado', 
-            'franquia_km_armado', 
-            'valorkm_armado', 
+            'valor_prontaresposta_armado',
+            'franquia_hora_armado',
+            'franquia_km_armado',
+            'valorkm_armado',
             'valorh_armado',
-            'valor_prontaresposta_desarmado', 
-            'franquia_hora_desarmado', 
-            'franquia_km_desarmado', 
-            'valorkm_desarmado', 
+            'valor_prontaresposta_desarmado',
+            'franquia_hora_desarmado',
+            'franquia_km_desarmado',
+            'valorkm_desarmado',
             'valorh_desarmado',
-            'valor_antenista', 
-            'franquia_hora_antenista', 
-            'franquia_km_antenista', 
-            'valorkm_antenista', 
+            'valor_antenista',
+            'franquia_hora_antenista',
+            'franquia_km_antenista',
+            'valorkm_antenista',
             'valorh_antenista',
+            'razao_social',
+            'nome_fantasia',
+            'inscricao_estadual',
+            'inscricao_municipal',
+            'atividade_principal',
+            'endereco',
+            'cidade',
+            'estado',
+            'representante_legal',
+            'email_legal',
+            'cpf_cnpj',
+            'email_legal',
+            'data_de_fechamento',
+             'contato_operacional',
+             'email_operacional',
+             'representante_operacional',
+             'contato_financeiro',
+             'representante_financeiro',
+             'email_financeiro',
+             'contato_legal',
+             'cep',
+             'dias_a_faturar',
+             
+
+            # Adicionando os campos de PDF
+            'contrato_pdf',
+            'proposta_pdf',
         ]
+
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
             'cnpj': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CNPJ'}),
@@ -502,21 +580,45 @@ class ClientesAcionamentoForm(forms.ModelForm):
             'agencia': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Agência'}),
             'conta': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Conta'}),
             'servicos': forms.Select(attrs={'class': 'form-control'}),
-            'valor_prontaresposta_armado': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Valor Pronta Resposta Armado'}),
+            'valor_prontaresposta_armado': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Valor PR Armado'}),
             'franquia_hora_armado': forms.NumberInput(attrs={'class': 'form-control'}),
             'franquia_km_armado': forms.NumberInput(attrs={'class': 'form-control'}),
             'valorkm_armado': forms.NumberInput(attrs={'class': 'form-control'}),
             'valorh_armado': forms.NumberInput(attrs={'class': 'form-control'}),
-            'valor_prontaresposta_desarmado': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Valor Pronta Resposta Desarmado'}),
+
+            'valor_prontaresposta_desarmado': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Valor PR Desarmado'}),
             'franquia_hora_desarmado': forms.NumberInput(attrs={'class': 'form-control'}),
             'franquia_km_desarmado': forms.NumberInput(attrs={'class': 'form-control'}),
             'valorkm_desarmado': forms.NumberInput(attrs={'class': 'form-control'}),
             'valorh_desarmado': forms.NumberInput(attrs={'class': 'form-control'}),
+
             'valor_antenista': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Valor Antenista'}),
             'franquia_hora_antenista': forms.NumberInput(attrs={'class': 'form-control'}),
             'franquia_km_antenista': forms.NumberInput(attrs={'class': 'form-control'}),
             'valorkm_antenista': forms.NumberInput(attrs={'class': 'form-control'}),
             'valorh_antenista': forms.NumberInput(attrs={'class': 'form-control'}),
+
+            'razao_social': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Razão Social'}),
+            'nome_fantasia': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome Fantasia'}),
+            'inscricao_estadual': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Inscrição Estadual'}),
+            'inscricao_municipal': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Inscrição Municipal'}),
+            'atividade_principal': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Atividade Principal'}),
+            'endereco': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Endereço'}),
+            'cidade': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cidade'}),
+            'estado': forms.Select(attrs={'class': 'form-control'}),
+            'cep': forms.TextInput(attrs={'class': 'form-control'}),
+            'representante_legal': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
+            'contato_legal': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'}),
+            'representante_financeiro': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
+            'contato_financeiro': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'}),
+            'representante_operacional': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
+            'contato_operacional': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'}),
+            'data_de_fechamento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Data de Fechamento'}),
+            'dias_a_faturar': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dias a Faturar'}),
+
+            # Widgets para os campos de PDF (se desejar estilizar)
+            'contrato_pdf': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'proposta_pdf': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 
