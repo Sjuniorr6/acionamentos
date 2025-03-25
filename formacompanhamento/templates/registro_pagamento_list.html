@@ -214,8 +214,8 @@ form .form-control {
                                 <i class="bi bi-pencil-square fs-6"></i>
                             </a>
 
-                            {% if registro.data_hora_final and registro.status != "Pago" and registro.status != "A Faturar" %}
-                                <!-- Botão Validar: via AJAX, atualiza o status no banco para "A Faturar" e remove a linha -->
+                            <!-- Botão "Validar" só aparece se data_hora_final estiver preenchido -->
+                            {% if registro.data_hora_final %}
                                 <a href="{% url 'formacompanhamento:validar' registro.pk %}" class="my-btn my-btn-info my-btn-sm btn-validar">
                                     <i class="bi bi-check-square fs-6"></i>
                                 </a>
@@ -241,4 +241,44 @@ form .form-control {
         </table>
     </div>
 </main>
+
+<!-- Adicionando Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+    // Inicializa o mapa com centro em São Paulo, Brasil
+    var map = L.map('map').setView([-23.55052, -46.633308], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Função para desenhar rota com OSRM (opcional)
+    function drawRoute(coord1, coord2) {
+        var routeUrl = `https://router.project-osrm.org/route/v1/driving/${coord1.lon},${coord1.lat};${coord2.lon},${coord2.lat}?overview=full&geometries=geojson`;
+        return fetch(routeUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 'Ok') {
+                    var routeCoords = data.routes[0].geometry.coordinates.map(function(coord) {
+                        return [coord[1], coord[0]];
+                    });
+                    L.polyline(routeCoords, { color: 'blue' }).addTo(map);
+                    map.fitBounds(routeCoords);
+                }
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.registro-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                const registroEndereco = row.getAttribute('data-registro-endereco');
+                const prestadorNome = row.getAttribute('data-prestador-nome');
+                // ... lógica do clique na linha com mapa
+            });
+        });
+    });
+</script>
+
 {% endblock %}
