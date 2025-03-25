@@ -2,40 +2,30 @@
 {% load static %}
 {% block content %}
 {% include "components/_header.html" %}
+
 <style>
-/* ========== ESTILIZAÇÃO GERAL ========== */
+/* ========== ESTILIZAÇÃO GERAL (igual ao anterior) ========== */
 body {
     background-color: #2c2c2c;
     font-family: Arial, sans-serif;
 }
 
-/* ========== CONTAINER GERAL ========== */
 .container {
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* ========== TÍTULO PRINCIPAL ========== */
-h1 {
-    text-align: center;
-    color: white;
-    font-size: 28px;
-    margin-bottom: 20px;
-}
-
-/* ========== GRID DE CARDS ========== */
 .lista-prestadores {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Define 4 colunas */
-    gap: 20px; /* Espaçamento entre os cards */
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
     justify-content: center;
 }
 
-/* ========== CARD PRINCIPAL ========== */
 .card-prestador {
     position: relative;
-    width: 380px;  
-    min-height: 520px; 
+    width: 380px;
+    min-height: 520px;
     background: #1e1e1e;
     border-radius: 10px;
     overflow: hidden;
@@ -46,44 +36,32 @@ h1 {
     display: flex;
     flex-direction: column;
 }
-
-/* Ajusta para expandir quando exibe os detalhes */
-.card-prestador.expandido {
-    min-height: auto; /* Permite que cresça conforme o conteúdo */
-}
-
 .card-prestador:hover {
     transform: scale(1.05);
 }
 
-/* ========== ÍCONE DE STATUS ========== */
+/* Ícone de status */
 .card-status-icone {
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 40px;  /* Aumente este valor para deixar maior */
-    height: 40px; /* Aumente este valor para deixar maior */
+    width: 40px;
+    height: 40px;
     background-color: rgb(26, 221, 26);
     border-radius: 50%;
-    border: 2px solid white; /* Adiciona um contorno branco para mais destaque */
+    border: 2px solid white;
 }
-
-/* Verde para "Ativo" */
 .card-status-icone.ativo {
     background-color: rgb(26, 221, 26);
 }
-
-/* Vermelho para "Inativo" */
 .card-status-icone.inativo {
     background-color: rgb(221, 26, 26);
 }
-
-/* Amarelo para "Pendente" */
 .card-status-icone.pendente {
     background-color: rgb(221, 221, 26);
 }
 
-/* ========== BOTÃO EDITAR ========== */
+/* Botão editar */
 .btn-editar {
     position: absolute;
     top: 10px;
@@ -97,23 +75,22 @@ h1 {
     font-weight: bold;
     font-size: 20px;
 }
-
 .btn-editar:hover {
     background: rgba(255, 255, 255, 1);
     color: #000;
 }
 
-/* ========== IMAGEM DO PRESTADOR (TOPO) ========== */
+/* Imagem do prestador */
 .card-imagem {
-    width: 120px;  /* Tamanho ajustado */
-    height: 120px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #d4a55d;
-    margin-top: 15px;
+    margin: 15px auto 0 auto;
+    display: block;
 }
 
-/* ========== CONTEÚDO DO CARD ========== */
 .card-conteudo {
     padding: 10px;
     flex-grow: 1;
@@ -131,35 +108,27 @@ h1 {
 
 .card-status {
     color: white;
-    font-size: 20px; /* "PRONTA RESPOSTA" mais legível */
+    font-size: 20px;
     font-weight: bold;
 }
 
-.card-status-text {
-    font-size: 20px;
-    color: #d4d4d4;
-    margin-bottom: 10px;
-}
-
-/* ========== RODAPÉ DO CARD ========== */
 .card-footer {
     width: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 10px;
+    position: relative;
+    margin-top: auto;
 }
 
-/* Botão INFORMAÇÕES */
 .card-informacoes {
-    padding:  8px 14px;
+    padding: 8px 14px;
     background: #d4a55d;
     color: white;
     font-size: 19px;
     font-weight: bold;
-    text-align: center;
     border-radius: 4px;
-    text-decoration: none;
     border: none;
     cursor: pointer;
     transition: background 0.3s;
@@ -168,29 +137,19 @@ h1 {
     justify-content: center;
     align-items: center;
 }
-
-/* Container do ícone do WhatsApp */
-.whatsapp-container {
-    display: flex;
-    align-items: center;
-}
-
 .card-informacoes:hover {
     background: #b2844d;
 }
 
-/* Ícone do WhatsApp */
 .whatsapp-icon {
     width: 40px;
     height: 40px;
     transition: transform 0.3s ease;
 }
-
 .whatsapp-icon:hover {
     transform: scale(1.2);
 }
 
-/* Os detalhes devem ser visíveis dentro do card */
 .card-detalhes {
     display: none;
     padding: 10px;
@@ -201,33 +160,8 @@ h1 {
     color: white;
     text-align: left;
     width: 100%;
-    flex-grow: 1; /* Faz com que o conteúdo ocupe o espaço necessário */
 }
-
-/* Quando o card estiver ativo, mostrar os detalhes */
 .card-detalhes.ativo {
-    display: block;
-}
-
-/* Container do rodapé */
-.card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px; /* Espaço entre o botão e o WhatsApp */
-    width: 100%;
-    padding: 10px;
-    position: relative; /* Ajuste para evitar sobreposição */
-    margin-top: auto; /* Empurra o rodapé para baixo */
-}
-
-.card-imagem {
-    width: 200px;  
-    height: 200px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #d4a55d;
-    margin: 15px auto 0 auto; /* Centraliza a imagem */
     display: block;
 }
 
@@ -239,77 +173,62 @@ h1 {
     margin-top: 20px;
 }
 
-.container-titulo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.table-container {
+    margin: 20px auto;
+    max-width: 95%;
+}
+.table-container table {
     width: 100%;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
 }
-
-/* Expande os filtros para preencher a largura */
-form {
-    width: 100%;
-    padding: 15px;
+.table thead {
+    background-color: #d4a55d;
+    color: #fff;
 }
-
-.form-control {
-    width: 100%; /* Ocupa toda a largura da coluna */
-    height: 45px; /* Ajuste de altura */
-    font-size: 16px; /* Tamanho do texto */
-    padding: 10px; /* Ajusta o espaçamento interno */
+.table thead th {
+    padding: 10px;
+    text-align: center;
 }
-
-.row {
-    justify-content: center;
-    gap: 10px;
+.table tbody td {
+    text-align: center;
+    padding: 10px;
 }
-
-.form-control, .btn {
-    max-width: 100%;
-    margin-bottom: 25px; /* Ajuste o valor conforme necessário */
-}
-
-.d-flex.justify-content-end {
-    margin-right: 20px; /* Ajusta a distância da borda direita */
-    margin-top: 100px; /* Adiciona espaço acima */
-}
-
-.d-flex.gap-3 {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.btn {
-    min-width: 120px; /* Ajuste o tamanho mínimo dos botões */
+.table .btn-sm {
+    font-size: 14px;
+    padding: 5px 10px;
 }
 </style>
 
 <div class="container mt-5">
     <h2 class="titulo-lista">Lista de Prestadores</h2>
 
+    <!-- Botões de ação (cadastrar + mudar layout) -->
     <div class="d-flex justify-content-end mt-4 me-3">
         <div class="d-flex gap-2">
             <a href="{% url 'formacompanhamento:criar_prestador' %}" class="btn btn-success">Cadastrar Prestador</a>
             <button id="toggle-layout" type="button" class="btn btn-secondary">Mudar para Tabela</button>
         </div>
     </div>
+
+    <!-- Filtros -->
     <form method="GET" class="row mb-3">
         <!-- Filtro por Serviço -->
         <div class="col-md-3">
             <select name="servicos" class="form-control">
                 <option value="" {% if not request.GET.servicos %}selected{% endif %}>Todos os Serviços</option>
-                <option value="Ponta Resposta Armado" {% if request.GET.servicos == "Ponta Resposta Armado" %}selected{% endif %}>Ponta Resposta Armado</option>
+                <option value="Pronta Resposta Armado" {% if request.GET.servicos == "Pronta Resposta Armado" %}selected{% endif %}>Pronta Resposta Armado</option>
                 <option value="Pronta Resposta Desarmado" {% if request.GET.servicos == "Pronta Resposta Desarmado" %}selected{% endif %}>Pronta Resposta Desarmado</option>
                 <option value="Antenista" {% if request.GET.servicos == "Antenista" %}selected{% endif %}>Antenista</option>
             </select>
         </div>
-    
+
         <!-- Filtro por Nome do Agente -->
         <div class="col-md-3">
             <input type="text" name="nome" value="{{ request.GET.nome }}" placeholder="AGENTE" class="form-control">
         </div>
-    
+
         <!-- Filtro por Estado -->
         <div class="col-md-3">
             <select name="estado" class="form-control">
@@ -319,13 +238,14 @@ form {
                 {% endfor %}
             </select>
         </div>
-    
+
         <!-- Botão Filtrar -->
         <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100">FILTRAR</button>
         </div>
     </form>
 
+    <!-- Layout em Cards -->
     <div class="lista-prestadores">
         {% for prestador in prestadores %}
         <div class="card-prestador">
@@ -349,11 +269,12 @@ form {
                 <img src="{% static 'images/default-avatar.png' %}" class="card-imagem" alt="Foto não disponível">
             {% endif %}
 
+            <!-- Conteúdo do card -->
             <div class="card-conteudo">
                 <h5 class="card-nome">{{ prestador.Nome }}</h5>
                 <p class="card-status">{{ prestador.servicos }}</p>
 
-                <!-- Botão para exibir informações -->
+                <!-- Rodapé: Botão INFORMAÇÕES + WhatsApp -->
                 <div class="card-footer">
                     <button class="card-informacoes">INFORMAÇÕES</button>
                     <a href="https://wa.me/{{ prestador.telefone }}" target="_blank">
@@ -361,7 +282,7 @@ form {
                     </a>
                 </div>
 
-                <!-- Área de detalhes oculta inicialmente -->
+                <!-- Área de detalhes (oculta inicialmente) -->
                 <div class="card-detalhes">
                     <p>
                         <strong>CPF/CNPJ:</strong> {{ prestador.cpf_cnpj }}<br>
@@ -375,10 +296,62 @@ form {
                         <strong>Disponibilidade:</strong> {{ prestador.disponibilidade }}<br>
                         <strong>Região:</strong> {{ prestador.regiao_atuacao }}<br>
                         <strong>Serviços:</strong> {{ prestador.servicos }}<br>
-                        <strong>Franquia KM:</strong> {{ prestador.franquia_km }}<br>
-                        <strong>Valor Acionamento:</strong> {{ prestador.valor_acionamento }}<br>
-                        <strong>Valor (Antenista):</strong> {{ prestador.valor_antenista }}<br>
                         <strong>Vencimento CNH:</strong> {{ prestador.vencimento_cnh }}<br>
+
+                        {# Se for "Todos os Serviços", mostra todos os valores #}
+                        {% if prestador.servicos == "" or prestador.servicos == "Todos os Serviços" %}
+                            <!-- Armado -->
+                            <strong>Valor (Armado):</strong> {{ prestador.valor_prontaresposta_armado }}<br>
+                            <strong>Franquia Hora (Armado):</strong> {{ prestador.franquia_hora_armado }}<br>
+                            <strong>Franquia KM (Armado):</strong> {{ prestador.franquia_km_armado }}<br>
+                            <strong>Valor KM (Armado):</strong> {{ prestador.valorkm_armado }}<br>
+                            <strong>Valor Hora (Armado):</strong> {{ prestador.valorh_armado }}<br>
+                            <hr>
+
+                            <!-- Desarmado -->
+                            <strong>Valor (Desarmado):</strong> {{ prestador.valor_prontaresposta_desarmado }}<br>
+                            <strong>Franquia Hora (Desarmado):</strong> {{ prestador.franquia_hora_desarmado }}<br>
+                            <strong>Franquia KM (Desarmado):</strong> {{ prestador.franquia_km_desarmado }}<br>
+                            <strong>Valor KM (Desarmado):</strong> {{ prestador.valorkm_desarmado }}<br>
+                            <strong>Valor Hora (Desarmado):</strong> {{ prestador.valorh_desarmado }}<br>
+                            <hr>
+
+                            <!-- Antenista -->
+                            <strong>Valor (Antenista):</strong> {{ prestador.valor_antenista }}<br>
+                            <strong>Franquia Hora (Antenista):</strong> {{ prestador.franquia_hora_antenista }}<br>
+                            <strong>Franquia KM (Antenista):</strong> {{ prestador.franquia_km_antenista }}<br>
+                            <strong>Valor KM (Antenista):</strong> {{ prestador.valorkm_antenista }}<br>
+                            <strong>Valor Hora (Antenista):</strong> {{ prestador.valorh_antenista }}<br>
+                            <hr>
+
+                            <!-- Valor Acionamento genérico -->
+                            <strong>Valor Acionamento:</strong> {{ prestador.valor_acionamento }}<br>
+
+                        {% elif prestador.servicos == "Pronta Resposta Armado" %}
+                            <strong>Valor (Armado):</strong> {{ prestador.valor_prontaresposta_armado }}<br>
+                            <strong>Franquia Hora (Armado):</strong> {{ prestador.franquia_hora_armado }}<br>
+                            <strong>Franquia KM (Armado):</strong> {{ prestador.franquia_km_armado }}<br>
+                            <strong>Valor KM (Armado):</strong> {{ prestador.valorkm_armado }}<br>
+                            <strong>Valor Hora (Armado):</strong> {{ prestador.valorh_armado }}<br>
+
+                        {% elif prestador.servicos == "Pronta Resposta Desarmado" %}
+                            <strong>Valor (Desarmado):</strong> {{ prestador.valor_prontaresposta_desarmado }}<br>
+                            <strong>Franquia Hora (Desarmado):</strong> {{ prestador.franquia_hora_desarmado }}<br>
+                            <strong>Franquia KM (Desarmado):</strong> {{ prestador.franquia_km_desarmado }}<br>
+                            <strong>Valor KM (Desarmado):</strong> {{ prestador.valorkm_desarmado }}<br>
+                            <strong>Valor Hora (Desarmado):</strong> {{ prestador.valorh_desarmado }}<br>
+
+                        {% elif prestador.servicos == "Antenista" %}
+                            <strong>Valor (Antenista):</strong> {{ prestador.valor_antenista }}<br>
+                            <strong>Franquia Hora (Antenista):</strong> {{ prestador.franquia_hora_antenista }}<br>
+                            <strong>Franquia KM (Antenista):</strong> {{ prestador.franquia_km_antenista }}<br>
+                            <strong>Valor KM (Antenista):</strong> {{ prestador.valorkm_antenista }}<br>
+                            <strong>Valor Hora (Antenista):</strong> {{ prestador.valorh_antenista }}<br>
+
+                        {% else %}
+                            <!-- Caso não seja nenhum desses serviços -->
+                            <strong>Valor Acionamento:</strong> {{ prestador.valor_acionamento }}<br>
+                        {% endif %}
                     </p>
                 </div>
             </div>
@@ -391,7 +364,7 @@ form {
     </div>
 </div>
 
-<!-- Estrutura da Tabela (inicialmente oculta) -->
+<!-- Tabela (inicialmente oculta) -->
 <div id="tabela-prestadores" class="table-container" style="display: none;">
     <table class="table table-bordered table-striped">
         <thead>
@@ -430,48 +403,42 @@ form {
     </table>
 </div>
 
-<!-- Script para alternar a exibição das informações -->
+<!-- Script para alternar a exibição das informações e o layout -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Seleciona todos os botões de informações
-        var botoes = document.querySelectorAll(".card-informacoes");
-        
-        botoes.forEach(function (botao) {
-            botao.addEventListener("click", function (event) {
-                event.preventDefault(); // Impede comportamento padrão (como submit)
-                // Encontra o próximo elemento irmão do botão que é a div de detalhes
-                var detalhes = this.closest(".card-conteudo").querySelector(".card-detalhes");
-
-                // Alterna a visibilidade da seção de detalhes
-                if (detalhes.classList.contains("ativo")) {
-                    detalhes.classList.remove("ativo");
-                    this.textContent = "INFORMAÇÕES";
-                } else {
-                    detalhes.classList.add("ativo");
-                    this.textContent = "FECHAR";
-                }
-            });
-        });
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        var botaoAlternar = document.getElementById("toggle-layout");
-        var listaPrestadores = document.querySelector(".lista-prestadores");
-        var tabelaPrestadores = document.getElementById("tabela-prestadores");
-
-        botaoAlternar.addEventListener("click", function (event) {
-            event.preventDefault(); // Impede comportamento padrão
-            if (listaPrestadores.style.display === "none") {
-                listaPrestadores.style.display = "grid";
-                tabelaPrestadores.style.display = "none";
-                botaoAlternar.textContent = "Mudar para Tabela";
+document.addEventListener("DOMContentLoaded", function () {
+    // Alterna exibição dos detalhes no card
+    var botoes = document.querySelectorAll(".card-informacoes");
+    botoes.forEach(function (botao) {
+        botao.addEventListener("click", function (event) {
+            event.preventDefault();
+            var detalhes = this.closest(".card-conteudo").querySelector(".card-detalhes");
+            if (detalhes.classList.contains("ativo")) {
+                detalhes.classList.remove("ativo");
+                this.textContent = "INFORMAÇÕES";
             } else {
-                listaPrestadores.style.display = "none";
-                tabelaPrestadores.style.display = "block";
-                botaoAlternar.textContent = "Mudar para Cards";
+                detalhes.classList.add("ativo");
+                this.textContent = "FECHAR";
             }
         });
     });
+
+    // Botão para mudar de layout (cards <-> tabela)
+    var botaoAlternar = document.getElementById("toggle-layout");
+    var listaPrestadores = document.querySelector(".lista-prestadores");
+    var tabelaPrestadores = document.getElementById("tabela-prestadores");
+
+    botaoAlternar.addEventListener("click", function (event) {
+        event.preventDefault();
+        if (listaPrestadores.style.display === "none") {
+            listaPrestadores.style.display = "grid";
+            tabelaPrestadores.style.display = "none";
+            botaoAlternar.textContent = "Mudar para Tabela";
+        } else {
+            listaPrestadores.style.display = "none";
+            tabelaPrestadores.style.display = "block";
+            botaoAlternar.textContent = "Mudar para Cards";
+        }
+    });
+});
 </script>
-    
 {% endblock %}

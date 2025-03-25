@@ -613,7 +613,13 @@ class ClientesAcionamentoForm(forms.ModelForm):
             'contato_financeiro': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'}),
             'representante_operacional': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
             'contato_operacional': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'}),
-            'data_de_fechamento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Data de Fechamento'}),
+            'data_de_fechamento': forms.DateInput(
+    attrs={
+        'type': 'date',
+        'class': 'form-control',
+        'placeholder': 'Data de Fechamento'
+    }
+),
             'dias_a_faturar': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dias a Faturar'}),
 
             # Widgets para os campos de PDF (se desejar estilizar)

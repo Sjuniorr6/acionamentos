@@ -117,28 +117,28 @@ th:last-child, td:last-child {
       <tbody>
         <tr>
           <td>{{ cliente.id }}</td>
-          <td>{{ cliente.nome|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.cnpj|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.telefone|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.banco|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.agencia|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.conta|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.servicos|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valor_prontaresposta_armado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.franquia_hora_armado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.franquia_km_armado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valorkm_armado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valorh_armado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valor_prontaresposta_desarmado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.franquia_hora_desarmado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.franquia_km_desarmado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valorkm_desarmado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valorh_desarmado|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valor_antenista|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.franquia_hora_antenista|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.franquia_km_antenista|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valorkm_antenista|default:"NAO CONTRATADO" }}</td>
-          <td>{{ cliente.valorh_antenista|default:"NAO CONTRATADO" }}</td>
+          <td>{{ cliente.nome|default:"N/A"}}</td>
+          <td>{{ cliente.cnpj|default:"N/A" }}</td>
+          <td>{{ cliente.telefone|default:"N/A" }}</td>
+          <td>{{ cliente.banco|default:"N/A" }}</td>
+          <td>{{ cliente.agencia|default:"N/A" }}</td>
+          <td>{{ cliente.conta|default:"N/A" }}</td>
+          <td>{{ cliente.servicos|default:"N/A" }}</td>
+          <td>{{ cliente.valor_prontaresposta_armado|default:"N/A" }}</td>
+          <td>{{ cliente.franquia_hora_armado|default:"N/A" }}</td>
+          <td>{{ cliente.franquia_km_armado|default:"N/A" }}</td>
+          <td>{{ cliente.valorkm_armado|default:"N/A" }}</td>
+          <td>{{ cliente.valorh_armado|default:"N/A" }}</td>
+          <td>{{ cliente.valor_prontaresposta_desarmado|default:"N/A" }}</td>
+          <td>{{ cliente.franquia_hora_desarmado|default:"N/A" }}</td>
+          <td>{{ cliente.franquia_km_desarmado|default:"N/A" }}</td>
+          <td>{{ cliente.valorkm_desarmado|default:"N/A" }}</td>
+          <td>{{ cliente.valorh_desarmado|default:"N/A" }}</td>
+          <td>{{ cliente.valor_antenista|default:"N/A" }}</td>
+          <td>{{ cliente.franquia_hora_antenista|default:"N/A" }}</td>
+          <td>{{ cliente.franquia_km_antenista|default:"N/A" }}</td>
+          <td>{{ cliente.valorkm_antenista|default:"N/A" }}</td>
+          <td>{{ cliente.valorh_antenista|default:"N/A" }}</td>
           <td>
             <a href="{% url 'formacompanhamento:ClienteUpdateView' cliente.pk %}"
                 class="btn btn-sm btn-warning">Editar</a>

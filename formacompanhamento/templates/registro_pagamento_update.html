@@ -8,17 +8,18 @@
         <div class="card-body">
             <form method="post" action="{% url 'formacompanhamento:registro_pagamento_update' form.instance.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
-
                 <div class="container mt-4">
                     <h3 class="text-white">
                       {% if form.instance.pk %}Editar Pagamento{% else %}Novo Acionamento{% endif %}
                     </h3>
                     <div class="card mb-4">
                       <div class="card-body">
+                        {# Se necessário, mantenha apenas uma tag <form> externa #}
                         <form method="post" action="{% url 'formacompanhamento:registro_pagamento_create' %}" enctype="multipart/form-data">
                           {% csrf_token %}
                           
                           <!-- CAMPOS CLIENTE E PRESTADOR -->
+                          {% if form.tipo_servicos.value %}
                           <h4 class="mt-2">Tipo de Serviço</h4>
                           <div class="row mb-3">
                             <div class="col-md-4">
@@ -27,24 +28,31 @@
                               {{ form.tipo_servicos }}
                             </div>
                           </div>
+                          {% endif %}
                           
                           <h4 class="mt-2">Dados do Cliente</h4>
                           <div class="row mb-3">
+                            {% if form.cliente.value %}
                             <div class="col-md-4">
                               <label for="id_cliente" class="form-label">Cliente</label>
                               {{ form.cliente.errors }}
                               {{ form.cliente }}
                             </div>
+                            {% endif %}
+                            {% if form.protocolo.value %}
                             <div class="col-md-4">
                               <label for="id_protocolo" class="form-label">Protocolo</label>
                               {{ form.protocolo }}
                             </div>
+                            {% endif %}
+                            {% if form.endereco.value %}
                             <div class="col-md-4">
                               <label for="id_endereco" class="form-label">Endereço</label>
                               {{ form.endereco }}
                               <!-- Botão para visualizar mapa em uma nova aba (rota customizada) -->
                               <button type="button" class="btn btn-info mt-2" onclick="openMap()">Ver Mapa</button>
                             </div>
+                            {% endif %}
                           </div>
                           
                           <div>
@@ -53,36 +61,44 @@
                             
                             <!-- Primeira linha: Marca/Modelo, Ano, Cor -->
                             <div class="row mb-3">
+                              {% if form.modelo.value %}
                               <div class="col-md-3">
                                 <label for="id_modelo" class="form-label">Marca / Modelo</label>
                                 {{ form.modelo }}
                               </div>
+                              {% endif %}
+                              {% if form.ano.value %}
                               <div class="col-md-3">
                                 <label for="id_ano" class="form-label">Ano Fabricação / Modelo</label>
                                 {{ form.ano }}
                               </div>
+                              {% endif %}
+                              {% if form.cor.value %}
                               <div class="col-md-3">
                                 <label for="id_cor" class="form-label">Cor</label>
                                 {{ form.cor }}
                               </div>
+                              {% endif %}
                             </div>
                             
                             <!-- Botão para revelar as placas -->
-                            <button type="button" id="btnAdicionarPlaca" class="btn btn-secondary mb-3">Adicionar Placa</button>
+                            <button type="button" id="btnAdicionarPlaca" class="btn btn-secondary mb-3" onclick="toggleVisibility('placas-container')">Adicionar Placa</button>
                             
-                            <!-- Linha com as 3 placas (agora SEM display: none) -->
-                            <div class="row mb-3">
-                              <div class="col-md-4 placa-dinamica" id="placa1">
-                                <label for="id_placas1" class="form-label">Placa1</label>
-                                {{ form.placas1 }}
-                              </div>
-                              <div class="col-md-4 placa-dinamica" id="placa2">
-                                <label for="id_placas2" class="form-label">Placa2</label>
-                                {{ form.placas2 }}
-                              </div>
-                              <div class="col-md-4 placa-dinamica" id="placa3">
-                                <label for="id_placas3" class="form-label">Placa3</label>
-                                {{ form.placas3 }}
+                            <!-- Container para as placas -->
+                            <div id="placas-container" style="display: block;">
+                              <div class="row mb-3">
+                                <div class="col-md-4 placa-dinamica" id="placa1" style="display: block;">
+                                  <label for="id_placas1" class="form-label">Placa1</label>
+                                  {{ form.placas1 }}
+                                </div>
+                                <div class="col-md-4 placa-dinamica" id="placa2" style="display: {% if form.placas2.value %}block{% else %}none{% endif %};">
+                                  <label for="id_placas2" class="form-label">Placa2</label>
+                                  {{ form.placas2 }}
+                                </div>
+                                <div class="col-md-4 placa-dinamica" id="placa3" style="display: {% if form.placas3.value %}block{% else %}none{% endif %};">
+                                  <label for="id_placas3" class="form-label">Placa3</label>
+                                  {{ form.placas3 }}
+                                </div>
                               </div>
                             </div>
                             
@@ -91,57 +107,77 @@
                             <!-- DADOS DO ACIONAMENTO -->
                             <h4 class="text-white">Dados do Acionamento</h4>
                             <div class="row mb-3">
+                              {% if form.solicitante.value %}
                               <div class="col-md-5">
                                 <label for="id_solicitante" class="form-label">Solicitante</label>
                                 {{ form.solicitante }}
                               </div>
+                              {% endif %}
+                              {% if form.tipo_contato.value %}
                               <div class="col-md-2">
                                 <label for="id_tipo_contato" class="form-label">Tipo de Contato</label>
                                 {{ form.tipo_contato }}
                               </div>
+                              {% endif %}
+                              {% if form.motivo.value %}
                               <div class="col-md-3">
                                 <label for="id_motivo" class="form-label">Motivo</label>
                                 <div class="input-group">
                                   {{ form.motivo|add_class:"form-control border-danger" }}
                                 </div>
                               </div>
+                              {% endif %}
+                              {% if form.quantidade_agentes.value %}
                               <div class="col-md-2">
                                 <label for="id_quantidade_agentes" class="form-label">Quantidade de Agentes</label>
                                 {{ form.quantidade_agentes }}
                               </div>
+                              {% endif %}
                             </div>
                             <div class="row mb-3">
+                              {% if form.prestador.value %}
                               <div class="col-md-2">
                                 <label for="id_prestador" class="form-label">Prestador</label>
                                 {{ form.prestador }}
                               </div>
+                              {% endif %}
+                              {% if form.acionamento.value %}
                               <div class="col-md-2">
                                 <label for="id_acionamento" class="form-label">Valor de Acionamento</label>
                                 {{ form.acionamento }}
                               </div>
+                              {% endif %}
+                              {% if form.franquia_hora.value %}
                               <div class="col-md-2">
                                 <label for="id_franquia_hora" class="form-label">Franquia de Horas</label>
                                 {{ form.franquia_hora }}
                               </div>
+                              {% endif %}
+                              {% if form.km_franquia.value %}
                               <div class="col-md-2">
                                 <label for="id_km_franquia" class="form-label">Franquia de KM</label>
                                 {{ form.km_franquia }}
                               </div>
+                              {% endif %}
+                              {% if form.valor_hora_excedente.value %}
                               <div class="col-md-2">
                                 <label for="id_valor_hora_excedente" class="form-label">Valor de Hora Excedente</label>
                                 {{ form.valor_hora_excedente }}
                               </div>
+                              {% endif %}
+                              {% if form.valor_km_excedente.value %}
                               <div class="col-md-2">
                                 <label for="id_valor_km_excedente" class="form-label">Valor de KM Excedente</label>
                                 {{ form.valor_km_excedente }}
                               </div>
+                              {% endif %}
                             </div>
                             <hr>
                             
                             <!-- DADOS DA OPERAÇÃO -->
                             <h4 class="mt-4">Dados da Operação</h4>
-                            <!-- Bloco do Agente Principal (block = "") -->
                             <div class="row mb-3">
+                              {% if form.data_hora_inicial.value %}
                               <div class="col-md-3">
                                 <label for="id_data_hora_inicial" class="form-label">Início de Operação</label>
                                 <div class="input-group">
@@ -149,14 +185,20 @@
                                   <button type="button" class="btn btn-primary" id="btn_inicial" onclick="registrarDataHora('id_data_hora_inicial','btn_inicial')">Registrar</button>
                                 </div>
                               </div>
+                              {% endif %}
+                              {% if form.sla.value %}
                               <div class="col-md-1">
                                 <label for="id_sla" class="form-label">SLA</label>
                                 {{ form.sla }}
                               </div>
+                              {% endif %}
+                              {% if form.previsa_chegada.value %}
                               <div class="col-md-2">
                                 <label for="id_previsa_chegada" class="form-label">Previsão de Chegada</label>
                                 {{ form.previsa_chegada }}
                               </div>
+                              {% endif %}
+                              
                               <div class="col-md-3">
                                 <label for="id_data_hora_chegada" class="form-label">Data e Hora (Chegada)</label>
                                 <div class="input-group">
@@ -164,6 +206,8 @@
                                   <button type="button" class="btn btn-primary" id="btn_chegada" onclick="registrarDataHora('id_data_hora_chegada','btn_chegada')">Registrar</button>
                                 </div>
                               </div>
+                              
+                              
                               <div class="col-md-3">
                                 <label for="id_data_hora_final" class="form-label">Final de Operação</label>
                                 <div class="input-group">
@@ -171,32 +215,43 @@
                                   <button type="button" class="btn btn-primary" id="btn_final" onclick="registrarDataHora('id_data_hora_final','btn_final')">Registrar</button>
                                 </div>
                               </div>
+                             
                             </div>
                             <div class="row mb-3">
+                              
                               <div class="col-md-2">
                                 <label for="id_hora_total" class="form-label">Hora Total</label>
                                 {{ form.hora_total }}
                               </div>
+                              
+                           
                               <div class="col-md-2">
                                 <label for="id_km_inicial" class="form-label">Km Inicial</label>
                                 {{ form.km_inicial }}
                               </div>
+                              
+                              
                               <div class="col-md-2">
                                 <label for="id_km_final" class="form-label">Km Final</label>
                                 {{ form.km_final }}
                               </div>
+                             
+                              
                               <div class="col-md-2">
                                 <label for="id_km_total" class="form-label">KM Total</label>
                                 {{ form.km_total }}
                               </div>
+                             
                               <div class="col-md-2">
                                 <label for="id_km_excedente" class="form-label">KM Excedente</label>
                                 {{ form.km_excedente }}
                               </div>
+                            
                               <div class="col-md-2">
                                 <label for="id_hora_excedente" class="form-label">Hora Excedente</label>
                                 {{ form.hora_excedente }}
                               </div>
+                             
                             </div>
                             <hr>
                             
@@ -204,12 +259,10 @@
                             <button type="button" id="btnAdicionarAgente" class="btn btn-secondary mb-3">Adicionar Agente</button>
                             
                             <h5>Agentes Adicionais</h5>
-                            <!-- CAMPOS DINÂMICOS PARA AGENTES ADICIONAIS -->
-                            
+                            <!-- Container para agentes: somente o agente principal é exibido inicialmente -->
                             <div id="agentes-container">
-                              <!-- Agente adicional 1 (block = "1") -->
-                              <!-- Removido style="display: none;" -->
-                              <div class="agente-dinamico" id="agente1">
+                              <!-- Agente principal (sempre visível) -->
+                              <div class="agente-dinamico" id="agente1" style="display: none;">
                                 <div class="row mb-3">
                                   <div class="col-md-3">
                                     <label for="id_prestador1" class="form-label">Prestador</label>
@@ -294,9 +347,10 @@
                                   </div>
                                 </div>
                               </div>
-                              
-                              <!-- Bloco para Agente Adicional 2 (block = "2") -->
-                              <div class="agente-dinamico" id="agente2">
+                            
+                              <!-- Agente adicional 2 (oculto inicialmente) -->
+                              <div class="agente-dinamico" id="agente2" style="display: none;">
+                                <!-- Conteúdo similar ao agente 1, adaptado para o agente 2 -->
                                 <hr>
                                 <div class="row mb-3">
                                   <div class="col-md-3">
@@ -382,9 +436,9 @@
                                   </div>
                                 </div>
                               </div>
-                              
-                              <!-- Bloco para Agente Adicional 3 (block = "3") -->
-                              <div class="agente-dinamico" id="agente3">
+                            
+                              <!-- Agente adicional 3 (oculto inicialmente) -->
+                              <div class="agente-dinamico" id="agente3" style="display: none;">
                                 <hr>
                                 <div class="row mb-3">
                                   <div class="col-md-3">
@@ -471,280 +525,314 @@
                                 </div>
                               </div>
                             </div>
-                            <hr>
-                            
+                          
                             <!-- DADOS GERAIS E IMAGENS -->
+                            <div class="row mb-3"></div>
                             <div class="row mb-3">
-                            </div>
-                            <div class="row mb-3">
+                              {% if form.rastreador.value %}
                               <div class="col-md-2">
                                 <label for="id_rastreador" class="form-label">Rastreador</label>
                                 {{ form.rastreador }}
                               </div>
+                              {% endif %}
+                              {% if form.id_equipamento.value %}
                               <div class="col-md-2" id="id_equipamento_field">
                                 <label for="id_id_equipamento" class="form-label">ID Equipamento</label>
                                 {{ form.id_equipamento }}
                               </div>
+                              {% endif %}
+                              {% if form.ultima_posicao.value %}
                               <div class="col-md-6" id="ultima_posicao_field">
                                 <label for="id_ultima_posicao" class="form-label">Endereço da Última Posição</label>
                                 {{ form.ultima_posicao }}
                               </div>
+                              {% endif %}
+                              {% if form.latlong.value %}
                               <div class="col-md-2" id="latlong_field">
                                 <label for="id_latlong" class="form-label">Latitude - Longitude</label>
                                 {{ form.latlong }}
                               </div>
+                              {% endif %}
                             </div>
                             <div class="row mb-3">
+                              {% if form.isca.value %}
                               <div class="col-md-2">
                                 <label for="id_isca" class="form-label">Isca</label>
                                 {{ form.isca }}
                               </div>
+                              {% endif %}
+                              {% if form.id_isca.value %}
                               <div class="col-md-2" id="id_isca_field">
                                 <label for="id_id_isca" class="form-label">ID Equipamento</label>
                                 {{ form.id_isca }}
                               </div>
+                              {% endif %}
+                              {% if form.ultima_posicao_isca.value %}
                               <div class="col-md-6" id="ultima_posicao_isca_field">
                                 <label for="id_ultima_posicao_isca" class="form-label">Endereço da Última Posição</label>
                                 {{ form.ultima_posicao_isca }}
                               </div>
+                              {% endif %}
+                              {% if form.latlong_isca.value %}
                               <div class="col-md-2" id="latlong_isca_field">
                                 <label for="id_latlong_isca" class="form-label">Latitude - Longitude</label>
                                 {{ form.latlong_isca }}
                               </div>
+                              {% endif %}
                             </div>
                             <hr>
                             
+                            {% if form.descricao.value %}
                             <div class="col-md-12" id="descricao">
                               <label for="{{ form.descricao.id_for_label }}" class="form-label"><h5>Descrição</h5></label>
                               {{ form.descricao|add_class:"form-control" }}
                             </div>
-                            
+                            {% endif %}
                             <!-- Container com todos os blocos de campos de imagem -->
-
-                          
-                  
-               <!-- Container com todos os blocos de campos de imagem -->
+<!-- Container com todos os blocos de campos de imagem -->
+<!-- Container com todos os blocos de campos de imagem -->
 <h4 class="mt-4">Imagens</h4>
+<button type="button" id="btnAdicionarFoto" class="btn btn-secondary mb-3">Adicionar Fotos</button>
+{% if form.imagem1 != "" %}
 <div id="imagens-groups">
-
-  <!-- Grupo 1: imagem1 a imagem6 -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-1" style="display: none;">
+  <!-- Grupo 1: Imagem 1 a Imagem 6 -->
+  <div id="image-group-1" class="d-flex flex-wrap mb-3 image-group" 
+       style="display: {% if form.imagem1.value or form.imagem2.value or form.imagem3.value or form.imagem4.value or form.imagem5.value or form.imagem6.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem1" class="form-label">Imagem 1</label>
       {{ form.imagem1 }}
     </div>
-    <div class="col-md-2">
+    {% endif %}
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem2" class="form-label">Imagem 2</label>
       {{ form.imagem2 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem3" class="form-label">Imagem 3</label>
       {{ form.imagem3 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem4" class="form-label">Imagem 4</label>
       {{ form.imagem4 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem5" class="form-label">Imagem 5</label>
       {{ form.imagem5 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem6" class="form-label">Imagem 6</label>
       {{ form.imagem6 }}
     </div>
   </div>
-
-  <!-- Grupo 2: imagem7 a imagem12 -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-2" style="display: none;">
+  <!-- Grupo 2: Imagem 7 a Imagem 12 -->
+  <div id="image-group-2" class="d-flex flex-wrap mb-3 image-group" 
+  style="display: {% if form.imagem7.value or form.imagem8.value or form.imagem9.value or form.imagem10.value or form.imagem11.value or form.imagem12.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem7" class="form-label">Imagem 7</label>
       {{ form.imagem7 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem8" class="form-label">Imagem 8</label>
       {{ form.imagem8 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem9" class="form-label">Imagem 9</label>
       {{ form.imagem9 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem10" class="form-label">Imagem 10</label>
       {{ form.imagem10 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem11" class="form-label">Imagem 11</label>
       {{ form.imagem11 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem12" class="form-label">Imagem 12</label>
       {{ form.imagem12 }}
     </div>
   </div>
-
-  <!-- Grupo 3: imagem13 a imagem18 -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-3" style="display: none;"></div>
+  <!-- Grupo 3: Imagem 13 a Imagem 18 -->
+  <div id="image-group-3" class="d-flex flex-wrap mb-3 image-group" 
+       style="display: {% if form.imagem13.value or form.imagem14.value or form.imagem15.value or form.imagem16.value or form.imagem17.value or form.imagem18.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem13" class="form-label">Imagem 13</label>
       {{ form.imagem13 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem14" class="form-label">Imagem 14</label>
       {{ form.imagem14 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem15" class="form-label">Imagem 15</label>
       {{ form.imagem15 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem16" class="form-label">Imagem 16</label>
       {{ form.imagem16 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem17" class="form-label">Imagem 17</label>
       {{ form.imagem17 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem18" class="form-label">Imagem 18</label>
       {{ form.imagem18 }}
     </div>
   </div>
-
-  <!-- Grupo 4: imagem19 a imagem24 -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-4" style="display: none;"></div>
+  <!-- Grupo 4: Imagem 19 a Imagem 24 -->
+  <div id="image-group-4" class="d-flex flex-wrap mb-3 image-group" 
+       style="display: {% if form.imagem19.value or form.imagem20.value or form.imagem21.value or form.imagem22.value or form.imagem23.value or form.imagem24.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem19" class="form-label">Imagem 19</label>
       {{ form.imagem19 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem20" class="form-label">Imagem 20</label>
       {{ form.imagem20 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem21" class="form-label">Imagem 21</label>
       {{ form.imagem21 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem22" class="form-label">Imagem 22</label>
       {{ form.imagem22 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem23" class="form-label">Imagem 23</label>
       {{ form.imagem23 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem24" class="form-label">Imagem 24</label>
       {{ form.imagem24 }}
     </div>
   </div>
-
-  <!-- Grupo 5: imagem25 a imagem30 -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-5" style="display: none;"></div>
+  <!-- Grupo 5: Imagem 25 a Imagem 30 -->
+  <div id="image-group-5" class="d-flex flex-wrap mb-3 image-group" 
+       style="display: {% if form.imagem25.value or form.imagem26.value or form.imagem27.value or form.imagem28.value or form.imagem29.value or form.imagem30.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem25" class="form-label">Imagem 25</label>
       {{ form.imagem25 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem26" class="form-label">Imagem 26</label>
       {{ form.imagem26 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem27" class="form-label">Imagem 27</label>
       {{ form.imagem27 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem28" class="form-label">Imagem 28</label>
       {{ form.imagem28 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem29" class="form-label">Imagem 29</label>
       {{ form.imagem29 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem30" class="form-label">Imagem 30</label>
       {{ form.imagem30 }}
     </div>
   </div>
-
-  <!-- Grupo 6: imagem31 a imagem36 -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-6" style="display: none;"></div>
+  <!-- Grupo 6: Imagem 31 a Imagem 36 -->
+  <div id="image-group-6" class="d-flex flex-wrap mb-3 image-group" 
+       style="display: {% if form.imagem31.value or form.imagem32.value or form.imagem33.value or form.imagem34.value or form.imagem35.value or form.imagem36.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem31" class="form-label">Imagem 31</label>
       {{ form.imagem31 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem32" class="form-label">Imagem 32</label>
       {{ form.imagem32 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem33" class="form-label">Imagem 33</label>
       {{ form.imagem33 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem34" class="form-label">Imagem 34</label>
       {{ form.imagem34 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem35" class="form-label">Imagem 35</label>
       {{ form.imagem35 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem36" class="form-label">Imagem 36</label>
       {{ form.imagem36 }}
     </div>
   </div>
-
-  <!-- Grupo 7: imagem37 a imagem42 -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-7" style="display: none;"></div>
+  <!-- Grupo 7: Imagem 37 a Imagem 42 -->
+  <div id="image-group-7" class="d-flex flex-wrap mb-3 image-group" 
+       style="display: {% if form.imagem37.value or form.imagem38.value or form.imagem39.value or form.imagem40.value or form.imagem41.value or form.imagem42.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem37" class="form-label">Imagem 37</label>
       {{ form.imagem37 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem38" class="form-label">Imagem 38</label>
       {{ form.imagem38 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem39" class="form-label">Imagem 39</label>
       {{ form.imagem39 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem40" class="form-label">Imagem 40</label>
       {{ form.imagem40 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem41" class="form-label">Imagem 41</label>
       {{ form.imagem41 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem42" class="form-label">Imagem 42</label>
       {{ form.imagem42 }}
     </div>
   </div>
-
-  <!-- Grupo 8: imagem43 a imagem45 (último grupo com 3 campos) -->
-  <div class="row mb-3 image-group">
-    <div class="col-md-2">
+  <div class="btnAdicionarFoto" id="image-group-8" style="display: none;"></div>
+  <!-- Grupo 8: Imagem 43 a Imagem 45 (com 3 colunas vazias para completar a linha) -->
+  <div id="image-group-8" class="d-flex flex-wrap mb-3 image-group" 
+       style="display: {% if form.imagem43.value or form.imagem44.value or form.imagem45.value %}flex{% else %}none{% endif %};">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem43" class="form-label">Imagem 43</label>
       {{ form.imagem43 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem44" class="form-label">Imagem 44</label>
       {{ form.imagem44 }}
     </div>
-    <div class="col-md-2">
+    <div class="p-2" style="flex: 0 0 16.66%;">
       <label for="id_imagem45" class="form-label">Imagem 45</label>
       {{ form.imagem45 }}
     </div>
+    <div class="p-2" style="flex: 0 0 16.66%;"></div>
+    <div class="p-2" style="flex: 0 0 16.66%;"></div>
+    <div class="p-2" style="flex: 0 0 16.66%;"></div>
   </div>
 
 </div>
-                  
-                
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                    <a href="{% url 'formacompanhamento:registro_pagamento_list' %}" class="btn btn-secondary">Cancelar e Voltar</a>
+</div>
+
+<!-- Botão para adicionar fotos -->
+
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="submit" class="btn btn-primary">Salvar</button>
+                                <a href="{% url 'formacompanhamento:registro_pagamento_list' %}" class="btn btn-secondary">Cancelar e Voltar</a>
+                            </div>
+                        </form>
+                      </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -761,7 +849,7 @@
     </div>
 {% endif %}
 
-<!-- Script para exibir os blocos dos agentes adicionais e realizar os cálculos, incluindo a atualização automática dos campos via motivo -->
+<!-- Script para exibir os blocos dos agentes adicionais, placas e fotos, e realizar os cálculos -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -866,7 +954,6 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // ======================================================
     // 3. updateAcionamentoByMotivo: Atualiza os campos de acordo com o motivo selecionado.
-    // Se o motivo for "antenista", "pronta resposta armado" ou "pronta resposta desarmado", os campos serão atualizados conforme os valores do prestador.
     function updateAcionamentoByMotivo(block) {
         var motivoField = document.getElementById("id_motivo" + block);
         var motivo = motivoField ? motivoField.value.trim().toLowerCase() : "";
@@ -902,13 +989,11 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("Campo Acionamento atualizado para block", block, ":", acionamentoField ? acionamentoField.value : "não encontrado");
     }
     
-    // Atualiza o motivo para o agente principal
     if (document.getElementById("id_motivo")) {
         document.getElementById("id_motivo").addEventListener("change", function() {
             updateAcionamentoByMotivo("");
         });
     }
-    // Atualiza para os agentes adicionais (ex: id_motivo1, id_motivo2, etc.)
     var motivosAdicionais = document.querySelectorAll("[id^='id_motivo']");
     motivosAdicionais.forEach(function(elem) {
         if (elem.id !== "id_motivo") {
@@ -1060,7 +1145,6 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             console.error("Não encontrou o elemento com id:", finalId);
         }
-        // Listener para alterações na franquia de hora
         var franquiaElem = document.getElementById("id_franquia_hora" + block);
         if (franquiaElem) {
             franquiaElem.addEventListener("change", function() { 
@@ -1071,7 +1155,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
     }
-    // Anexa os listeners para o cálculo de Hora Total e Hora Excedente (agente principal e agentes adicionais)
     attachHoraTotalCalculation("");    // Agente principal
     attachHoraTotalCalculation("1");     // Agente adicional 1
     attachHoraTotalCalculation("2");     // Agente adicional 2
@@ -1079,8 +1162,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
     // ======================================================
-    // 7. calculateHoraExcedente: Calcula a "Hora Excedente" como a diferença entre a duração total (em minutos)
-    // e a franquia de hora (convertida para minutos). O resultado é exibido no formato H.MM.
+    // 7. calculateHoraExcedente: Calcula a "Hora Excedente".
     function calculateHoraExcedente(block) {
         var inicioId = "id_data_hora_inicial" + block;
         var finalId = "id_data_hora_final" + block;
@@ -1128,8 +1210,6 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // ======================================================
     // 8. calculateKmTotal: Calcula o KM Total e o KM Excedente.
-    //     KM Total = Km Final - Km Inicial
-    //     KM Excedente = KM Total - Franquia de KM
     function calculateKmTotal(block) {
         var kmInicialElem = document.getElementById("id_km_inicial" + block);
         var kmFinalElem = document.getElementById("id_km_final" + block);
@@ -1185,7 +1265,6 @@ document.addEventListener("DOMContentLoaded", function() {
             kmFranquiaElem.addEventListener("blur", function() { calculateKmTotal(block); });
         }
     }
-    // Anexa os listeners para o cálculo de KM (agente principal e agentes adicionais)
     attachKmCalculation("");    // Agente principal
     attachKmCalculation("1");     // Agente adicional 1
     attachKmCalculation("2");     // Agente adicional 2
@@ -1207,6 +1286,37 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
+    // ======================================================
+    // 10. Evento para exibir os grupos de fotos dinamicamente.
+    var btnAdicionarFoto = document.getElementById("btnAdicionarFoto");
+    if (btnAdicionarFoto) {
+        var currentGroup = 1; // Controla qual grupo será exibido
+        btnAdicionarFoto.addEventListener("click", function() {
+            var imageGroups = document.querySelectorAll("[id^='image-group-']");
+            
+            // Verifica se há grupos de imagens disponíveis para exibir
+            if (currentGroup <= imageGroups.length) {
+                // Exibe o próximo grupo
+                var currentImageGroup = imageGroups[currentGroup - 1];
+                currentImageGroup.style.display = "flex";
+                currentGroup++; // Avança para o próximo grupo de 6
+            }
+
+            // Se todos os grupos forem exibidos, desativa o botão
+            if (currentGroup > imageGroups.length) {
+                btnAdicionarFoto.style.display = "none"; // Oculta o botão após exibir todos os grupos
+            }
+        });
+    }
+    
+    function toggleVisibility(id) {
+        var element = document.getElementById(id);
+        if (element.style.display === "none" || element.style.display === "") {
+            element.style.display = "block";
+        } else {
+            element.style.display = "none";
+        }
+    }
 });
 </script>
     

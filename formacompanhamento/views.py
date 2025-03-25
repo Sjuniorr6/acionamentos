@@ -659,14 +659,29 @@ from .forms import RegistroPagamentoForm
 from .models import clientes_acionamento
 
 
-class RegistroPagamentoUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
+class RegistroPagamentoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = RegistroPagamento
     form_class = RegistroPagamentoForm
     template_name = 'registro_pagamento_update.html'  # Seu template de edição
     success_url = reverse_lazy('formacompanhamento:registro_pagamento_list')  # Redireciona após salvar
     permission_required = "formacompanhamento.view_agentes"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        instance = self.object
+        filled_fields = []
+        # Itera sobre os campos definidos no formulário
+        for field_name in self.form_class.base_fields:
+            # Obtém o valor do campo na instância (caso seja None ou string vazia, não é considerado preenchido)
+            value = getattr(instance, field_name, None)
+            if value not in [None, '', []]:
+                filled_fields.append(field_name)
+        context['filled_fields'] = filled_fields
+        return context
+
     def form_valid(self, form):
         return super().form_valid(form)
+
 
 
 
@@ -676,14 +691,17 @@ from .models import clientes_acionamento
 from .forms import ClientesAcionamentoForm
 from django.urls import reverse_lazy
 
-class ClienteUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
+class ClienteUpdateView(UpdateView):
     model = clientes_acionamento
     form_class = ClientesAcionamentoForm
     template_name = 'update_clientes_acionamento.html'
     success_url = reverse_lazy('formacompanhamento:clientes_acionamento_list')
-    permission_required = "formacompanhamento.view_agentes"
 
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Inclui as variáveis que são necessárias no template
+        context['form'] = self.get_form()
+        return context
 class RegistroPagamentoDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = RegistroPagamento
     template_name = 'registro_pagamento_confirm_delete.html'

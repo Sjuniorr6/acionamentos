@@ -1,42 +1,278 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
 {% include "components/_header.html" %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8 col-sm-12">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center">
-                    <h2>Editar Cliente</h2>
-                </div>
-                <div class="card-body">
-                    <!-- Exibe mensagens de erro, se houver -->
-                    {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>Por favor, corrija os erros abaixo:</strong>
-                    </div>
-                    {% endif %}
 
-                    <!-- Formulário para edição -->
-                    <form method="post">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save me-2"></i>Salvar
-                            </button>
-                            <a href="{% url 'formacompanhamento:clientes_acionamento_list' %}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left-circle me-2"></i>Cancelar
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<style>
+  .container {
+    max-width: 100%;
+    width: 95%; /* Ajuste conforme necessário */
+    margin: auto; /* Centraliza o container */
+    padding: 20px; /* Adiciona um espaçamento interno */
+  }
+</style>
+
+<div class="container mt-5">
+  <h1 class="text-white">
+    {% if form.instance.pk %}
+      Editar Cliente
+    {% else %}
+      Novo Cliente
+    {% endif %}
+  </h1>
+
+  <div class="container py-4 bg-white shadow-sm rounded text-dark">
+    <h2>
+      {% if form.instance.pk %}Editar Cliente{% else %}Novo Cliente{% endif %}
+    </h2>
+
+    <!-- Formulário -->
+    <form method="post" novalidate enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Linha 1: Razão Social, Nome Fantasia, CNPJ, etc. -->
+      <div class="row mb-3">
+        <div class="col-md-2">
+          <label for="id_razao_social" class="form-label">Razão Social</label>
+          {{ form.razao_social|add_class:"form-control" }}
         </div>
-    </div>
+        <div class="col-md-2">
+          <label for="id_nome" class="form-label">Nome Fantasia</label>
+          {{ form.nome|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_cnpj" class="form-label">CNPJ</label>
+          {{ form.cnpj|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_atividade_principal" class="form-label">Atividade Principal</label>
+          {{ form.atividade_principal|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_inscricao_estadual" class="form-label">Inscrição Estadual</label>
+          {{ form.inscricao_estadual|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_inscricao_municipal" class="form-label">Inscrição Municipal</label>
+          {{ form.inscricao_municipal|add_class:"form-control" }}
+        </div>
+      </div>
+
+      <!-- Linha 2: Endereço, CEP, Estado, Cidade, Telefone -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="id_endereco" class="form-label">Endereço</label>
+          {{ form.endereco|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_cep" class="form-label">CEP</label>
+          {{ form.cep|add_class:"form-control" }}
+        </div>
+        <div class="col-md-1">
+          <label for="id_estado" class="form-label">Estado</label>
+          {{ form.estado|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_cidade" class="form-label">Cidade</label>
+          {{ form.cidade|add_class:"form-control" }}
+        </div>
+        <div class="col-md-3">
+          <label for="id_telefone" class="form-label">Telefone</label>
+          {{ form.telefone|add_class:"form-control" }}
+          <hr>
+        </div>
+      </div>
+
+      <!-- Representantes -->
+      <h3>Representantes</h3>
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label for="id_representante_legal" class="form-label">Representante Legal</label>
+          {{ form.representante_legal|add_class:"form-control" }}
+        </div>
+        <div class="col-md-3">
+          <label for="id_contato_legal" class="form-label">Telefone</label>
+          {{ form.contato_legal|add_class:"form-control" }}
+        </div>
+        <div class="col-md-3">
+          <label for="id_email_legal" class="form-label">E-mail</label>
+          {{ form.email_legal|add_class:"form-control" }}
+        </div>
+        <div class="col-md-3">
+          <label for="id_cpf_cnpj" class="form-label">CPF/CNPJ</label>
+          {{ form.cpf_cnpj|add_class:"form-control" }}
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-2">
+          <label for="id_representante_financeiro" class="form-label">Financeiro</label>
+          {{ form.representante_financeiro|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_contato_financeiro" class="form-label">Contato Financeiro</label>
+          {{ form.contato_financeiro|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_email_financeiro" class="form-label">E-mail Financeiro</label>
+          {{ form.email_financeiro|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_representante_operacional" class="form-label">Operacional</label>
+          {{ form.representante_operacional|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_contato_operacional" class="form-label">Contato Operacional</label>
+          {{ form.contato_operacional|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_email_operacional" class="form-label">E-mail Operacional</label>
+          {{ form.email_operacional|add_class:"form-control" }}
+        </div>
+      </div>
+      <hr>
+
+      <!-- Dados Bancários -->
+      <h3>Dados Bancários</h3>
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label for="id_banco" class="form-label">Banco</label>
+          {{ form.banco|add_class:"form-control" }}
+        </div>
+        <div class="col-md-3">
+          <label for="id_agencia" class="form-label">Agência</label>
+          {{ form.agencia|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_conta" class="form-label">Conta</label>
+          {{ form.conta|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_data_de_fechamento" class="form-label">Data de Fechamento</label>
+          {{ form.data_de_fechamento|add_class:"form-control" }}
+        </div>
+        <div class="col-md-2">
+          <label for="id_dias_a_faturar" class="form-label">Dias a Faturar</label>
+          {{ form.dias_a_faturar|add_class:"form-control" }}
+        </div>
+      </div>
+      <hr>
+
+      <!-- Anexos -->
+      <h3>Anexos</h3>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="id_contrato_pdf" class="form-label">Contrato PDF</label>
+          {{ form.contrato_pdf|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4">
+          <label for="id_proposta_pdf" class="form-label">Proposta PDF</label>
+          {{ form.proposta_pdf|add_class:"form-control" }}
+        </div>
+      </div>
+      <hr>
+
+      <!-- Serviços -->
+      <h3>Serviços</h3>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="{{ form.servicos.id_for_label }}" class="form-label">Serviços</label>
+          {{ form.servicos|add_class:"form-control" }}
+        </div>
+      </div>
+
+      <!-- Campos específicos de cada serviço (dinâmicos) -->
+      <div id="div_antenista_fields" style="display: {% if form.servicos.value == 'Antenista' %}block{% else %}none{% endif %};">
+        <h5 class="mb-3">Antenista</h5>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="id_valor_antenista" class="form-label">Valor Antenista</label>
+            {{ form.valor_antenista|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_hora_antenista" class="form-label">Franquia Hora (Antenista)</label>
+            {{ form.franquia_hora_antenista|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_km_antenista" class="form-label">Franquia KM (Antenista)</label>
+            {{ form.franquia_km_antenista|add_class:"form-control" }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_valorkm_antenista" class="form-label">Valor por KM (Antenista)</label>
+            {{ form.valorkm_antenista|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_valorh_antenista" class="form-label">Valor por Hora (Antenista)</label>
+            {{ form.valorh_antenista|add_class:"form-control" }}
+          </div>
+        </div>
+      </div>
+
+      <div id="div_armado_fields" style="display: {% if form.servicos.value == 'Ponta Resposta Armado' %}block{% else %}none{% endif %};">
+        <h5 class="mb-3">Ponta Resposta Armado</h5>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="id_valor_prontaresposta_armado" class="form-label">Valor Pronta Resposta Armado</label>
+            {{ form.valor_prontaresposta_armado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_hora_armado" class="form-label">Franquia Hora (Armado)</label>
+            {{ form.franquia_hora_armado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_km_armado" class="form-label">Franquia KM (Armado)</label>
+            {{ form.franquia_km_armado|add_class:"form-control" }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_valorkm_armado" class="form-label">Valor por KM (Armado)</label>
+            {{ form.valorkm_armado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_valorh_armado" class="form-label">Valor por Hora (Armado)</label>
+            {{ form.valorh_armado|add_class:"form-control" }}
+          </div>
+        </div>
+      </div>
+
+      <div id="div_desarmado_fields" style="display: {% if form.servicos.value == 'Pronta Resposta Desarmado' %}block{% else %}none{% endif %};">
+        <h5 class="mb-3">Pronta Resposta Desarmado</h5>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="id_valor_prontaresposta_desarmado" class="form-label">Valor Pronta Resposta Desarmado</label>
+            {{ form.valor_prontaresposta_desarmado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_hora_desarmado" class="form-label">Franquia Hora (Desarmado)</label>
+            {{ form.franquia_hora_desarmado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_franquia_km_desarmado" class="form-label">Franquia KM (Desarmado)</label>
+            {{ form.franquia_km_desarmado|add_class:"form-control" }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="id_valorkm_desarmado" class="form-label">Valor por KM (Desarmado)</label>
+            {{ form.valorkm_desarmado|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_valorh_desarmado" class="form-label">Valor por Hora (Desarmado)</label>
+            {{ form.valorh_desarmado|add_class:"form-control" }}
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'formacompanhamento:clientes_acionamento_list' %}" class="btn btn-danger btn-lg">Voltar</a>
+        <button type="submit" class="btn btn-success btn-lg">Salvar</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- Bootstrap Icons (opcional) -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 {% endblock %}

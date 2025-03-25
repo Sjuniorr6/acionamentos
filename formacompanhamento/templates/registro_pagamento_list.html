@@ -153,7 +153,6 @@ form .form-control {
                     <th>Chegada</th>
                     <th>Data/Hora Final</th>
                     <th>Prestador</th>
-                    <!-- Coluna para mostrar a latlong do agente -->
                     <th>Lat/Long do Agente</th>
                     <th>Solicitante</th>
                     <th>Qtd. Agentes</th>
@@ -170,16 +169,11 @@ form .form-control {
                     >
                         <td>
                             <span class="status-dot" style="display: inline-block; width: 12px; height: 12px; margin-right: 6px; border-radius: 50%; background-color: 
-                                {% if not registro.data_hora_inicial %}
-                                    gray;
-                                {% elif registro.data_hora_inicial and not registro.data_hora_chegada %}
-                                    blue;
-                                {% elif registro.data_hora_chegada and not registro.data_hora_final %}
-                                    green;
-                                {% elif registro.data_hora_final %}
-                                    orange;
-                                {% else %}
-                                    #83b9a2;
+                                {% if not registro.data_hora_inicial %} gray;
+                                {% elif registro.data_hora_inicial and not registro.data_hora_chegada %} blue;
+                                {% elif registro.data_hora_chegada and not registro.data_hora_final %} green;
+                                {% elif registro.data_hora_final %} orange;
+                                {% else %} #83b9a2;
                                 {% endif %}">
                             </span>
                             {% if registro.endereco %}
@@ -196,7 +190,6 @@ form .form-control {
                         <td>{{ registro.data_hora_chegada|date:"d/m/Y H:i" }}</td>
                         <td>{{ registro.data_hora_final|date:"d/m/Y H:i" }}</td>
                         <td>{{ registro.prestador }}</td>
-                        <!-- Exibe a latlong do agente -->
                         <td class="prestador-endereco" data-prestador="{{ registro.prestador }}"></td>
                         <td>{{ registro.solicitante }}</td>
                         <td>{{ registro.quantidade_agentes }}</td>
@@ -211,8 +204,8 @@ form .form-control {
                             {% elif registro.data_hora_final %}
                                 <span class="badge" style="background-color: #ffc107; color: #000;">Pendente</span>
                             {% elif registro.status == "A Faturar" %}
-                            <span class="badge" style="background-color: #ff0798; color: #000;">A Faturar</span>
-                            {% else%}
+                                <span class="badge" style="background-color: #ff0798; color: #000;">A Faturar</span>
+                            {% else %}
                                 <span class="badge" style="background-color: #E2E3E5; color: #000;">Status Desconhecido</span>
                             {% endif %}
                         </td>
@@ -220,17 +213,20 @@ form .form-control {
                             <a href="{% url 'formacompanhamento:registro_pagamento_update' registro.pk %}" class="my-btn my-btn-warning my-btn-sm">
                                 <i class="bi bi-pencil-square fs-6"></i>
                             </a>
-                            {% if registro.status != "Pago" and registro.status != "A Faturar" %}
+
+                            {% if registro.data_hora_final and registro.status != "Pago" and registro.status != "A Faturar" %}
                                 <!-- Botão Validar: via AJAX, atualiza o status no banco para "A Faturar" e remove a linha -->
                                 <a href="{% url 'formacompanhamento:validar' registro.pk %}" class="my-btn my-btn-info my-btn-sm btn-validar">
                                     <i class="bi bi-check-square fs-6"></i>
                                 </a>
                             {% endif %}
+
                             {% if registro.status == 'A Faturar' or registro.status == 'Pago' %}
                                 <a href="{% url 'formacompanhamento:download_pdf' registro.pk %}" class="my-btn my-btn-danger my-btn-sm">
                                     <i class="bi bi-box-arrow-down fs-6"></i>
                                 </a>
                             {% endif %}
+
                             <a href="{% url 'formacompanhamento:detalhar_acionamento' registro.pk %}" class="my-btn my-btn-primary my-btn-sm">
                                 <i class="bi bi-card-list fs-6"></i>
                             </a>
@@ -245,264 +241,4 @@ form .form-control {
         </table>
     </div>
 </main>
-
-<!-- Adicionando Leaflet.js -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
-<script>
-    // Inicializa o mapa com centro em São Paulo, Brasil
-    var map = L.map('map').setView([-23.55052, -46.633308], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Variáveis globais para os marcadores, rota e círculo
-    var markerRegistro = null;
-    var markerPrestador = null;
-    var routeLayer = null;
-    var circleLayer = null;
-
-    // Função para exibir o alerta fixo de erro
-    function showError(message) {
-        var errorAlert = document.getElementById('error-alert');
-        errorAlert.innerText = message;
-        errorAlert.style.display = 'block';
-        setTimeout(function() {
-            errorAlert.style.display = 'none';
-        }, 5000);
-    }
-
-    /**
-     * geocodeOrLatLon(input):
-     *  - Se input for do tipo "-23.55, -46.63", retorna {lat, lon}.
-     *  - Senão, utiliza Nominatim (tentando também com ", Brasil").
-     *  - Decodifica sequências Unicode "\u002D" para hífen real.
-     */
-     function geocodeOrLatLon(input) {
-    // 1) Limpeza inicial: remover possíveis sequências Unicode de hífen
-    let cleaned = input
-        // Substitui hífen unicode (\u2013, \u2014, etc.) por hífen ASCII
-        .replace(/[\u2012\u2013\u2014\u2015]/g, '-')
-        // Substitui sequências "\u002D" por hífen ASCII
-        .replace(/\\u002D/g, '-')
-
-        // Remove parênteses, colchetes e palavras como 'lat:' ou 'lon:'
-        .replace(/[()[\]]/g, ' ')
-        .replace(/\blat\b\s*:\s*/gi, '')
-        .replace(/\blon(gitude)?\b\s*:\s*/gi, '')
-
-        // Padroniza vírgula/ ponto-e-vírgula. Ex.: "-18.8; -41.9" => "-18.8, -41.9"
-        .replace(/;/g, ',')
-
-        // Remove espaços repetidos
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    console.log("Geocodificando (após limpeza):", cleaned);
-
-    // 2) Verifica se é vazio, "teste", "none", etc.
-    if (!cleaned || cleaned.toLowerCase() === 'teste' || cleaned.toLowerCase() === 'none') {
-        return Promise.reject(new Error('Endereço/Coordenada inválido(a): ' + input));
-    }
-
-    // 3) Tenta casar com regex "lat, lon"
-    //    -> -?d+(.\d+)? , -?d+(.\d+)? 
-    //    (ex.: -18.87857, -41.97541)
-    let latLonMatch = cleaned.match(/^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/);
-    if (latLonMatch) {
-        console.log("Input reconhecido como coordenadas (lat,lon).");
-
-        // Converte em float
-        let latNum = parseFloat(latLonMatch[1]);
-        let lonNum = parseFloat(latLonMatch[3]);
-
-        // Validação extra (faixa de latitude e longitude)
-        // Se quiser garantir que lat está entre -90 e 90 e lon entre -180 e 180
-        if (latNum < -90 || latNum > 90 || lonNum < -180 || lonNum > 180) {
-            return Promise.reject(new Error('Lat/Long fora da faixa válida: ' + cleaned));
-        }
-
-        return Promise.resolve({
-            lat: latNum,
-            lon: lonNum
-        });
-    } else {
-        // 4) Não casou como "lat, lon": tenta geocodificar como endereço via Nominatim
-        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleaned)}`;
-        console.log("Nominatim URL:", url);
-
-        return fetch(url)
-            .then(r => r.json())
-            .then(data => {
-                if (data.length > 0) {
-                    return {
-                        lat: parseFloat(data[0].lat),
-                        lon: parseFloat(data[0].lon)
-                    };
-                } else {
-                    // Se não encontrou e não tem "Brasil", tenta acrescentar "Brasil" no final
-                    if (!cleaned.toLowerCase().includes("brasil")) {
-                        let newQuery = cleaned + ", Brasil";
-                        let newUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(newQuery)}`;
-                        console.log("Tentando com query ajustada:", newUrl);
-                        return fetch(newUrl)
-                            .then(resp => resp.json())
-                            .then(newData => {
-                                if (newData.length > 0) {
-                                    return {
-                                        lat: parseFloat(newData[0].lat),
-                                        lon: parseFloat(newData[0].lon)
-                                    };
-                                } else {
-                                    throw new Error('Endereço não encontrado (nem com "Brasil"): ' + input);
-                                }
-                            });
-                    } else {
-                        throw new Error('Endereço não encontrado: ' + input);
-                    }
-                }
-            });
-    }
-}
-
-
-    // Função para desenhar rota com OSRM (opcional)
-    function drawRoute(coord1, coord2) {
-        var routeUrl = `https://router.project-osrm.org/route/v1/driving/${coord1.lon},${coord1.lat};${coord2.lon},${coord2.lat}?overview=full&geometries=geojson`;
-        console.log("Requisição de rota:", routeUrl);
-        return fetch(routeUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.code === 'Ok') {
-                    if (routeLayer) { map.removeLayer(routeLayer); }
-                    var routeCoords = data.routes[0].geometry.coordinates.map(function(coord) {
-                        return [coord[1], coord[0]];
-                    });
-                    routeLayer = L.polyline(routeCoords, { color: 'blue' }).addTo(map);
-                    map.fitBounds(routeLayer.getBounds());
-                } else {
-                    console.error("Erro na rota:", data);
-                }
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Processa latlong dos prestadores para exibição na tabela
-        const rows = document.querySelectorAll('.registro-row');
-        const endpoint = '/api/prestadores/enderecos/';
-        let prestadoresDict = {};
-
-        fetch(endpoint)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(item => {
-                    prestadoresDict[item.nome] = item.latlong;
-                });
-                let tdEnderecos = document.querySelectorAll('.prestador-endereco');
-                tdEnderecos.forEach(td => {
-                    let nomePrestador = td.getAttribute('data-prestador');
-                    td.textContent = prestadoresDict[nomePrestador] || 'LatLong não encontrado';
-                });
-
-                // Evento para clique nas linhas (mapa)
-                rows.forEach(row => {
-                    row.addEventListener('click', function() {
-                        if (markerRegistro) map.removeLayer(markerRegistro);
-                        if (markerPrestador) map.removeLayer(markerPrestador);
-                        if (routeLayer) map.removeLayer(routeLayer);
-                        if (circleLayer) map.removeLayer(circleLayer);
-                        let registroEndereco = row.getAttribute('data-registro-endereco') || '';
-                        let prestadorNome = row.getAttribute('data-prestador-nome') || '';
-                        let prestadorLatLong = prestadoresDict[prestadorNome] || '';
-                        console.log("Registro ID:", row.getAttribute('data-registro-id'));
-                        console.log("Endereço do Registro:", registroEndereco);
-                        console.log("Prestador Nome:", prestadorNome);
-                        console.log("Prestador LatLong:", prestadorLatLong);
-                        if (!registroEndereco.trim() || registroEndereco.toLowerCase() === 'teste' || registroEndereco.toLowerCase() === 'none' ||
-                            !prestadorLatLong.trim() || prestadorLatLong.toLowerCase() === 'teste' || prestadorLatLong.toLowerCase() === 'none') {
-                            showError('Um dos campos está inválido para geocodificação.');
-                            return;
-                        }
-                        Promise.all([
-                            geocodeOrLatLon(registroEndereco),
-                            geocodeOrLatLon(prestadorLatLong)
-                        ])
-                        .then(coords => {
-                            let coordRegistro = coords[0];
-                            let coordPrestador = coords[1];
-                            console.log("Coord Registro:", coordRegistro, "Coord Prestador:", coordPrestador);
-                            markerRegistro = L.marker([coordRegistro.lat, coordRegistro.lon], {
-                                icon: L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                })
-                            }).addTo(map).bindPopup(`<b>Registro</b><br>${registroEndereco}`);
-                            markerPrestador = L.marker([coordPrestador.lat, coordPrestador.lon], {
-                                icon: L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                })
-                            }).addTo(map).bindPopup(`<b>Agente</b><br>${prestadorLatLong}`);
-                            drawRoute(coordRegistro, coordPrestador);
-                            circleLayer = L.circle([coordRegistro.lat, coordRegistro.lon], {
-                                radius: 5000,
-                                color: 'red',
-                                fillColor: '#f03',
-                                fillOpacity: 0.1
-                            }).addTo(map);
-                        })
-                        .catch(err => {
-                            console.error("Erro ao geocodificar:", err);
-                            showError('Não foi possível geocodar um dos endereços (ou lat,lon).');
-                        });
-                    });
-                });
-            })
-            .catch(error => {
-                console.error("Erro ao buscar latlong dos prestadores:", error);
-                showError('Erro ao buscar latlong dos prestadores.');
-            });
-    });
-
-    // Bloco: Intercepta o clique no botão "Validar" para atualizar status via AJAX e remover a linha
-    document.addEventListener('DOMContentLoaded', function() {
-        var validarButtons = document.querySelectorAll('.btn-validar');
-        validarButtons.forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();  // Impede a navegação
-                var url = this.getAttribute('href');  // URL da validação
-                var row = this.closest('.registro-row');  // linha do registro
-                // Envia requisição AJAX via fetch para atualizar o status para "A Faturar"
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(function(response) {
-                    if (response.ok) { return response.json(); }
-                    throw new Error('Erro na resposta da rede.');
-                })
-                .then(function(data) {
-                    // Se a validação foi bem-sucedida, remove a linha
-                    row.remove();
-                    // Opcional: aqui você pode exibir uma mensagem de sucesso ou atualizar a lista de faturamento
-                })
-                .catch(function(error) {
-                    console.error('Erro ao validar:', error);
-                    showError('Erro ao validar o registro.');
-                });
-            });
-        });
-    });
-</script>
 {% endblock %}
