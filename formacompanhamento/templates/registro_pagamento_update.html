@@ -261,269 +261,272 @@
                             <!-- Container para agentes: somente o agente principal é exibido inicialmente -->
                             <div id="agentes-container">
 
-                              <!-- Agente principal (sempre visível) -->
-                              <div class="agente-dinamico" id="agente1" style="display: none;">
-                                <div class="row mb-3">
-                                  <div class="col-md-3">
-                                    <label for="id_prestador1" class="form-label">Prestador</label>
-                                    {{ form.prestador1|add_class:"prestador-select" }}
-                                  </div>
-                                  <div class="col-md-1">
-                                    <label for="id_acionamento1" class="form-label">Acionamento</label>
-                                    {{ form.acionamento1 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_km_franquia1" class="form-label">Franquia de KM</label>
-                                    {{ form.km_franquia1 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_franquia_hora1" class="form-label">Franquia Hora</label>
-                                    {{ form.franquia_hora1 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_valor_hora_excedente1" class="form-label">Valor Hora Excedente</label>
-                                    {{ form.valor_hora_excedente1 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_hora_excedente1" class="form-label">Hora Excedente</label>
-                                    {{ form.hora_excedente1 }}
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_inicial1" class="form-label">Início de Operação 1</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_inicial1 }}
-                                      <button type="button" class="btn btn-primary" id="btn_inicial1" onclick="registrarDataHora('id_data_hora_inicial1','btn_inicial1')">Registrar</button>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_chegada1" class="form-label">Data e Hora (Chegada) 1</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_chegada1 }}
-                                      <button type="button" class="btn btn-primary" id="btn_chegada1" onclick="registrarDataHora('id_data_hora_chegada1','btn_chegada1')">Registrar</button>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_final1" class="form-label">Final de Operação 1</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_final1 }}
-                                      <button type="button" class="btn btn-primary" id="btn_final1" onclick="registrarDataHora('id_data_hora_final1','btn_final1')">Registrar</button>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-4">
-                                    <label for="id_km_inicial1" class="form-label">Km Inicial 1</label>
-                                    {{ form.km_inicial1 }}
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_km_final1" class="form-label">Km Final 1</label>
-                                    {{ form.km_final1 }}
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_km_total1" class="form-label">KM Total 1</label>
-                                    {{ form.km_total1 }}
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-2">
-                                    <label for="id_km_excedente1" class="form-label">KM Excedente 1</label>
-                                    {{ form.km_excedente1 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_valor_total_km_excedente1" class="form-label">Valor KM Excedente 1</label>
-                                    {{ form.valor_km_excedente1 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_hora_total1" class="form-label">Hora Total 1</label>
-                                    <input type="text" name="hora_total1" id="id_hora_total1" class="form-control" placeholder="Hora Total" readonly>
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_motivo1" class="form-label">Motivo</label>
-                                    <div class="input-group">
-                                      {{ form.motivo1|add_class:"form-control border-danger" }}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+ <!-- Agente principal (exibido se o campo prestador1 estiver preenchido) -->
+<div class="agente-dinamico" id="agente1"
+style="{% if form.prestador1.value %}display: block;{% else %}display: none;{% endif %}">
+<div class="row mb-3">
+<div class="col-md-3">
+ <label for="id_prestador1" class="form-label">Prestador</label>
+ {{ form.prestador1|add_class:"prestador-select" }}
+</div>
+<div class="col-md-1">
+ <label for="id_acionamento1" class="form-label">Acionamento</label>
+ {{ form.acionamento1 }}
+</div>
+<div class="col-md-2">
+ <label for="id_km_franquia1" class="form-label">Franquia de KM</label>
+ {{ form.km_franquia1 }}
+</div>
+<div class="col-md-2">
+ <label for="id_franquia_hora1" class="form-label">Franquia Hora</label>
+ {{ form.franquia_hora1 }}
+</div>
+<div class="col-md-2">
+ <label for="id_valor_hora_excedente1" class="form-label">Valor Hora Excedente</label>
+ {{ form.valor_hora_excedente1 }}
+</div>
+<div class="col-md-2">
+ <label for="id_hora_excedente1" class="form-label">Hora Excedente</label>
+ {{ form.hora_excedente1 }}
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-4">
+ <label for="id_data_hora_inicial1" class="form-label">Início de Operação 1</label>
+ <div class="input-group">
+   {{ form.data_hora_inicial1 }}
+   <button type="button" class="btn btn-primary" id="btn_inicial1" onclick="registrarDataHora('id_data_hora_inicial1','btn_inicial1')">Registrar</button>
+ </div>
+</div>
+<div class="col-md-4">
+ <label for="id_data_hora_chegada1" class="form-label">Data e Hora (Chegada) 1</label>
+ <div class="input-group">
+   {{ form.data_hora_chegada1 }}
+   <button type="button" class="btn btn-primary" id="btn_chegada1" onclick="registrarDataHora('id_data_hora_chegada1','btn_chegada1')">Registrar</button>
+ </div>
+</div>
+<div class="col-md-4">
+ <label for="id_data_hora_final1" class="form-label">Final de Operação 1</label>
+ <div class="input-group">
+   {{ form.data_hora_final1 }}
+   <button type="button" class="btn btn-primary" id="btn_final1" onclick="registrarDataHora('id_data_hora_final1','btn_final1')">Registrar</button>
+ </div>
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-4">
+ <label for="id_km_inicial1" class="form-label">Km Inicial 1</label>
+ {{ form.km_inicial1 }}
+</div>
+<div class="col-md-4">
+ <label for="id_km_final1" class="form-label">Km Final 1</label>
+ {{ form.km_final1 }}
+</div>
+<div class="col-md-4">
+ <label for="id_km_total1" class="form-label">KM Total 1</label>
+ {{ form.km_total1 }}
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-2">
+ <label for="id_km_excedente1" class="form-label">KM Excedente 1</label>
+ {{ form.km_excedente1 }}
+</div>
+<div class="col-md-2">
+ <label for="id_valor_total_km_excedente1" class="form-label">Valor KM Excedente 1</label>
+ {{ form.valor_km_excedente1 }}
+</div>
+<div class="col-md-2">
+ <label for="id_hora_total1" class="form-label">Hora Total 1</label>
+ <input type="text" name="hora_total1" id="id_hora_total1" class="form-control" placeholder="Hora Total" readonly>
+</div>
+<div class="col-md-2">
+ <label for="id_motivo1" class="form-label">Motivo</label>
+ <div class="input-group">
+   {{ form.motivo1|add_class:"form-control border-danger" }}
+ </div>
+</div>
+</div>
+</div>
 
-                              <!-- Agente adicional 2 (oculto inicialmente) -->
-                              <div class="agente-dinamico" id="agente2" style="display: none;">
-                                <hr>
-                                <div class="row mb-3">
-                                  <div class="col-md-3">
-                                    <label for="id_prestador2" class="form-label">Prestador</label>
-                                    {{ form.prestador2|add_class:"prestador-select" }}
-                                  </div>
-                                  <div class="col-md-1">
-                                    <label for="id_acionamento2" class="form-label">Acionamento</label>
-                                    {{ form.acionamento2 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_km_franquia2" class="form-label">Franquia de KM</label>
-                                    {{ form.km_franquia2 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_franquia_hora2" class="form-label">Franquia Hora</label>
-                                    {{ form.franquia_hora2 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_valor_hora_excedente2" class="form-label">Valor Hora Excedente</label>
-                                    {{ form.valor_hora_excedente2 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_hora_excedente2" class="form-label">Hora Excedente</label>
-                                    {{ form.hora_excedente2 }}
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_inicial2" class="form-label">Início de Operação 2</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_inicial2 }}
-                                      <button type="button" class="btn btn-primary" id="btn_inicial2" onclick="registrarDataHora('id_data_hora_inicial2','btn_inicial2')">Registrar</button>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_chegada2" class="form-label">Data e Hora (Chegada) 2</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_chegada2 }}
-                                      <button type="button" class="btn btn-primary" id="btn_chegada2" onclick="registrarDataHora('id_data_hora_chegada2','btn_chegada2')">Registrar</button>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_final2" class="form-label">Final de Operação 2</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_final2 }}
-                                      <button type="button" class="btn btn-primary" id="btn_final2" onclick="registrarDataHora('id_data_hora_final2','btn_final2')">Registrar</button>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-4">
-                                    <label for="id_km_inicial2" class="form-label">Km Inicial 2</label>
-                                    {{ form.km_inicial2 }}
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_km_final2" class="form-label">Km Final 2</label>
-                                    {{ form.km_final2 }}
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_km_total2" class="form-label">KM Total 2</label>
-                                    {{ form.km_total2 }}
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-3">
-                                    <label for="id_km_excedente2" class="form-label">KM Excedente 2</label>
-                                    {{ form.km_excedente2 }}
-                                  </div>
-                                  <div class="col-md-3">
-                                    <label for="id_valor_total_km_excedente2" class="form-label">Valor KM Excedente 2</label>
-                                    {{ form.valor_km_excedente2 }}
-                                  </div>
-                                  <div class="col-md-3">
-                                    <label for="id_hora_total2" class="form-label">Hora Total 2</label>
-                                    <input type="text" name="hora_total2" id="id_hora_total2" class="form-control" placeholder="Hora Total" readonly>
-                                  </div>
-                                  <div class="col-md-3">
-                                    <label for="id_motivo2" class="form-label">Motivo</label>
-                                    <div class="input-group">
-                                      {{ form.motivo2|add_class:"form-control border-danger" }}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+<!-- Agente adicional 2 (exibido se o campo prestador2 estiver preenchido) -->
+<div class="agente-dinamico" id="agente2"
+style="{% if form.prestador2.value %}display: block;{% else %}display: none;{% endif %}">
+<hr>
+<div class="row mb-3">
+<div class="col-md-3">
+ <label for="id_prestador2" class="form-label">Prestador</label>
+ {{ form.prestador2|add_class:"prestador-select" }}
+</div>
+<div class="col-md-1">
+ <label for="id_acionamento2" class="form-label">Acionamento</label>
+ {{ form.acionamento2 }}
+</div>
+<div class="col-md-2">
+ <label for="id_km_franquia2" class="form-label">Franquia de KM</label>
+ {{ form.km_franquia2 }}
+</div>
+<div class="col-md-2">
+ <label for="id_franquia_hora2" class="form-label">Franquia Hora</label>
+ {{ form.franquia_hora2 }}
+</div>
+<div class="col-md-2">
+ <label for="id_valor_hora_excedente2" class="form-label">Valor Hora Excedente</label>
+ {{ form.valor_hora_excedente2 }}
+</div>
+<div class="col-md-2">
+ <label for="id_hora_excedente2" class="form-label">Hora Excedente</label>
+ {{ form.hora_excedente2 }}
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-4">
+ <label for="id_data_hora_inicial2" class="form-label">Início de Operação 2</label>
+ <div class="input-group">
+   {{ form.data_hora_inicial2 }}
+   <button type="button" class="btn btn-primary" id="btn_inicial2" onclick="registrarDataHora('id_data_hora_inicial2','btn_inicial2')">Registrar</button>
+ </div>
+</div>
+<div class="col-md-4">
+ <label for="id_data_hora_chegada2" class="form-label">Data e Hora (Chegada) 2</label>
+ <div class="input-group">
+   {{ form.data_hora_chegada2 }}
+   <button type="button" class="btn btn-primary" id="btn_chegada2" onclick="registrarDataHora('id_data_hora_chegada2','btn_chegada2')">Registrar</button>
+ </div>
+</div>
+<div class="col-md-4">
+ <label for="id_data_hora_final2" class="form-label">Final de Operação 2</label>
+ <div class="input-group">
+   {{ form.data_hora_final2 }}
+   <button type="button" class="btn btn-primary" id="btn_final2" onclick="registrarDataHora('id_data_hora_final2','btn_final2')">Registrar</button>
+ </div>
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-4">
+ <label for="id_km_inicial2" class="form-label">Km Inicial 2</label>
+ {{ form.km_inicial2 }}
+</div>
+<div class="col-md-4">
+ <label for="id_km_final2" class="form-label">Km Final 2</label>
+ {{ form.km_final2 }}
+</div>
+<div class="col-md-4">
+ <label for="id_km_total2" class="form-label">KM Total 2</label>
+ {{ form.km_total2 }}
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-3">
+ <label for="id_km_excedente2" class="form-label">KM Excedente 2</label>
+ {{ form.km_excedente2 }}
+</div>
+<div class="col-md-3">
+ <label for="id_valor_total_km_excedente2" class="form-label">Valor KM Excedente 2</label>
+ {{ form.valor_km_excedente2 }}
+</div>
+<div class="col-md-3">
+ <label for="id_hora_total2" class="form-label">Hora Total 2</label>
+ <input type="text" name="hora_total2" id="id_hora_total2" class="form-control" placeholder="Hora Total" readonly>
+</div>
+<div class="col-md-3">
+ <label for="id_motivo2" class="form-label">Motivo</label>
+ <div class="input-group">
+   {{ form.motivo2|add_class:"form-control border-danger" }}
+ </div>
+</div>
+</div>
+</div>
 
-                              <!-- Agente adicional 3 (oculto inicialmente) -->
-                              <div class="agente-dinamico" id="agente3" style="display: none;">
-                                <hr>
-                                <div class="row mb-3">
-                                  <div class="col-md-3">
-                                    <label for="id_prestador3" class="form-label">Prestador</label>
-                                    {{ form.prestador3|add_class:"prestador-select" }}
-                                  </div>
-                                  <div class="col-md-1">
-                                    <label for="id_acionamento3" class="form-label">Acionamento</label>
-                                    {{ form.acionamento3 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_km_franquia3" class="form-label">Franquia de KM</label>
-                                    {{ form.km_franquia3 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_franquia_hora3" class="form-label">Franquia Hora</label>
-                                    {{ form.franquia_hora3 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_valor_hora_excedente3" class="form-label">Valor Hora Excedente</label>
-                                    {{ form.valor_hora_excedente3 }}
-                                  </div>
-                                  <div class="col-md-2">
-                                    <label for="id_hora_excedente3" class="form-label">Hora Excedente</label>
-                                    {{ form.hora_excedente3 }}
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_inicial3" class="form-label">Início de Operação 3</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_inicial3 }}
-                                      <button type="button" class="btn btn-primary" id="btn_inicial3" onclick="registrarDataHora('id_data_hora_inicial3','btn_inicial3')">Registrar</button>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_chegada3" class="form-label">Data e Hora (Chegada) 3</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_chegada3 }}
-                                      <button type="button" class="btn btn-primary" id="btn_chegada3" onclick="registrarDataHora('id_data_hora_chegada3','btn_chegada3')">Registrar</button>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_data_hora_final3" class="form-label">Final de Operação 3</label>
-                                    <div class="input-group">
-                                      {{ form.data_hora_final3 }}
-                                      <button type="button" class="btn btn-primary" id="btn_final3" onclick="registrarDataHora('id_data_hora_final3','btn_final3')">Registrar</button>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-4">
-                                    <label for="id_km_inicial3" class="form-label">Km Inicial 3</label>
-                                    {{ form.km_inicial3 }}
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_km_final3" class="form-label">Km Final 3</label>
-                                    {{ form.km_final3 }}
-                                  </div>
-                                  <div class="col-md-4">
-                                    <label for="id_km_total3" class="form-label">KM Total 3</label>
-                                    {{ form.km_total3 }}
-                                  </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <div class="col-md-3">
-                                    <label for="id_km_excedente3" class="form-label">KM Excedente 3</label>
-                                    {{ form.km_excedente3 }}
-                                  </div>
-                                  <div class="col-md-3">
-                                    <label for="id_valor_total_km_excedente3" class="form-label">Valor KM Excedente 3</label>
-                                    {{ form.valor_km_excedente3 }}
-                                  </div>
-                                  <div class="col-md-3">
-                                    <label for="id_hora_total3" class="form-label">Hora Total 3</label>
-                                    <input type="text" name="hora_total3" id="id_hora_total3" class="form-control" placeholder="Hora Total" readonly>
-                                  </div>
-                                  <div class="col-md-3">
-                                    <label for="id_motivo3" class="form-label">Motivo</label>
-                                    <div class="input-group">
-                                      {{ form.motivo3|add_class:"form-control border-danger" }}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+<!-- Agente adicional 3 (exibido se o campo prestador3 estiver preenchido) -->
+<div class="agente-dinamico" id="agente3"
+style="{% if form.prestador3.value %}display: block;{% else %}display: none;{% endif %}">
+<hr>
+<div class="row mb-3">
+<div class="col-md-3">
+ <label for="id_prestador3" class="form-label">Prestador</label>
+ {{ form.prestador3|add_class:"prestador-select" }}
+</div>
+<div class="col-md-1">
+ <label for="id_acionamento3" class="form-label">Acionamento</label>
+ {{ form.acionamento3 }}
+</div>
+<div class="col-md-2">
+ <label for="id_km_franquia3" class="form-label">Franquia de KM</label>
+ {{ form.km_franquia3 }}
+</div>
+<div class="col-md-2">
+ <label for="id_franquia_hora3" class="form-label">Franquia Hora</label>
+ {{ form.franquia_hora3 }}
+</div>
+<div class="col-md-2">
+ <label for="id_valor_hora_excedente3" class="form-label">Valor Hora Excedente</label>
+ {{ form.valor_hora_excedente3 }}
+</div>
+<div class="col-md-2">
+ <label for="id_hora_excedente3" class="form-label">Hora Excedente</label>
+ {{ form.hora_excedente3 }}
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-4">
+ <label for="id_data_hora_inicial3" class="form-label">Início de Operação 3</label>
+ <div class="input-group">
+   {{ form.data_hora_inicial3 }}
+   <button type="button" class="btn btn-primary" id="btn_inicial3" onclick="registrarDataHora('id_data_hora_inicial3','btn_inicial3')">Registrar</button>
+ </div>
+</div>
+<div class="col-md-4">
+ <label for="id_data_hora_chegada3" class="form-label">Data e Hora (Chegada) 3</label>
+ <div class="input-group">
+   {{ form.data_hora_chegada3 }}
+   <button type="button" class="btn btn-primary" id="btn_chegada3" onclick="registrarDataHora('id_data_hora_chegada3','btn_chegada3')">Registrar</button>
+ </div>
+</div>
+<div class="col-md-4">
+ <label for="id_data_hora_final3" class="form-label">Final de Operação 3</label>
+ <div class="input-group">
+   {{ form.data_hora_final3 }}
+   <button type="button" class="btn btn-primary" id="btn_final3" onclick="registrarDataHora('id_data_hora_final3','btn_final3')">Registrar</button>
+ </div>
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-4">
+ <label for="id_km_inicial3" class="form-label">Km Inicial 3</label>
+ {{ form.km_inicial3 }}
+</div>
+<div class="col-md-4">
+ <label for="id_km_final3" class="form-label">Km Final 3</label>
+ {{ form.km_final3 }}
+</div>
+<div class="col-md-4">
+ <label for="id_km_total3" class="form-label">KM Total 3</label>
+ {{ form.km_total3 }}
+</div>
+</div>
+<div class="row mb-3">
+<div class="col-md-3">
+ <label for="id_km_excedente3" class="form-label">KM Excedente 3</label>
+ {{ form.km_excedente3 }}
+</div>
+<div class="col-md-3">
+ <label for="id_valor_total_km_excedente3" class="form-label">Valor KM Excedente 3</label>
+ {{ form.valor_km_excedente3 }}
+</div>
+<div class="col-md-3">
+ <label for="id_hora_total3" class="form-label">Hora Total 3</label>
+ <input type="text" name="hora_total3" id="id_hora_total3" class="form-control" placeholder="Hora Total" readonly>
+</div>
+<div class="col-md-3">
+ <label for="id_motivo3" class="form-label">Motivo</label>
+ <div class="input-group">
+   {{ form.motivo3|add_class:"form-control border-danger" }}
+ </div>
+</div>
+</div>
+</div>
+
 
                             <!-- DADOS GERAIS E IMAGENS -->
                             <div class="row mb-3"></div>
@@ -849,6 +852,7 @@
 
 <!-- Script para exibir os blocos dos agentes adicionais, placas e fotos, e realizar os cálculos -->
 <script>
+  
   document.addEventListener("DOMContentLoaded", function() {
     // ======================================================
     // 1) Função para registrar a data/hora atual
