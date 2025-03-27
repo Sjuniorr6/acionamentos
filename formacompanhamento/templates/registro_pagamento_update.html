@@ -849,72 +849,354 @@
 
 <!-- Script para exibir os blocos dos agentes adicionais, placas e fotos, e realizar os cálculos -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-
-    // ================================================
-    // 1. registrarDataHora: (mantido sem alterações)
+  document.addEventListener("DOMContentLoaded", function() {
+    // ======================================================
+    // 1) Função para registrar a data/hora atual
     function registrarDataHora(inputId, btnId) {
-        // ...
+      var agora = new Date();
+      var ano = agora.getFullYear();
+      var mes = ("0" + (agora.getMonth() + 1)).slice(-2);
+      var dia = ("0" + agora.getDate()).slice(-2);
+      var hora = ("0" + agora.getHours()).slice(-2);
+      var minutos = ("0" + agora.getMinutes()).slice(-2);
+      var segundos = ("0" + agora.getSeconds()).slice(-2);
+      var dataHoraFormatada = ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
+
+      var inputField = document.getElementById(inputId);
+      if (inputField) {
+        inputField.value = dataHoraFormatada;
+      }
+
+      var botao = document.getElementById(btnId);
+      if (botao) {
+        botao.style.display = "none";
+      }
+
+      if (inputId.indexOf("id_data_hora_inicial") === 0 || inputId.indexOf("id_data_hora_final") === 0) {
+        var block = inputId.replace(/id_data_hora_(inicial|final)/, "");
+        calculateHoraTotal(block);
+        calculateHoraExcedente(block);
+      }
     }
     window.registrarDataHora = registrarDataHora;
 
-    // ================================================
-    // 2. attachPrestadorChangeListener: (mantido)
+    // ======================================================
+    // 2) Atualiza os campos do prestador via AJAX
+    var lastPrestadorData = null;
     function attachPrestadorChangeListener(selectElem) {
-        // ...
+      selectElem.addEventListener("change", function() {
+        var prestadorId = this.value;
+        var block = this.id.replace("id_prestador", "");
+        if (prestadorId) {
+          fetch("{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId)
+            .then(function(response) {
+              if (!response.ok) {
+                throw new Error("Erro na resposta da rede.");
+              }
+              return response.json();
+            })
+            .then(function(data) {
+              if (!data.error) {
+                lastPrestadorData = data;
+                var acionamentoId = "id_acionamento" + block;
+                if (document.getElementById(acionamentoId)) {
+                  document.getElementById(acionamentoId).value = data.acionamento || "";
+                }
+                updateAcionamentoByMotivo(block);
+                calculateHoraExcedente(block);
+              }
+            })
+            .catch(function(error) {
+              console.error("Erro ao buscar os dados do prestador:", error);
+            });
+        }
+      });
     }
-    // ...
-    
-    // ================================================
-    // 3. updateAcionamentoByMotivo: (mantido)
+    var prestadorSelects = document.querySelectorAll(".prestador-select");
+    prestadorSelects.forEach(function(selectElem) {
+      attachPrestadorChangeListener(selectElem);
+    });
+    var mainSelect = document.getElementById("id_prestador");
+    if (mainSelect && !mainSelect.classList.contains("prestador-select")) {
+      attachPrestadorChangeListener(mainSelect);
+    }
+
+    // ======================================================
+    // 3) Atualiza os campos de acionamento conforme o motivo selecionado
     function updateAcionamentoByMotivo(block) {
-        // ...
+      var motivoField = document.getElementById("id_motivo" + block);
+      var motivo = motivoField ? motivoField.value.trim().toLowerCase() : "";
+
+      var acionamentoField = document.getElementById("id_acionamento" + block);
+      var franquiaHoraField = document.getElementById("id_franquia_hora" + block);
+      var kmFranquiaField = document.getElementById("id_km_franquia" + block);
+      var valorHoraExcedenteField = document.getElementById("id_valor_hora_excedente" + block);
+      var valorKmExcedenteField = document.getElementById("id_valor_km_excedente" + block);
+
+      // Exemplos de motivos
+      if (motivo === "antenista") {
+        if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_antenista || ""; }
+        if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_antenista || ""; }
+        if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_antenista || ""; }
+        if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_antenista || ""; }
+        if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_antenista || ""; }
+      } else if (motivo === "pronta resposta armado") {
+        if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_armado || ""; }
+        if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_armado || ""; }
+        if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_armado || ""; }
+        if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_armado || ""; }
+        if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_armado || ""; }
+      } else if (motivo === "pronta resposta desarmado") {
+        if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_desarmado || ""; }
+        if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_desarmado || ""; }
+        if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_desarmado || ""; }
+        if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_desarmado || ""; }
+        if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_desarmado || ""; }
+      } else {
+        if (acionamentoField) { acionamentoField.value = lastPrestadorData.acionamento || ""; }
+      }
     }
+    if (document.getElementById("id_motivo")) {
+      document.getElementById("id_motivo").addEventListener("change", function() {
+        updateAcionamentoByMotivo("");
+      });
+    }
+    var motivosAdicionais = document.querySelectorAll("[id^='id_motivo']");
+    motivosAdicionais.forEach(function(elem) {
+      if (elem.id !== "id_motivo") {
+        var block = elem.id.replace("id_motivo", "");
+        elem.addEventListener("change", function() {
+          updateAcionamentoByMotivo(block);
+        });
+      }
+    });
+
+    let currentGroupIndex = 0;
     
-    // ================================================
-    // 4. toggleFieldVisibility: (mantido)
+    function showMoreImages() {
+      // Seleciona todas as divs que têm a classe .image-group
+      const groups = document.querySelectorAll('.image-group');
+      // Se ainda houver grupo para mostrar
+      if (currentGroupIndex < groups.length) {
+        groups[currentGroupIndex].style.display = 'flex'; 
+        currentGroupIndex++;
+      }
+    }
+    // AQUI:
+    window.showMoreImages = showMoreImages;
+
+    // ======================================================
+    // 4) Exibe/oculta campos conforme seleção
     function toggleFieldVisibility(selectId, fieldIds, expectedValue="sim") {
-        // ...
+      var selectElem = document.getElementById(selectId);
+      if (!selectElem) return;
+      function updateVisibility() {
+        var valor = selectElem.value.toLowerCase();
+        fieldIds.forEach(function(fieldId) {
+          var fieldElem = document.getElementById(fieldId);
+          if (fieldElem) {
+            fieldElem.style.display = (valor === expectedValue.toLowerCase()) ? "block" : "none";
+          }
+        });
+      }
+      updateVisibility();
+      selectElem.addEventListener("change", updateVisibility);
     }
     toggleFieldVisibility("id_rastreador", ["id_equipamento_field", "ultima_posicao_field", "latlong_field"], "sim");
     toggleFieldVisibility("id_isca", ["id_isca_field", "ultima_posicao_isca_field", "latlong_isca_field"], "sim");
 
-    // ================================================
-    // 5. calculatePrevisaoChegada: (mantido)
-    function calculatePrevisaoChegada() {
-        // ...
+    // ======================================================
+    // 5) Calcula a previsão de chegada
+    function formatDateTime(dateObj) {
+      var ano = dateObj.getFullYear();
+      var mes = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+      var dia = ("0" + dateObj.getDate()).slice(-2);
+      var hora = ("0" + dateObj.getHours()).slice(-2);
+      var minutos = ("0" + dateObj.getMinutes()).slice(-2);
+      var segundos = ("0" + dateObj.getSeconds()).slice(-2);
+      return ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
     }
-    // ...
-    
-    // ================================================
-    // 6. calculateHoraTotal + attachHoraTotalCalculation: (mantido)
+    function calculatePrevisaoChegada() {
+      var slaElem = document.getElementById("id_sla");
+      var inicioElem = document.getElementById("id_data_hora_inicial");
+      var previsaoElem = document.getElementById("id_previsa_chegada");
+      if (slaElem && inicioElem && previsaoElem) {
+        var slaValue = parseFloat(slaElem.value);
+        var inicioStr = inicioElem.value;
+        if (!isNaN(slaValue) && inicioStr) {
+          var inicioISO = inicioStr.indexOf("T") === -1 ? inicioStr.replace(" ", "T") : inicioStr;
+          var inicioDate = new Date(inicioISO);
+          if (!isNaN(inicioDate.getTime())) {
+            var previsaoDate = new Date(inicioDate.getTime() + slaValue * 60000);
+            previsaoElem.value = formatDateTime(previsaoDate);
+          }
+        }
+      }
+    }
+    if (document.getElementById("id_sla")) {
+      document.getElementById("id_sla").addEventListener("input", calculatePrevisaoChegada);
+      document.getElementById("id_sla").addEventListener("change", calculatePrevisaoChegada);
+    }
+    if (document.getElementById("id_data_hora_inicial")) {
+      document.getElementById("id_data_hora_inicial").addEventListener("change", calculatePrevisaoChegada);
+      document.getElementById("id_data_hora_inicial").addEventListener("blur", calculatePrevisaoChegada);
+    }
+
+    // ======================================================
+    // 6) Calcula a Hora Total
     function parseDateTimeGeneric(dateTimeStr) {
-        // ...
+      if (!dateTimeStr) return NaN;
+      var isoStr = dateTimeStr.indexOf("T") === -1 ? dateTimeStr.replace(" ", "T") : dateTimeStr;
+      return new Date(isoStr);
     }
     function calculateHoraTotal(block) {
-        // ...
+      var inicioId = "id_data_hora_inicial" + block;
+      var finalId = "id_data_hora_final" + block;
+      var totalId = "id_hora_total" + block;
+      var inicioElem = document.getElementById(inicioId);
+      var finalElem = document.getElementById(finalId);
+      var totalElem = document.getElementById(totalId);
+      if (inicioElem && finalElem && totalElem) {
+        var inicioStr = inicioElem.value.trim();
+        var finalStr = finalElem.value.trim();
+        if (inicioStr && finalStr) {
+          var inicioDate = parseDateTimeGeneric(inicioStr);
+          var finalDate = parseDateTimeGeneric(finalStr);
+          if (isNaN(inicioDate.getTime()) || isNaN(finalDate.getTime()) || finalDate < inicioDate) {
+            totalElem.value = "";
+            return;
+          }
+          var diffMs = finalDate - inicioDate;
+          var diffMinutes = Math.floor(diffMs / 60000);
+          var hours = Math.floor(diffMinutes / 60);
+          var minutes = diffMinutes % 60;
+          totalElem.value = hours + "." + (minutes < 10 ? "0" + minutes : minutes);
+        } else {
+          totalElem.value = "";
+        }
+      }
     }
     function attachHoraTotalCalculation(block) {
-        // ...
+      var inicioId = "id_data_hora_inicial" + block;
+      var finalId = "id_data_hora_final" + block;
+      var inicioElem = document.getElementById(inicioId);
+      var finalElem = document.getElementById(finalId);
+      if (inicioElem) {
+        inicioElem.addEventListener("change", function() {
+          calculateHoraTotal(block);
+          calculateHoraExcedente(block);
+        });
+        inicioElem.addEventListener("blur", function() {
+          calculateHoraTotal(block);
+          calculateHoraExcedente(block);
+        });
+      }
+      if (finalElem) {
+        finalElem.addEventListener("change", function() {
+          calculateHoraTotal(block);
+          calculateHoraExcedente(block);
+        });
+        finalElem.addEventListener("blur", function() {
+          calculateHoraTotal(block);
+          calculateHoraExcedente(block);
+        });
+      }
+      var franquiaElem = document.getElementById("id_franquia_hora" + block);
+      if (franquiaElem) {
+        franquiaElem.addEventListener("change", function() {
+          calculateHoraExcedente(block);
+        });
+        franquiaElem.addEventListener("blur", function() {
+          calculateHoraExcedente(block);
+        });
+      }
     }
     attachHoraTotalCalculation("");
     attachHoraTotalCalculation("1");
     attachHoraTotalCalculation("2");
     attachHoraTotalCalculation("3");
 
-    // ================================================
-    // 7. calculateHoraExcedente: (mantido)
+    // ======================================================
+    // 7) Calcula a Hora Excedente
     function calculateHoraExcedente(block) {
-        // ...
+      var inicioId = "id_data_hora_inicial" + block;
+      var finalId = "id_data_hora_final" + block;
+      var franquiaId = "id_franquia_hora" + block;
+      var excedenteId = "id_hora_excedente" + block;
+      var inicioElem = document.getElementById(inicioId);
+      var finalElem = document.getElementById(finalId);
+      var franquiaElem = document.getElementById(franquiaId);
+      var excedenteElem = document.getElementById(excedenteId);
+      if (inicioElem && finalElem && franquiaElem && excedenteElem) {
+        var inicioStr = inicioElem.value.trim();
+        var finalStr = finalElem.value.trim();
+        if (inicioStr && finalStr) {
+          var inicioDate = parseDateTimeGeneric(inicioStr);
+          var finalDate = parseDateTimeGeneric(finalStr);
+          if (isNaN(inicioDate.getTime()) || isNaN(finalDate.getTime()) || finalDate < inicioDate) {
+            excedenteElem.value = "";
+            return;
+          }
+          var diffMs = finalDate - inicioDate;
+          var diffMinutes = Math.floor(diffMs / 60000);
+          var franquia = parseFloat(franquiaElem.value);
+          if (isNaN(franquia)) { franquia = 0; }
+          var franquiaMinutes = franquia * 60;
+          var excedenteMinutes = diffMinutes - franquiaMinutes;
+          if (excedenteMinutes < 0) { excedenteMinutes = 0; }
+          var hoursEx = Math.floor(excedenteMinutes / 60);
+          var minutesEx = excedenteMinutes % 60;
+          excedenteElem.value = hoursEx + "." + (minutesEx < 10 ? "0" + minutesEx : minutesEx);
+        } else {
+          excedenteElem.value = "";
+        }
+      }
     }
 
-    // ================================================
-    // 8. calculateKmTotal + attachKmCalculation: (mantido)
+    // ======================================================
+    // 8) Calcula o KM Total e o KM Excedente
     function calculateKmTotal(block) {
-        // ...
+      var kmInicialElem = document.getElementById("id_km_inicial" + block);
+      var kmFinalElem = document.getElementById("id_km_final" + block);
+      var kmTotalElem = document.getElementById("id_km_total" + block);
+      var kmFranquiaElem = document.getElementById("id_km_franquia" + block);
+      var kmExcedenteElem = document.getElementById("id_km_excedente" + block);
+      if (kmInicialElem && kmFinalElem && kmTotalElem) {
+        var kmInicial = parseFloat(kmInicialElem.value);
+        var kmFinal = parseFloat(kmFinalElem.value);
+        if (isNaN(kmInicial) || isNaN(kmFinal)) {
+          kmTotalElem.value = "";
+          if (kmExcedenteElem) { kmExcedenteElem.value = ""; }
+          return;
+        }
+        var kmTotal = kmFinal - kmInicial;
+        kmTotalElem.value = kmTotal;
+        if (kmFranquiaElem && kmExcedenteElem) {
+          var kmFranquia = parseFloat(kmFranquiaElem.value);
+          if (!isNaN(kmFranquia)) {
+            kmExcedenteElem.value = kmTotal - kmFranquia;
+          } else {
+            kmExcedenteElem.value = "";
+          }
+        }
+      }
     }
     function attachKmCalculation(block) {
-        // ...
+      var kmInicialElem = document.getElementById("id_km_inicial" + block);
+      var kmFinalElem = document.getElementById("id_km_final" + block);
+      var kmFranquiaElem = document.getElementById("id_km_franquia" + block);
+      if (kmInicialElem) {
+        kmInicialElem.addEventListener("change", function() { calculateKmTotal(block); });
+        kmInicialElem.addEventListener("blur", function() { calculateKmTotal(block); });
+      }
+      if (kmFinalElem) {
+        kmFinalElem.addEventListener("change", function() { calculateKmTotal(block); });
+        kmFinalElem.addEventListener("blur", function() { calculateKmTotal(block); });
+      }
+      if (kmFranquiaElem) {
+        kmFranquiaElem.addEventListener("change", function() { calculateKmTotal(block); });
+        kmFranquiaElem.addEventListener("blur", function() { calculateKmTotal(block); });
+      }
     }
     attachKmCalculation("");
     attachKmCalculation("1");
