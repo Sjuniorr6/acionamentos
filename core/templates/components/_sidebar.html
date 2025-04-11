@@ -1,9 +1,7 @@
-
 {% load static %}
 
 <style>
-
-/* SIDEBAR */
+  /* SIDEBAR */
   .sidebar {
     position: fixed;
     top: 0;
@@ -55,7 +53,7 @@
     text-align: left;
     transition: transform 0.1s ease;
   }
-  
+
   .sidebar-menu li:hover {
     transform: scale(1.02);
   }
@@ -91,95 +89,99 @@
   }
   .sidebar:hover .sidebar-menu li a .menu-text {
     opacity: 1;
-    margin-left: 12px; 
+    margin-left: 12px;
   }
-  
-      /* Se o usuário estiver logado, deixamos espaço para a sidebar */
-      .with-sidebar {
-      margin-left: 120px; /* Largura da sidebar fechada */
-    }
 
-  </style>
+  /* Se o usuário estiver logado, deixamos espaço para a sidebar */
+  .with-sidebar {
+    margin-left: 120px; /* Largura da sidebar fechada */
+  }
+</style>
 
-
-  <header class="navbar">
-    <nav>
-      <div class="scroll-container">
-          <span class="scroll-text">GS SAFECARGO</span>
-      </div>
+<header class="navbar">
+  <nav>
+    <div class="scroll-container">
+      <span class="scroll-text">GS SAFECARGO</span>
+    </div>
   </nav>
 </header>
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <div class="sidebar-header">
-      <!-- Ajuste aqui para a logo do seu projeto -->
-      <img src="{% static 'core/images/favicon.ico' %}" alt="Logo" class="sidebar-logo">
-    </div>
-    <ul class="sidebar-menu">
-      <li>
-        <a href="{% url 'home' %}">
-          <i class="bi bi-house-door"></i>
-          <span class="menu-text">Home</span>
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'formacompanhamento:registro_pagamento_create' %}">
-          <i class="bi bi-pencil-square"></i>
-          <span class="menu-text">Formulário</span>
-        </a>
-      </li>
-      <!--
+  <div class="sidebar-header">
+    <!-- Ajuste aqui para a logo do seu projeto -->
+    <img
+      src="{% static 'core/images/favicon.ico' %}"
+      alt="Logo"
+      class="sidebar-logo"
+    />
+  </div>
+  <ul class="sidebar-menu">
+    <li>
+      <a href="{% url 'home' %}">
+        <i class="bi bi-house-door"></i>
+        <span class="menu-text">Home</span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'formacompanhamento:registro_pagamento_create' %}">
+        <i class="bi bi-pencil-square"></i>
+        <span class="menu-text">Formulário</span>
+      </a>
+    </li>
+    <!--
       <li>
         <a href="{% url 'formacompanhamento:criar_prestador' %}">
           <i class="bi bi-book"></i>
           <span class="menu-text">Prestadores</span>
         </a>
       </li>-->
-      <li>
-        <a href="{% url 'formacompanhamento:lista_prestadores' %}">
-          <i class="bi bi-list-ul"></i>
-          <span class="menu-text">Lista de Prestadores</span>
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'formacompanhamento:registro_pagamento_list' %}">
-          <i class="bi bi-clipboard"></i>
-          <span class="menu-text">Lista de Acionamentos</span>
-        </a>
-      </li>
-      <!--
+    <li>
+      <a href="{% url 'formacompanhamento:lista_prestadores' %}">
+        <i class="bi bi-list-ul"></i>
+        <span class="menu-text">Lista de Prestadores</span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'formacompanhamento:registro_pagamento_list' %}">
+        <i class="bi bi-clipboard"></i>
+        <span class="menu-text">Lista de Acionamentos</span>
+      </a>
+    </li>
+    <!--
       <li>
         <a href="{% url 'formacompanhamento:create_clientes_acionamento' %}">
           <i class="bi bi-person-plus"></i>
           <span class="menu-text">Cad. Clientes</span>
         </a>
       </li>-->
-      <li>
-        <a href="{% url 'formacompanhamento:clientes_acionamento_list' %}">
-          <i class="bi bi-people"></i>
-          <span class="menu-text">Clientes</span>
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'formacompanhamento:faturamento_lista' %}">
-          <i class="bi bi-file-earmark-text"></i>
-          <span class="menu-text">Faturamento</span>
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'formacompanhamento:historico' %}">
-          <i class="bi bi-book"></i>
-          <span class="menu-text">Historico</span>
-        </a>
-      </li>
-      <!-- Botão Sair -->
-      <li style="margin-top: 10px;">
-        <form action="{% url 'logout' %}" method="POST" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger" style="width:120px;">
-            Sair
-          </button>
-        </form>
-      </li>
-    </ul>
-  </div>
+    <li>
+      <a href="{% url 'formacompanhamento:clientes_acionamento_list' %}">
+        <i class="bi bi-people"></i>
+        <span class="menu-text">Clientes</span>
+      </a>
+    </li>
+    <li>
+      {% if perms.formacompanhamento.delete_agente %}
+      <a href="{% url 'formacompanhamento:faturamento_lista' %}">
+        <i class="bi bi-file-earmark-text"></i>
+        <span class="menu-text">Faturamento</span>
+      </a>
+    </li>
+    {% endif %}
+    <li>
+      <a href="{% url 'formacompanhamento:historico' %}">
+        <i class="bi bi-book"></i>
+        <span class="menu-text">Historico</span>
+      </a>
+    </li>
+    <!-- Botão Sair -->
+    <li style="margin-top: 10px">
+      <form action="{% url 'logout' %}" method="POST" style="display: inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" style="width: 120px">
+          Sair
+        </button>
+      </form>
+    </li>
+  </ul>
+</div>
