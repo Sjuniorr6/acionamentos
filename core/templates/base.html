@@ -22,6 +22,9 @@
   <!-- Bootstrap Icons via CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   
+  <!-- Font Awesome para o ícone do sino -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
   <!-- Estilos gerais e animação fade-in -->
   <style>
     /* Layout de fundo e animação */
@@ -217,6 +220,56 @@
     animation-delay: 1s; /* Espera 3 segundos antes de iniciar */
 }
 
+/* Estilos para o sino de notificações */
+.notification-bell {
+  margin-right: 20px;
+}
+
+.notification-bell .btn-link {
+  color: white;
+  text-decoration: none;
+  padding: 0;
+}
+
+.notification-bell .btn-link:hover {
+  color: #ffd700;
+}
+
+.notification-counter {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Estilos para o ícone de notificações na sidebar */
+.sidebar-menu li a.position-relative {
+  padding-right: 30px; /* Espaço para o badge */
+}
+
+.sidebar-menu li a .badge {
+  font-size: 0.7rem !important;
+  padding: 0.25rem 0.5rem !important;
+  margin-left: 5px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.3s ease;
+}
+
+.sidebar:hover .sidebar-menu li a .badge {
+  right: 20px;
+}
+
+/* Animação suave para o badge quando houver novas notificações */
+@keyframes pulse {
+  0% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.2); }
+  100% { transform: translateY(-50%) scale(1); }
+}
+
+.sidebar-menu li a .badge:not(:empty) {
+  animation: pulse 2s infinite;
+}
 
   </style>
   
@@ -297,6 +350,25 @@
             <span class="menu-text">Historico</span>
           </a>
         </li>
+        <!-- Ocorrências de Transporte -->
+        <li>
+          <a href="{% url 'formacompanhamento:ocorrencia_transporte_list' %}">
+            <i class="bi bi-truck"></i>
+            <span class="menu-text">Ocorrências</span>
+          </a>
+        </li>
+        <!-- Notificações -->
+        <li>
+          <a href="{% url 'notifications:list' %}" class="position-relative">
+            <i class="bi bi-bell"></i>
+            <span class="menu-text">Notificações</span>
+            {% if request.unread_notifications_count > 0 %}
+            <span class="position-absolute top-50 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem; margin-top: -10px;">
+              {{ request.unread_notifications_count }}
+            </span>
+            {% endif %}
+          </a>
+        </li>
         <!-- Botão Sair -->
         <li style="margin-top: 10px;">
           <form action="{% url 'logout' %}" method="POST" style="display:inline;">
@@ -309,6 +381,29 @@
       </ul>
     </div>
 
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="d-flex justify-content-between align-items-center w-100 px-4">
+            <div></div>
+            <a href="{% url 'home' %}" class="gs-link">GS Acionamento</a>
+            <div class="d-flex align-items-center">
+                <a href="{% url 'formacompanhamento:ocorrencia_transporte_create' %}" class="btn btn-link text-white me-3" title="Nova Ocorrência de Transporte">
+                    <i class="bi bi-truck" style="font-size: 1.5rem;"></i>
+                </a>
+                <div class="notification-bell">
+                    <a href="{% url 'notifications:list' %}" class="btn btn-link position-relative">
+                        <i class="fas fa-bell text-white" style="font-size: 1.5rem;"></i>
+                        {% if request.unread_notifications_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-counter">
+                            {{ request.unread_notifications_count }}
+                        </span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <!-- Container com espaço para a sidebar -->
     <div class="content-container with-sidebar">
   {% else %}
@@ -319,5 +414,79 @@
     {% block content %}{% endblock %}
 
   </div>
+
+  <!-- Bootstrap JS e Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+  {% block extra_js %}
+  <script>
+  // Função para atualizar todos os contadores de notificação
+  function updateAllNotificationCounters(count) {
+      const counters = [
+          document.getElementById('unread-count'),
+          document.getElementById('notification-counter'),
+          document.querySelector('.sidebar-menu .badge')
+      ];
+      
+      counters.forEach(counter => {
+          if (counter) {
+              if (count > 0) {
+                  counter.textContent = count;
+                  counter.style.display = 'inline-block';
+              } else {
+                  counter.style.display = 'none';
+              }
+          }
+      });
+  }
+
+  // Conectar ao WebSocket quando a página carregar
+  document.addEventListener('DOMContentLoaded', function() {
+      const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+      const ws_path = ws_scheme + '://' + window.location.host + '/ws/notifications/';
+      const socket = new WebSocket(ws_path);
+
+      socket.onmessage = function(e) {
+          const data = JSON.parse(e.data);
+          if (data.type === 'notification_message') {
+              updateAllNotificationCounters(data.count);
+          }
+      };
+
+      socket.onclose = function(e) {
+          console.log('WebSocket connection closed');
+          // Tentar reconectar após 3 segundos
+          setTimeout(connectWebSocket, 3000);
+      };
+
+      // Marcar notificação como lida quando visualizada
+      const markNotificationAsRead = function(notificationId) {
+          fetch(`/notifications/${notificationId}/mark-as-read/`, {
+              method: 'POST',
+              headers: {
+                  'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                  'Content-Type': 'application/json'
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  updateAllNotificationCounters(data.unread_count);
+              }
+          });
+      };
+
+      // Adicionar evento de clique para marcar notificações como lidas
+      document.querySelectorAll('[data-notification-id]').forEach(notification => {
+          notification.addEventListener('click', function() {
+              const notificationId = this.dataset.notificationId;
+              markNotificationAsRead(notificationId);
+          });
+      });
+  });
+  </script>
+  {% endblock %}
+
 </body>
 </html>

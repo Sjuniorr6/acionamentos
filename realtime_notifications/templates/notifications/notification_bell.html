@@ -1,0 +1,91 @@
+{% load static %}
+
+{% if user.is_authenticated %}
+<div class="dropdown">
+    <a href="#" class="nav-link dropdown-toggle position-relative" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-bell"></i>
+        {% if unread_notifications_count > 0 %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">
+                {{ unread_notifications_count }}
+            </span>
+        {% endif %}
+    </a>
+    
+    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="min-width: 300px;">
+        <h6 class="dropdown-header">Notificações</h6>
+        {% for notification in notifications %}
+            <div class="dropdown-item notification-item {% if not notification.read %}unread{% endif %}" data-notification-id="{{ notification.id }}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>{{ notification.title }}</strong>
+                        <p class="mb-0 small">{{ notification.message }}</p>
+                        {% if not notification.read %}
+                            <span class="badge bg-primary">Nova</span>
+                        {% endif %}
+                        <small class="text-muted d-block">{{ notification.created_at|date:"d/m/Y H:i" }}</small>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="dropdown-item">Nenhuma notificação</div>
+        {% endfor %}
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center" href="{% url 'notifications:list' %}">Ver todas</a>
+    </div>
+</div>
+
+<script>
+    // Conectar ao WebSocket
+    const notificationSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/notifications/'
+    );
+
+    notificationSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        
+        // Atualizar o contador de notificações
+        const counter = document.getElementById('notification-counter');
+        if (counter) {
+            counter.textContent = data.message.unread_count;
+            counter.style.display = data.message.unread_count > 0 ? '' : 'none';
+        }
+    };
+
+    notificationSocket.onclose = function(e) {
+        console.error('Notification socket closed unexpectedly');
+    };
+</script>
+{% endif %}
+
+<style>
+.notification-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background-color: #f8f9fa;
+}
+
+.notification-item:hover {
+    background-color: #f0f0f0;
+}
+
+.notification-item h6 {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.notification-item p {
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.notification-item small {
+    font-size: 0.75rem;
+}
+</style> 

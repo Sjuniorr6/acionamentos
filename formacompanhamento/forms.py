@@ -656,3 +656,48 @@ class ClientesAcionamentoForm(forms.ModelForm):
             raise forms.ValidationError("O valor de acionamento não pode ser negativo.")
         return valordeacionamento
 
+from django import forms
+from .models import OcorrenciaTransporte
+
+class OcorrenciaTransporteForm(forms.ModelForm):
+    class Meta:
+        model = OcorrenciaTransporte
+        fields = [
+            'transportadora', 'placa', 'carreta', 'motorista', 'cpf',
+            'telefone', 'local', 'endereco', 'latitude', 'longitude',
+            'tipo_ocorrencia', 'data_hora_ocorrencia'
+        ]
+        widgets = {
+            'data_hora_ocorrencia': forms.DateTimeInput(
+                attrs={'type': 'datetime-local'},
+                format='%Y-%m-%dT%H:%M'
+            ),
+            'endereco': forms.Textarea(attrs={'rows': 3}),
+            'latitude': forms.NumberInput(attrs={'step': '0.000001'}),
+            'longitude': forms.NumberInput(attrs={'step': '0.000001'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Adiciona classes Bootstrap aos campos
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})
+        
+        # Máscaras e placeholders
+        self.fields['cpf'].widget.attrs.update({
+            'data-mask': '000.000.000-00',
+            'placeholder': '000.000.000-00'
+        })
+        self.fields['telefone'].widget.attrs.update({
+            'data-mask': '(00) 00000-0000',
+            'placeholder': '(00) 00000-0000'
+        })
+        self.fields['placa'].widget.attrs.update({
+            'placeholder': 'ABC1234',
+            'pattern': '[A-Za-z]{3}[0-9][A-Za-z0-9][0-9]{2}'
+        })
+        self.fields['carreta'].widget.attrs.update({
+            'placeholder': 'ABC1234',
+            'pattern': '[A-Za-z]{3}[0-9][A-Za-z0-9][0-9]{2}'
+        })
+

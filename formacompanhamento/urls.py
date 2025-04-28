@@ -39,6 +39,10 @@ from .views import (
     RegistroPagamentohListView,
     all_prestadores_addresses,
     mapa_mapbox_view,
+    ocorrencia_transporte_create,
+    ocorrencia_transporte_list,
+    ocorrencia_transporte_update,
+    ocorrencia_transporte_delete,
 )
 
 # Definindo o namespace do app
@@ -105,6 +109,10 @@ urlpatterns = [
     path('registro_pagamento/<int:pk>/detalhes/', views.detalhar_acionamento, name='detalhar_acionamento'),
 path('api/prestadores/enderecos/', all_prestadores_addresses, name='all_prestadores_addresses'),
      path('api/registro_pagamento/<int:pk>/detalhes/', detalhar_acionamento_endpoint, name='detalhar_acionamento_endpoint'),
+    path('ocorrencia-transporte/', views.ocorrencia_transporte_list, name='ocorrencia_transporte_list'),
+    path('ocorrencia-transporte/nova/', views.ocorrencia_transporte_create, name='ocorrencia_transporte_create'),
+    path('ocorrencia-transporte/<int:pk>/editar/', views.ocorrencia_transporte_update, name='ocorrencia_transporte_update'),
+    path('ocorrencia-transporte/<int:pk>/excluir/', views.ocorrencia_transporte_delete, name='ocorrencia_transporte_delete'),
 ]
 
 # Servir arquivos de mídia apenas em modo de desenvolvimento

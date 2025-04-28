@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalhes da Ocorrência</h2>
+        <div>
+            <a href="{% url 'formacompanhamento:ocorrencia_transporte_list' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+            <a href="{% url 'formacompanhamento:ocorrencia_transporte_edit' object.pk %}" class="btn btn-primary me-2">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'formacompanhamento:ocorrencia_transporte_delete' object.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Excluir
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Informações da Ocorrência</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Data e Hora:</dt>
+                        <dd class="col-sm-8">{{ object.data_hora_ocorrencia|date:"d/m/Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Placa do Veículo:</dt>
+                        <dd class="col-sm-8">{{ object.placa_veiculo }}</dd>
+
+                        <dt class="col-sm-4">Nome do Motorista:</dt>
+                        <dd class="col-sm-8">{{ object.nome_motorista }}</dd>
+
+                        <dt class="col-sm-4">CPF do Motorista:</dt>
+                        <dd class="col-sm-8">{{ object.cpf_motorista }}</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Telefone do Motorista:</dt>
+                        <dd class="col-sm-8">{{ object.telefone_motorista }}</dd>
+
+                        <dt class="col-sm-4">Local da Ocorrência:</dt>
+                        <dd class="col-sm-8">{{ object.local_ocorrencia }}</dd>
+
+                        <dt class="col-sm-4">Data de Registro:</dt>
+                        <dd class="col-sm-8">{{ object.data_registro|date:"d/m/Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Última Atualização:</dt>
+                        <dd class="col-sm-8">{{ object.data_atualizacao|date:"d/m/Y H:i" }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h5>Descrição da Ocorrência</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            {{ object.descricao_ocorrencia|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

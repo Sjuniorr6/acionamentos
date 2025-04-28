@@ -9,6 +9,11 @@ from .models_agentes import agentes
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
 
 class clientes_acionamento(models.Model):
     servicos_options = [
@@ -584,6 +589,85 @@ class TotalRegistro(models.Model):
 
     def __str__(self):
         return f"Registro {self.registro_pagamento} - Cliente {self.cliente}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class OcorrenciaTransporte(models.Model):
+    TIPO_OCORRENCIA_CHOICES = [
+        ('acidente', 'Acidente'),
+        ('pane', 'Pane Mecânica'),
+        ('roubo', 'Roubo/Furto'),
+        ('atraso', 'Atraso'),
+        ('outros', 'Outros'),
+    ]
+
+    transportadora = models.CharField(max_length=100, null=True, blank=True)
+    placa = models.CharField(max_length=8, null=True, blank=True)
+    carreta = models.CharField(max_length=8, null=True, blank=True)
+    motorista = models.CharField(max_length=100, null=True, blank=True)
+    cpf = models.CharField(max_length=14, null=True, blank=True)
+    telefone = models.CharField(max_length=15, null=True, blank=True)
+    local = models.CharField(max_length=255, null=True, blank=True)
+    endereco = models.TextField(null=True, blank=True)
+    latitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+    tipo_ocorrencia = models.CharField(max_length=20, choices=TIPO_OCORRENCIA_CHOICES, null=True, blank=True)
+    data_hora_ocorrencia = models.DateTimeField(null=True, blank=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Ocorrência de Transporte'
+        verbose_name_plural = 'Ocorrências de Transporte'
+        ordering = ['-data_hora_ocorrencia']
+
+    def __str__(self):
+        return f"Ocorrência {self.tipo_ocorrencia} - {self.placa} - {self.data_hora_ocorrencia}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        if is_new:
+            from django.contrib.auth import get_user_model
+            from realtime_notifications.models import Notification
+            
+            User = get_user_model()
+            all_users = User.objects.all()
+            
+            tipo_ocorrencia_display = dict(self.TIPO_OCORRENCIA_CHOICES).get(self.tipo_ocorrencia, self.tipo_ocorrencia)
+            
+            for user in all_users:
+                Notification.objects.create(
+                    recipient=user,
+                    title=f"Nova Ocorrência de Transporte - {tipo_ocorrencia_display}",
+                    message=f"""
+                    Transportadora: {self.transportadora}
+                    Placa: {self.placa}
+                    Motorista: {self.motorista}
+                    Local: {self.local}
+                    Tipo: {tipo_ocorrencia_display}
+                    Data/Hora: {self.data_hora_ocorrencia.strftime('%d/%m/%Y %H:%M') if self.data_hora_ocorrencia else 'Não informado'}
+                    """,
+                    content_type=None,
+                    object_id=None
+                )
 
 
 

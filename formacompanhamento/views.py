@@ -4,11 +4,12 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, F
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from .models import RegistroPagamento, Formacompanhamento, agentes
-from .forms import RegistroPagamentoForm, formacompanhamentoForm, agentesForm
+from .models import RegistroPagamento, Formacompanhamento, agentes, OcorrenciaTransporte
+from .forms import RegistroPagamentoForm, formacompanhamentoForm, agentesForm, OcorrenciaTransporteForm
 from .utils import generate_pdf
 import json
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 # ----------------- Forma de Acompanhamento -----------------
 
 class formulariorateview(LoginRequiredMixin,PermissionRequiredMixin, CreateView):
@@ -1444,6 +1445,56 @@ def mapa_mapbox_view(request):
     endereco = request.GET.get("endereco", "")
     # Renderiza um template (ex: 'mapa_mapbox.html') com esse endereço
     return render(request, "mapa_mapbox.html", {"endereco": endereco})
+
+
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import OcorrenciaTransporteForm
+from .models import OcorrenciaTransporte
+
+@login_required
+def ocorrencia_transporte_create(request):
+    if request.method == 'POST':
+        form = OcorrenciaTransporteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ocorrência registrada com sucesso!')
+            return redirect('formacompanhamento:ocorrencia_transporte_list')
+    else:
+        form = OcorrenciaTransporteForm()
+    
+    return render(request, 'formacompanhamento/ocorrencia_transporte_form.html', {
+        'form': form,
+    })
+
+def ocorrencia_transporte_list(request):
+    ocorrencias = OcorrenciaTransporte.objects.all().order_by('-data_hora_ocorrencia')
+    return render(request, 'formacompanhamento/ocorrencia_transporte_list.html', {'ocorrencias': ocorrencias})
+
+@login_required
+def ocorrencia_transporte_update(request, pk):
+    ocorrencia = get_object_or_404(OcorrenciaTransporte, pk=pk)
+    if request.method == 'POST':
+        form = OcorrenciaTransporteForm(request.POST, instance=ocorrencia)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ocorrência atualizada com sucesso!')
+            return redirect('formacompanhamento:ocorrencia_transporte_list')
+    else:
+        form = OcorrenciaTransporteForm(instance=ocorrencia)
+    return render(request, 'formacompanhamento/ocorrencia_transporte_form.html', {'form': form})
+
+@login_required
+def ocorrencia_transporte_delete(request, pk):
+    ocorrencia = get_object_or_404(OcorrenciaTransporte, pk=pk)
+    if request.method == 'POST':
+        ocorrencia.delete()
+        messages.success(request, 'Ocorrência excluída com sucesso!')
+        return redirect('formacompanhamento:ocorrencia_transporte_list')
+    return render(request, 'formacompanhamento/ocorrencia_transporte_confirm_delete.html', {'object': ocorrencia})
 
 
 

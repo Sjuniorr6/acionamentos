@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{% if form.instance.pk %}Editar{% else %}Nova{% endif %} Ocorrência de Transporte</h4>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <form method="post" autocomplete="off">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_data_hora_ocorrencia" class="form-label">Data e Hora da Ocorrência</label>
+                    <input type="text" name="data_hora_ocorrencia" id="id_data_hora_ocorrencia" class="form-control" placeholder="dd/mm/aaaa --:--" value="{{ form.data_hora_ocorrencia.value|default_if_none:'' }}">
+                    {% if form.data_hora_ocorrencia.errors %}
+                        <div class="invalid-feedback d-block">{{ form.data_hora_ocorrencia.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_placa_veiculo" class="form-label">Placa do Veículo</label>
+                    <input type="text" name="placa_veiculo" id="id_placa_veiculo" class="form-control" placeholder="Ex: ABC-1234" value="{{ form.placa_veiculo.value|default_if_none:'' }}">
+                    {% if form.placa_veiculo.errors %}
+                        <div class="invalid-feedback d-block">{{ form.placa_veiculo.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_nome_motorista" class="form-label">Nome do Motorista</label>
+                    <input type="text" name="nome_motorista" id="id_nome_motorista" class="form-control" placeholder="Nome completo" value="{{ form.nome_motorista.value|default_if_none:'' }}">
+                    {% if form.nome_motorista.errors %}
+                        <div class="invalid-feedback d-block">{{ form.nome_motorista.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_cpf_motorista" class="form-label">CPF do Motorista</label>
+                    <input type="text" name="cpf_motorista" id="id_cpf_motorista" class="form-control" placeholder="000.000.000-00" value="{{ form.cpf_motorista.value|default_if_none:'' }}">
+                    {% if form.cpf_motorista.errors %}
+                        <div class="invalid-feedback d-block">{{ form.cpf_motorista.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_telefone_motorista" class="form-label">Telefone do Motorista</label>
+                    <input type="text" name="telefone_motorista" id="id_telefone_motorista" class="form-control" placeholder="(00) 00000-0000" value="{{ form.telefone_motorista.value|default_if_none:'' }}">
+                    {% if form.telefone_motorista.errors %}
+                        <div class="invalid-feedback d-block">{{ form.telefone_motorista.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_local_ocorrencia" class="form-label">Local da Ocorrência</label>
+                    <input type="text" name="local_ocorrencia" id="id_local_ocorrencia" class="form-control" placeholder="Endereço ou referência" value="{{ form.local_ocorrencia.value|default_if_none:'' }}">
+                    {% if form.local_ocorrencia.errors %}
+                        <div class="invalid-feedback d-block">{{ form.local_ocorrencia.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_descricao_ocorrencia" class="form-label">Descrição da Ocorrência</label>
+                    <textarea name="descricao_ocorrencia" id="id_descricao_ocorrencia" class="form-control" rows="3" placeholder="Descreva o ocorrido">{{ form.descricao_ocorrencia.value|default_if_none:'' }}</textarea>
+                    {% if form.descricao_ocorrencia.errors %}
+                        <div class="invalid-feedback d-block">{{ form.descricao_ocorrencia.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'formacompanhamento:ocorrencia_transporte_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#id_data_hora_ocorrencia').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm',
+            locale: 'pt-br'
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

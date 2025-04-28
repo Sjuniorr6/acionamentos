@@ -27,8 +27,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'corsheaders',
     'rest_framework',
-    
-
+    'channels',  # Django Channels
+    'realtime_notifications',  # Nosso novo app
 ]
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'formacompanhamento.middleware.LoginRequiredMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    
+    'realtime_notifications.middleware.NotificationsMiddleware',  # Adiciona as notificações ao contexto
 ]
 
 # Configuração de URL raiz
@@ -139,3 +139,16 @@ LOGIN_URL = 'login'               # URL para redirecionamento em caso de acesso 
 LOGOUT_REDIRECT_URL = 'login'  # ou 'home', '/', etc.    # Redireciona para a página de login após logout
 
 # Configuração padrão para o campo de chave primáriay
+
+# Configuração do Django Channels
+ASGI_APPLICATION = 'acionamento.asgi.application'
+
+# Configuração do Canal de Layers (usando Redis)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [("redis-gsacionamento.7yyk1usset1s.us-east-1.cache.amazonaws.com", 6379)],
+        },
+    },
+}

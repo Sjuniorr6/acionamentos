@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+<div class="container mt-4">
+    <h2>Notificações <span class="badge bg-danger" id="unread-count" {% if not unread_count %}style="display: none;"{% endif %}>{{ unread_count }}</span></h2>
+    
+    <!-- Lista de notificações -->
+    <div id="notifications-list" class="list-group">
+        {% for notification in notifications %}
+        <div class="list-group-item {% if not notification.read %}list-group-item-info{% endif %}" data-notification-id="{{ notification.id }}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    {% if not notification.read %}
+                    <span class="badge bg-primary mb-2">Nova</span>
+                    {% endif %}
+                    <h5 class="mb-1">{{ notification.title }}</h5>
+                    <div class="notification-content">
+                        {{ notification.message|linebreaks }}
+                    </div>
+                    <div class="mt-2">
+                        {% if notification.content_object %}
+                        <a href="{% url 'notifications:view_notification' notification.id %}" class="btn btn-sm btn-primary">Ver detalhes</a>
+                        {% endif %}
+                        <small class="text-muted ms-2">{{ notification.created_at|date:"d/m/Y H:i" }}</small>
+                    </div>
+                </div>
+                {% if not notification.read %}
+                <div class="ms-2">
+                    <span class="badge bg-primary rounded-circle" style="width: 10px; height: 10px;"></span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="list-group-item text-center">
+            <p class="mb-0">Nenhuma notificação encontrada.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.notification-content {
+    white-space: pre-line;
+    font-size: 0.95rem;
+    color: #555;
+}
+.list-group-item {
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+.list-group-item.list-group-item-info {
+    background-color: #e8f4f8;
+    border-left: 4px solid #0d6efd;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Marcar todas as notificações como lidas ao carregar a página
+    fetch('/notifications/mark-all-as-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            updateUnreadCount(0);
+            updateNotificationVisuals();
+        }
+    });
+
+    function updateUnreadCount(count) {
+        const unreadCountBadge = document.getElementById('unread-count');
+        const navbarCounter = document.getElementById('notification-counter');
+        const sidebarCounter = document.querySelector('.sidebar-menu .badge');
+        
+        const counters = [unreadCountBadge, navbarCounter, sidebarCounter];
+        
+        counters.forEach(counter => {
+            if (counter) {
+                if (count > 0) {
+                    counter.textContent = count;
+                    counter.style.display = 'inline-block';
+                } else {
+                    counter.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    function updateNotificationVisuals() {
+        document.querySelectorAll('.list-group-item').forEach(item => {
+            item.classList.remove('list-group-item-info');
+            const newBadge = item.querySelector('.badge.bg-primary');
+            if (newBadge) newBadge.remove();
+            const circle = item.querySelector('.rounded-circle');
+            if (circle) circle.parentElement.remove();
+        });
+    }
+
+    // Marcar notificação individual como lida quando clicar no link
+    document.querySelectorAll('[data-notification-id] a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const notificationId = this.closest('[data-notification-id]').dataset.notificationId;
+            const notificationItem = this.closest('.list-group-item');
+            
+            fetch(`/notifications/${notificationId}/mark-as-read/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    updateUnreadCount(data.unread_count);
+                    notificationItem.classList.remove('list-group-item-info');
+                    notificationItem.querySelector('.badge.bg-primary')?.remove();
+                    notificationItem.querySelector('.rounded-circle')?.parentElement?.remove();
+                }
+            });
+        });
+    });
+
+    // Atualizar a página a cada 120 segundos
+    setInterval(function() {
+        window.location.reload();
+    }, 120000); // 120 segundos
+});
+</script>
+{% endblock %} 

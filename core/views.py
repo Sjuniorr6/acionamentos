@@ -3,21 +3,31 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from realtime_notifications.models import Notification
+from django.contrib.auth import login
+
 class CustomLoginView(LoginView):
     template_name = 'login.html'
 
 class CustomLogoutView(LogoutView):
     next_page = 'login'
 
-class HomeView(TemplateView):
+class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
 
-
-from django.urls import reverse_lazy
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
-from django.views.generic.edit import CreateView
-from django.shortcuts import render
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Buscar as últimas 10 notificações do usuário
+        context['notifications'] = Notification.objects.filter(
+            recipient=self.request.user
+        ).order_by('-created_at')[:10]
+        context['unread_count'] = Notification.objects.filter(
+            recipient=self.request.user, 
+            read=False
+        ).count()
+        return context
 
 class RegisterView(CreateView):
     template_name = 'register.html'

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Ocorrências de Transporte</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="mb-3">
+        <a href="{% url 'formacompanhamento:ocorrencia_transporte_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova Ocorrência
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Motorista</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>Placa</th>
+                    <th>Local</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ocorrencia in ocorrencias %}
+                <tr>
+                    <td>{{ ocorrencia.data_hora_ocorrencia|date:"d/m/Y H:i" }}</td>
+                    <td>{{ ocorrencia.nome_motorista }}</td>
+                    <td>{{ ocorrencia.cpf_motorista }}</td>
+                    <td>{{ ocorrencia.telefone_motorista }}</td>
+                    <td>{{ ocorrencia.placa_veiculo }}</td>
+                    <td>{{ ocorrencia.local_ocorrencia }}</td>
+                    <td>{{ ocorrencia.descricao_ocorrencia|truncatechars:50 }}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'formacompanhamento:ocorrencia_transporte_update' ocorrencia.pk %}" class="btn btn-sm btn-primary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'formacompanhamento:ocorrencia_transporte_delete' ocorrencia.pk %}" class="btn btn-sm btn-danger" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center">Nenhuma ocorrência registrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

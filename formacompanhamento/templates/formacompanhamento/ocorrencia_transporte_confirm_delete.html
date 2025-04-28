@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Confirmar Exclusão</h2>
+        </div>
+        <div class="card-body">
+            <p>Tem certeza que deseja excluir a ocorrência de {{ object.data_hora_ocorrencia|date:"d/m/Y H:i" }}?</p>
+            <p><strong>Motorista:</strong> {{ object.nome_motorista }}</p>
+            <p><strong>Placa:</strong> {{ object.placa_veiculo }}</p>
+            <p><strong>Local:</strong> {{ object.local_ocorrencia }}</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'formacompanhamento:ocorrencia_transporte_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Confirmar Exclusão
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

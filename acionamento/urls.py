@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from formacompanhamento.urls import all_prestadores_addresses,detalhar_acionamento_endpoint
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('notifications/', include('realtime_notifications.urls')),
     path('', include('core.urls')),
     path('api/prestadores/enderecos/', all_prestadores_addresses, name='all_prestadores_addresses'),
     path('formacompanhamento/', include('formacompanhamento.urls')),
