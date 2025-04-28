@@ -154,5 +154,5 @@ CHANNEL_LAYERS = {
 }
 
 # Configurações do Celery
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+CELERY_BROKER_URL = 'redis://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0'
+CELERY_RESULT_BACKEND = 'redis://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0'
