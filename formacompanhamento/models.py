@@ -644,30 +644,23 @@ class OcorrenciaTransporte(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         
-        if is_new:
-            from django.contrib.auth import get_user_model
+        if is_new and self.usuario:
             from realtime_notifications.models import Notification
-            
-            User = get_user_model()
-            all_users = User.objects.all()
-            
             tipo_ocorrencia_display = dict(self.TIPO_OCORRENCIA_CHOICES).get(self.tipo_ocorrencia, self.tipo_ocorrencia)
-            
-            for user in all_users:
-                Notification.objects.create(
-                    recipient=user,
-                    title=f"Nova Ocorrência de Transporte - {tipo_ocorrencia_display}",
-                    message=f"""
-                    Transportadora: {self.transportadora}
-                    Placa: {self.placa}
-                    Motorista: {self.motorista}
-                    Local: {self.local}
-                    Tipo: {tipo_ocorrencia_display}
-                    Data/Hora: {self.data_hora_ocorrencia.strftime('%d/%m/%Y %H:%M') if self.data_hora_ocorrencia else 'Não informado'}
-                    """,
-                    content_type=None,
-                    object_id=None
-                )
+            Notification.objects.create(
+                recipient=self.usuario,
+                title=f"Nova Ocorrência de Transporte - {tipo_ocorrencia_display}",
+                message=f"""
+                Transportadora: {self.transportadora}
+                Placa: {self.placa}
+                Motorista: {self.motorista}
+                Local: {self.local}
+                Tipo: {tipo_ocorrencia_display}
+                Data/Hora: {self.data_hora_ocorrencia.strftime('%d/%m/%Y %H:%M') if self.data_hora_ocorrencia else 'Não informado'}
+                """,
+                content_type=None,
+                object_id=None
+            )
 
 
 
