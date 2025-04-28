@@ -1460,15 +1460,14 @@ def ocorrencia_transporte_create(request):
     if request.method == 'POST':
         form = OcorrenciaTransporteForm(request.POST)
         if form.is_valid():
-            form.save()
+            ocorrencia = form.save(commit=False)
+            ocorrencia.usuario = request.user  # Sempre preenche o usuário logado
+            ocorrencia.save()
             messages.success(request, 'Ocorrência registrada com sucesso!')
             return redirect('formacompanhamento:ocorrencia_transporte_list')
     else:
         form = OcorrenciaTransporteForm()
-    
-    return render(request, 'formacompanhamento/ocorrencia_transporte_form.html', {
-        'form': form,
-    })
+    return render(request, 'formacompanhamento/ocorrencia_transporte_form.html', {'form': form})
 
 def ocorrencia_transporte_list(request):
     ocorrencias = OcorrenciaTransporte.objects.all().order_by('-data_hora_ocorrencia')

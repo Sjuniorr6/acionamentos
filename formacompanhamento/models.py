@@ -645,6 +645,10 @@ class OcorrenciaTransporte(models.Model):
         super().save(*args, **kwargs)
         
         if is_new and self.usuario:
+            # LOG DE DEPURAÇÃO DOS DADOS DA OCORRÊNCIA
+            import logging
+            logger = logging.getLogger('django')
+            logger.warning(f"[DEBUG NOTIFICAÇÃO] transportadora={self.transportadora}, placa={self.placa}, motorista={self.motorista}, local={self.local}, tipo_ocorrencia={self.tipo_ocorrencia}, data_hora_ocorrencia={self.data_hora_ocorrencia}")
             from realtime_notifications.models import Notification
             tipo_ocorrencia_display = dict(self.TIPO_OCORRENCIA_CHOICES).get(self.tipo_ocorrencia, self.tipo_ocorrencia)
             Notification.objects.create(
