@@ -1,7 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from .models import Notification
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -43,6 +42,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_unread_count(self):
+        from .models import Notification
         return Notification.objects.filter(
             recipient=self.scope["user"],
             read=False
@@ -50,6 +50,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def mark_all_as_read(self):
+        from .models import Notification
         Notification.objects.filter(
             recipient=self.scope["user"],
             read=False
