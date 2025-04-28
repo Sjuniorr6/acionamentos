@@ -645,26 +645,18 @@ class OcorrenciaTransporte(models.Model):
         super().save(*args, **kwargs)
         
         if is_new and self.usuario:
-            # LOG DE DEPURAÇÃO DOS DADOS DA OCORRÊNCIA
-            import logging
-            logger = logging.getLogger('django')
-            logger.warning(f"[DEBUG NOTIFICAÇÃO] transportadora={self.transportadora}, placa={self.placa}, motorista={self.motorista}, local={self.local}, tipo_ocorrencia={self.tipo_ocorrencia}, data_hora_ocorrencia={self.data_hora_ocorrencia}")
-            from realtime_notifications.models import Notification
+            from realtime_notifications.tasks import create_notification
             tipo_ocorrencia_display = dict(self.TIPO_OCORRENCIA_CHOICES).get(self.tipo_ocorrencia, self.tipo_ocorrencia)
-            Notification.objects.create(
-                recipient=self.usuario,
-                title=f"Nova Ocorrência de Transporte - {tipo_ocorrencia_display}",
-                message=f"""
-                Transportadora: {self.transportadora}
-                Placa: {self.placa}
-                Motorista: {self.motorista}
-                Local: {self.local}
-                Tipo: {tipo_ocorrencia_display}
-                Data/Hora: {self.data_hora_ocorrencia.strftime('%d/%m/%Y %H:%M') if self.data_hora_ocorrencia else 'Não informado'}
-                """,
-                content_type=None,
-                object_id=None
-            )
+            title = f"Nova Ocorrência de Transporte - {tipo_ocorrencia_display}"
+            message = f"""
+            Transportadora: {self.transportadora}
+            Placa: {self.placa}
+            Motorista: {self.motorista}
+            Local: {self.local}
+            Tipo: {tipo_ocorrencia_display}
+            Data/Hora: {self.data_hora_ocorrencia.strftime('%d/%m/%Y %H:%M') if self.data_hora_ocorrencia else 'Não informado'}
+            """
+            create_notification.delay(self.usuario.id, title, message)
 
 
 
