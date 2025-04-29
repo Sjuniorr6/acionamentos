@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 app_name = 'notifications'
-
+ 
 urlpatterns = [
     path('', views.notification_list, name='list'),
     path('get/', views.get_notifications, name='get_notifications'),

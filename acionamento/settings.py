@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from ssl import CERT_NONE
 
 # Caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -154,6 +155,10 @@ CHANNEL_LAYERS = {
 }
 # Configurações do Celery
 CELERY_BROKER_URL = "rediss://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0"
-CELERY_BROKER_USE_SSL = True
+CELERY_BROKER_USE_SSL = {
+    'ssl_cert_reqs': CERT_NONE
+}
 CELERY_RESULT_BACKEND = "rediss://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0"
-CELERY_RESULT_BACKEND_USE_SSL = True
+CELERY_RESULT_BACKEND_USE_SSL = {
+    'ssl_cert_reqs': CERT_NONE
+}
