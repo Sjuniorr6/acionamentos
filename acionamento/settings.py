@@ -148,9 +148,10 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [{
-                "host": "master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com",
-                "port": 6379,
-                "ssl": True,
+                "address": "rediss://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0",
+                "connection_kwargs": {
+                    "ssl_cert_reqs": None
+                }
             }],
         },
     },
