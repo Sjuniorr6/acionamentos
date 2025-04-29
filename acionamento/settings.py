@@ -91,9 +91,9 @@ DATABASES = {
         'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
         'OPTIONS': {
-            'sslmode': 'verify-full',
-            'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
-        }
+    'sslmode': 'verify-full',
+    'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
+}
     }
 }
 
