@@ -94,10 +94,10 @@ DATABASES = {
     'sslmode': 'verify-full',
     'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
 }
-            'sslmode': 'require',
+        
         }
     }
-}
+
 
 # Validação de senhas
 AUTH_PASSWORD_VALIDATORS = [
