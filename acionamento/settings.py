@@ -141,14 +141,17 @@ ASGI_APPLICATION = 'acionamento.asgi.application'
 
 # Configuração do Canal de Layers (usando Redis)
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [("master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com", 6379)],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [{
+                "host": "master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com",
+                "port": 6379,
+                "ssl": True,
+            }],
         },
     },
 }
-
 # Configurações do Celery
 CELERY_BROKER_URL = 'redis://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0'
 CELERY_RESULT_BACKEND = 'redis://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0'
