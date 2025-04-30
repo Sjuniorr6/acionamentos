@@ -38,18 +38,12 @@ class Notification(models.Model):
 
     def send_notification(self):
         channel_layer = get_channel_layer()
-        # Envia a notificação para o grupo de todos os usuários
         for user in User.objects.all():
+            unread_count = Notification.objects.filter(recipient=user, read=False).count()
             async_to_sync(channel_layer.group_send)(
                 f"user_{user.id}",
                 {
                     "type": "notification_message",
-                    "message": {
-                        "id": self.id,
-                        "title": self.title,
-                        "message": self.message,
-                        "read": self.read,
-                        "created_at": self.created_at.isoformat()
-                    }
+                    "count": unread_count
                 }
             )
