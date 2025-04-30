@@ -27,17 +27,35 @@
                             {% if notification.content_object.placa %}
                             <li class="list-group-item"><strong>Placa:</strong> {{ notification.content_object.placa }}</li>
                             {% endif %}
+                            {% if notification.content_object.carreta %}
+                            <li class="list-group-item"><strong>Carreta:</strong> {{ notification.content_object.carreta }}</li>
+                            {% endif %}
                             {% if notification.content_object.motorista %}
                             <li class="list-group-item"><strong>Motorista:</strong> {{ notification.content_object.motorista }}</li>
+                            {% endif %}
+                            {% if notification.content_object.cpf %}
+                            <li class="list-group-item"><strong>CPF:</strong> {{ notification.content_object.cpf }}</li>
+                            {% endif %}
+                            {% if notification.content_object.telefone %}
+                            <li class="list-group-item"><strong>Telefone:</strong> {{ notification.content_object.telefone }}</li>
                             {% endif %}
                             {% if notification.content_object.local %}
                             <li class="list-group-item"><strong>Local:</strong> {{ notification.content_object.local }}</li>
                             {% endif %}
-                            {% if notification.content_object.tipo %}
-                            <li class="list-group-item"><strong>Tipo:</strong> {{ notification.content_object.tipo }}</li>
+                            {% if notification.content_object.endereco %}
+                            <li class="list-group-item"><strong>Endereço:</strong> {{ notification.content_object.endereco }}</li>
                             {% endif %}
-                            {% if notification.content_object.data_hora %}
-                            <li class="list-group-item"><strong>Data/Hora:</strong> {{ notification.content_object.data_hora|date:'d/m/Y H:i' }}</li>
+                            {% if notification.content_object.latitude and notification.content_object.longitude %}
+                            <li class="list-group-item"><strong>Latitude:</strong> {{ notification.content_object.latitude }}<br><strong>Longitude:</strong> {{ notification.content_object.longitude }}</li>
+                            {% endif %}
+                            {% if notification.content_object.tipo_ocorrencia %}
+                            <li class="list-group-item"><strong>Tipo:</strong> {{ notification.content_object.get_tipo_ocorrencia_display }}</li>
+                            {% endif %}
+                            {% if notification.content_object.data_hora_ocorrencia %}
+                            <li class="list-group-item"><strong>Data/Hora:</strong> {{ notification.content_object.data_hora_ocorrencia|date:'d/m/Y H:i' }}</li>
+                            {% endif %}
+                            {% if notification.content_object.usuario %}
+                            <li class="list-group-item"><strong>Usuário:</strong> {{ notification.content_object.usuario }}</li>
                             {% endif %}
                         </ul>
                     {% endif %}
