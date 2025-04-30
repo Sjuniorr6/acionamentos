@@ -656,7 +656,7 @@ class OcorrenciaTransporte(models.Model):
             Tipo: {tipo_ocorrencia_display}
             Data/Hora: {self.data_hora_ocorrencia.strftime('%d/%m/%Y %H:%M') if self.data_hora_ocorrencia else 'Não informado'}
             """
-            create_notification.delay(self.usuario.id, title, message)
+            create_notification.delay(self.usuario.id, title, message, self.id)
 
 
 
