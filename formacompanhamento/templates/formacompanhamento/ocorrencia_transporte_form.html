@@ -18,55 +18,7 @@
             {% endif %}
             <form method="post" autocomplete="off">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label for="id_data_hora_ocorrencia" class="form-label">Data e Hora da Ocorrência</label>
-                    <input type="text" name="data_hora_ocorrencia" id="id_data_hora_ocorrencia" class="form-control" placeholder="dd/mm/aaaa --:--" value="{{ form.data_hora_ocorrencia.value|default_if_none:'' }}">
-                    {% if form.data_hora_ocorrencia.errors %}
-                        <div class="invalid-feedback d-block">{{ form.data_hora_ocorrencia.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    <label for="id_placa_veiculo" class="form-label">Placa do Veículo</label>
-                    <input type="text" name="placa_veiculo" id="id_placa_veiculo" class="form-control" placeholder="Ex: ABC-1234" value="{{ form.placa_veiculo.value|default_if_none:'' }}">
-                    {% if form.placa_veiculo.errors %}
-                        <div class="invalid-feedback d-block">{{ form.placa_veiculo.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    <label for="id_nome_motorista" class="form-label">Nome do Motorista</label>
-                    <input type="text" name="nome_motorista" id="id_nome_motorista" class="form-control" placeholder="Nome completo" value="{{ form.nome_motorista.value|default_if_none:'' }}">
-                    {% if form.nome_motorista.errors %}
-                        <div class="invalid-feedback d-block">{{ form.nome_motorista.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    <label for="id_cpf_motorista" class="form-label">CPF do Motorista</label>
-                    <input type="text" name="cpf_motorista" id="id_cpf_motorista" class="form-control" placeholder="000.000.000-00" value="{{ form.cpf_motorista.value|default_if_none:'' }}">
-                    {% if form.cpf_motorista.errors %}
-                        <div class="invalid-feedback d-block">{{ form.cpf_motorista.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    <label for="id_telefone_motorista" class="form-label">Telefone do Motorista</label>
-                    <input type="text" name="telefone_motorista" id="id_telefone_motorista" class="form-control" placeholder="(00) 00000-0000" value="{{ form.telefone_motorista.value|default_if_none:'' }}">
-                    {% if form.telefone_motorista.errors %}
-                        <div class="invalid-feedback d-block">{{ form.telefone_motorista.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    <label for="id_local_ocorrencia" class="form-label">Local da Ocorrência</label>
-                    <input type="text" name="local_ocorrencia" id="id_local_ocorrencia" class="form-control" placeholder="Endereço ou referência" value="{{ form.local_ocorrencia.value|default_if_none:'' }}">
-                    {% if form.local_ocorrencia.errors %}
-                        <div class="invalid-feedback d-block">{{ form.local_ocorrencia.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    <label for="id_descricao_ocorrencia" class="form-label">Descrição da Ocorrência</label>
-                    <textarea name="descricao_ocorrencia" id="id_descricao_ocorrencia" class="form-control" rows="3" placeholder="Descreva o ocorrido">{{ form.descricao_ocorrencia.value|default_if_none:'' }}</textarea>
-                    {% if form.descricao_ocorrencia.errors %}
-                        <div class="invalid-feedback d-block">{{ form.descricao_ocorrencia.errors }}</div>
-                    {% endif %}
-                </div>
+                {{ form.as_p }}
                 <div class="d-flex justify-content-between mt-4">
                     <a href="{% url 'formacompanhamento:ocorrencia_transporte_list' %}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Voltar

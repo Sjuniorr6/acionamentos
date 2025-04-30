@@ -6,6 +6,7 @@ from django.db.models import F
 from .forms import NotificationForm
 from django.contrib import messages
 
+
 # Create your views here.
 
 @login_required
