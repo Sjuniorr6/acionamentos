@@ -149,9 +149,7 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [{
                 "address": "rediss://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0",
-                "connection_kwargs": {
-                    "ssl_cert_reqs": None
-                }
+                "ssl_cert_reqs": None
             }],
         },
     },
