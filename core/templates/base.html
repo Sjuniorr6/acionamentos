@@ -457,7 +457,9 @@
       socket.onclose = function(e) {
           console.log('WebSocket connection closed');
           // Tentar reconectar após 3 segundos
-          setTimeout(connectWebSocket, 3000);
+          setTimeout(function() {
+              window.location.reload();
+          }, 3000);
       };
 
       // Marcar notificação como lida quando visualizada
