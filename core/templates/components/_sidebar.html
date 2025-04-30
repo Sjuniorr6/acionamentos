@@ -117,6 +117,7 @@
     {% if perms.formacompanhamento.view_agente %}
   </div>
   <ul class="sidebar-menu">
+    {% if perms.formacompanhamento.view_agente %}
     <li>
       <a href="{% url 'home' %}">
         <i class="bi bi-house-door"></i>
@@ -129,13 +130,6 @@
         <span class="menu-text">Formulário</span>
       </a>
     </li>
-    <!--
-      <li>
-        <a href="{% url 'formacompanhamento:criar_prestador' %}">
-          <i class="bi bi-book"></i>
-          <span class="menu-text">Prestadores</span>
-        </a>
-      </li>-->
     <li>
       <a href="{% url 'formacompanhamento:lista_prestadores' %}">
         <i class="bi bi-list-ul"></i>
@@ -148,33 +142,50 @@
         <span class="menu-text">Lista de Acionamentos</span>
       </a>
     </li>
-    <!--
-      <li>
-        <a href="{% url 'formacompanhamento:create_clientes_acionamento' %}">
-          <i class="bi bi-person-plus"></i>
-          <span class="menu-text">Cad. Clientes</span>
-        </a>
-      </li>-->
     <li>
       <a href="{% url 'formacompanhamento:clientes_acionamento_list' %}">
         <i class="bi bi-people"></i>
         <span class="menu-text">Clientes</span>
       </a>
     </li>
+    {% endif %}
+    {% if perms.formacompanhamento.delete_agente %}
     <li>
-      {% if perms.formacompanhamento.delete_agente %}
       <a href="{% url 'formacompanhamento:faturamento_lista' %}">
         <i class="bi bi-file-earmark-text"></i>
         <span class="menu-text">Faturamento</span>
       </a>
     </li>
     {% endif %}
+    {% if perms.formacompanhamento.view_historico %}
     <li>
       <a href="{% url 'formacompanhamento:historico' %}">
         <i class="bi bi-book"></i>
         <span class="menu-text">Historico</span>
       </a>
     </li>
+    {% endif %}
+    {% if perms.formacompanhamento.view_ocorrenciatransporte %}
+    <li>
+      <a href="{% url 'formacompanhamento:ocorrencia_transporte_list' %}">
+        <i class="bi bi-truck"></i>
+        <span class="menu-text">Ocorrências</span>
+      </a>
+    </li>
+    {% endif %}
+    {% if perms.realtime_notifications.view_notification %}
+    <li>
+      <a href="{% url 'notifications:list' %}" class="position-relative">
+        <i class="bi bi-bell"></i>
+        <span class="menu-text">Notificações</span>
+        {% if request.unread_notifications_count > 0 %}
+        <span class="position-absolute top-50 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem; margin-top: -10px;">
+          {{ request.unread_notifications_count }}
+        </span>
+        {% endif %}
+      </a>
+    </li>
+    {% endif %}
     <!-- Botão Sair -->
     <li style="margin-top: 10px">
       <form action="{% url 'logout' %}" method="POST" style="display: inline">
