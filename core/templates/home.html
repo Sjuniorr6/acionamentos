@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'core/base.html' %}
 {% load static %}
 {% block title %}Home{% endblock %}
 
@@ -95,7 +95,6 @@
 {% endblock %}
 
 {% block content %}
-{% include "components/_header.html" %}
 <div class="home-container">
   <h1>Bem-vindo, {{ user.username }}!</h1>
   

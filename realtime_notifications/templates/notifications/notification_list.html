@@ -7,35 +7,54 @@
     <h2>Notificações <span class="badge bg-danger" id="unread-count" {% if not unread_count %}style="display: none;"{% endif %}>{{ unread_count }}</span></h2>
     
     <!-- Lista de notificações -->
-    <div id="notifications-list" class="list-group">
+    <div id="notifications-list" class="row g-3">
         {% for notification in notifications %}
-        <div class="list-group-item {% if not notification.read %}list-group-item-info{% endif %}" data-notification-id="{{ notification.id }}">
-            <div class="d-flex justify-content-between align-items-start">
-                <div class="flex-grow-1">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm mb-3 {% if not notification.read %}border-primary{% endif %}" data-notification-id="{{ notification.id }}">
+                <div class="card-body">
                     {% if not notification.read %}
                     <span class="badge bg-primary mb-2">Nova</span>
                     {% endif %}
-                    <h5 class="mb-1">{{ notification.title }}</h5>
-                    <div class="notification-content">
+                    <h5 class="card-title">{{ notification.title }}</h5>
+                    <div class="notification-content mb-2">
                         {{ notification.message|linebreaks }}
                     </div>
-                    <div class="mt-2">
+                    {% if notification.content_object %}
+                        <ul class="list-group list-group-flush mb-2">
+                            {% if notification.content_object.transportadora %}
+                            <li class="list-group-item"><strong>Transportadora:</strong> {{ notification.content_object.transportadora }}</li>
+                            {% endif %}
+                            {% if notification.content_object.placa %}
+                            <li class="list-group-item"><strong>Placa:</strong> {{ notification.content_object.placa }}</li>
+                            {% endif %}
+                            {% if notification.content_object.motorista %}
+                            <li class="list-group-item"><strong>Motorista:</strong> {{ notification.content_object.motorista }}</li>
+                            {% endif %}
+                            {% if notification.content_object.local %}
+                            <li class="list-group-item"><strong>Local:</strong> {{ notification.content_object.local }}</li>
+                            {% endif %}
+                            {% if notification.content_object.tipo %}
+                            <li class="list-group-item"><strong>Tipo:</strong> {{ notification.content_object.tipo }}</li>
+                            {% endif %}
+                            {% if notification.content_object.data_hora %}
+                            <li class="list-group-item"><strong>Data/Hora:</strong> {{ notification.content_object.data_hora|date:'d/m/Y H:i' }}</li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                    <div class="d-flex justify-content-between align-items-center mt-2">
                         {% if notification.content_object %}
                         <a href="{% url 'notifications:view_notification' notification.id %}" class="btn btn-sm btn-primary">Ver detalhes</a>
                         {% endif %}
                         <small class="text-muted ms-2">{{ notification.created_at|date:"d/m/Y H:i" }}</small>
                     </div>
                 </div>
-                {% if not notification.read %}
-                <div class="ms-2">
-                    <span class="badge bg-primary rounded-circle" style="width: 10px; height: 10px;"></span>
-                </div>
-                {% endif %}
             </div>
         </div>
         {% empty %}
-        <div class="list-group-item text-center">
-            <p class="mb-0">Nenhuma notificação encontrada.</p>
+        <div class="col-12 text-center">
+            <div class="card p-4">
+                <p class="mb-0">Nenhuma notificação encontrada.</p>
+            </div>
         </div>
         {% endfor %}
     </div>
@@ -47,15 +66,15 @@
     font-size: 0.95rem;
     color: #555;
 }
-.list-group-item {
-    transition: background-color 0.3s;
+.card {
+    transition: box-shadow 0.3s, border-color 0.3s;
     cursor: pointer;
 }
-.list-group-item:hover {
-    background-color: #f8f9fa;
+.card:hover {
+    box-shadow: 0 0 16px #e8f4f8;
+    border-color: #0d6efd;
 }
-.list-group-item.list-group-item-info {
-    background-color: #e8f4f8;
+.card.border-primary {
     border-left: 4px solid #0d6efd;
 }
 </style>
@@ -100,12 +119,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateNotificationVisuals() {
-        document.querySelectorAll('.list-group-item').forEach(item => {
-            item.classList.remove('list-group-item-info');
+        document.querySelectorAll('.card').forEach(item => {
+            item.classList.remove('border-primary');
             const newBadge = item.querySelector('.badge.bg-primary');
             if (newBadge) newBadge.remove();
-            const circle = item.querySelector('.rounded-circle');
-            if (circle) circle.parentElement.remove();
         });
     }
 
@@ -113,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('[data-notification-id] a').forEach(link => {
         link.addEventListener('click', function(e) {
             const notificationId = this.closest('[data-notification-id]').dataset.notificationId;
-            const notificationItem = this.closest('.list-group-item');
+            const notificationItem = this.closest('.card');
             
             fetch(`/notifications/${notificationId}/mark-as-read/`, {
                 method: 'POST',
@@ -125,18 +142,14 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.status === 'success') {
                     updateUnreadCount(data.unread_count);
-                    notificationItem.classList.remove('list-group-item-info');
+                    notificationItem.classList.remove('border-primary');
                     notificationItem.querySelector('.badge.bg-primary')?.remove();
-                    notificationItem.querySelector('.rounded-circle')?.parentElement?.remove();
                 }
             });
         });
     });
 
-    // Atualizar a página a cada 120 segundos
-    setInterval(function() {
-        window.location.reload();
-    }, 120000); // 120 segundos
+    // Removido o reload automático da página
 });
 </script>
 {% endblock %} 

@@ -487,11 +487,11 @@
 
       socket.onclose = function(e) {
           console.log('WebSocket desconectado, tentando reconectar...');
-          // Tentar reconectar após 3 segundos
-          setTimeout(function() {
-              console.log('Reconectando WebSocket...');
-              window.location.reload();
-          }, 3000);
+          // Removido o reload automático para não atualizar a página
+          // setTimeout(function() {
+          //     console.log('Reconectando WebSocket...');
+          //     window.location.reload();
+          // }, 3000);
       };
 
       // Marcar notificação como lida quando visualizada
