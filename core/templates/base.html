@@ -423,15 +423,20 @@
   <script>
   // Função para atualizar todos os contadores de notificação
   function updateAllNotificationCounters(count) {
+      console.log('Atualizando contadores com count:', count);
+      
+      // Seleciona todos os elementos que podem conter contadores
       const counters = [
           document.getElementById('unread-count'),
           document.getElementById('notification-counter'),
           document.querySelector('.sidebar-menu .badge'),
-          ...document.querySelectorAll('.notification-counter') // Garante todos os badges do sino
+          ...document.querySelectorAll('.notification-counter'),
+          ...document.querySelectorAll('.badge.bg-danger') // Adiciona todos os badges de notificação
       ];
       
       counters.forEach(counter => {
           if (counter) {
+              console.log('Atualizando contador:', counter);
               if (count > 0) {
                   counter.textContent = count;
                   counter.style.display = 'inline-block';
@@ -444,27 +449,44 @@
 
   // Conectar ao WebSocket quando a página carregar
   document.addEventListener('DOMContentLoaded', function() {
+      console.log('Iniciando conexão WebSocket...');
+      
       const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
       const ws_path = ws_scheme + '://' + window.location.host + '/ws/notifications/';
       const socket = new WebSocket(ws_path);
 
+      socket.onopen = function(e) {
+          console.log('WebSocket conectado com sucesso');
+      };
+
       socket.onmessage = function(e) {
-          const data = JSON.parse(e.data);
-          if (data.type === 'notification_message') {
-              updateAllNotificationCounters(data.count);
+          console.log('Mensagem WebSocket recebida:', e.data);
+          try {
+              const data = JSON.parse(e.data);
+              if (data.type === 'notification_message') {
+                  updateAllNotificationCounters(data.count);
+              }
+          } catch (error) {
+              console.error('Erro ao processar mensagem WebSocket:', error);
           }
       };
 
+      socket.onerror = function(e) {
+          console.error('Erro no WebSocket:', e);
+      };
+
       socket.onclose = function(e) {
-          console.log('WebSocket connection closed');
+          console.log('WebSocket desconectado, tentando reconectar...');
           // Tentar reconectar após 3 segundos
           setTimeout(function() {
+              console.log('Reconectando WebSocket...');
               window.location.reload();
           }, 3000);
       };
 
       // Marcar notificação como lida quando visualizada
       const markNotificationAsRead = function(notificationId) {
+          console.log('Marcando notificação como lida:', notificationId);
           fetch(`/notifications/${notificationId}/mark-as-read/`, {
               method: 'POST',
               headers: {
@@ -474,18 +496,23 @@
           })
           .then(response => response.json())
           .then(data => {
+              console.log('Resposta da marcação como lida:', data);
               if (data.status === 'success') {
                   updateAllNotificationCounters(data.unread_count);
               }
+          })
+          .catch(error => {
+              console.error('Erro ao marcar notificação como lida:', error);
           });
       };
 
       // Adicionar evento de clique para marcar notificações como lidas
-      document.querySelectorAll('[data-notification-id]').forEach(notification => {
-          notification.addEventListener('click', function() {
-              const notificationId = this.dataset.notificationId;
+      document.addEventListener('click', function(e) {
+          const notificationElement = e.target.closest('[data-notification-id]');
+          if (notificationElement) {
+              const notificationId = notificationElement.dataset.notificationId;
               markNotificationAsRead(notificationId);
-          });
+          }
       });
   });
   </script>
