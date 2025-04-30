@@ -668,36 +668,25 @@ class OcorrenciaTransporteForm(forms.ModelForm):
             'tipo_ocorrencia', 'data_hora_ocorrencia'
         ]
         widgets = {
-            'data_hora_ocorrencia': forms.DateTimeInput(
-                attrs={'type': 'datetime-local'},
-                format='%Y-%m-%dT%H:%M'
+            'data_hora_ocorrencia': forms.DateInput(
+                attrs={'type': 'date', 'placeholder': 'Selecione a data da ocorrência'},
+                format='%Y-%m-%d'
             ),
-            'endereco': forms.Textarea(attrs={'rows': 3}),
-            'latitude': forms.NumberInput(attrs={'step': '0.000001'}),
-            'longitude': forms.NumberInput(attrs={'step': '0.000001'}),
+            'endereco': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Ex: Rua Exemplo, 123, Bairro, Cidade'}),
+            'latitude': forms.NumberInput(attrs={'step': '0.000001', 'placeholder': 'Ex: -23.550520'}),
+            'longitude': forms.NumberInput(attrs={'step': '0.000001', 'placeholder': 'Ex: -46.633308'}),
+            'transportadora': forms.TextInput(attrs={'placeholder': 'Ex: Transportes Brasil Ltda.'}),
+            'placa': forms.TextInput(attrs={'placeholder': 'Ex: ABC1234'}),
+            'carreta': forms.TextInput(attrs={'placeholder': 'Ex: DEF5678'}),
+            'motorista': forms.TextInput(attrs={'placeholder': 'Nome completo do motorista'}),
+            'cpf': forms.TextInput(attrs={'data-mask': '000.000.000-00', 'placeholder': '000.000.000-00'}),
+            'telefone': forms.TextInput(attrs={'data-mask': '(00) 00000-0000', 'placeholder': '(00) 00000-0000'}),
+            'local': forms.TextInput(attrs={'placeholder': 'Ex: Rodovia BR-101, km 200'}),
+            'tipo_ocorrencia': forms.Select(attrs={'placeholder': 'Selecione o tipo de ocorrência'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Adiciona classes Bootstrap aos campos
         for field in self.fields:
-            self.fields[field].widget.attrs.update({'class': 'form-control'})
-        
-        # Máscaras e placeholders
-        self.fields['cpf'].widget.attrs.update({
-            'data-mask': '000.000.000-00',
-            'placeholder': '000.000.000-00'
-        })
-        self.fields['telefone'].widget.attrs.update({
-            'data-mask': '(00) 00000-0000',
-            'placeholder': '(00) 00000-0000'
-        })
-        self.fields['placa'].widget.attrs.update({
-            'placeholder': 'ABC1234',
-            'pattern': '[A-Za-z]{3}[0-9][A-Za-z0-9][0-9]{2}'
-        })
-        self.fields['carreta'].widget.attrs.update({
-            'placeholder': 'ABC1234',
-            'pattern': '[A-Za-z]{3}[0-9][A-Za-z0-9][0-9]{2}'
-        })
+            self.fields[field].widget.attrs.setdefault('class', 'form-control')
 
