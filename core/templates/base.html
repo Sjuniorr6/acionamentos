@@ -426,7 +426,8 @@
       const counters = [
           document.getElementById('unread-count'),
           document.getElementById('notification-counter'),
-          document.querySelector('.sidebar-menu .badge')
+          document.querySelector('.sidebar-menu .badge'),
+          ...document.querySelectorAll('.notification-counter') // Garante todos os badges do sino
       ];
       
       counters.forEach(counter => {
