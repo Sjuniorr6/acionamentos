@@ -308,6 +308,7 @@
                     <i class="bi bi-truck" style="font-size: 1.5rem;"></i>
                 </a>
                
+                {% if user.groups.filter.name == 'Gerência' %}
                 <div class="notification-bell">
                     <a href="{% url 'notifications:list' %}" class="btn btn-link position-relative">
                         <i class="fas fa-bell text-white" style="font-size: 1.5rem;"></i>
@@ -318,6 +319,7 @@
                         {% endif %}
                     </a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -372,8 +374,17 @@
       if (notificationBell) {
           if (count > 0) {
               notificationBell.style.display = 'inline-block';
+              // Garantir que a bola vermelha está visível
+              const badge = notificationBell.querySelector('.badge');
+              if (badge) {
+                  badge.style.display = 'inline-block';
+              }
           } else {
-              notificationBell.style.display = 'none';
+              // Não esconder o sino, apenas a bola vermelha
+              const badge = notificationBell.querySelector('.badge');
+              if (badge) {
+                  badge.style.display = 'none';
+              }
           }
       }
   }

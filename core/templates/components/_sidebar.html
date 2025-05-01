@@ -172,6 +172,7 @@
       </a>
     </li>
     {% endif %}
+    {% if user.groups.filter.name == 'Gerência' %}
     <li>
       <a href="{% url 'notifications:list' %}" class="position-relative">
         <i class="bi bi-bell"></i>
@@ -183,6 +184,7 @@
         {% endif %}
       </a>
     </li>
+    {% endif %}
     <!-- Botão Sair -->
     <li style="margin-top: 10px">
       <form action="{% url 'logout' %}" method="POST" style="display: inline">
