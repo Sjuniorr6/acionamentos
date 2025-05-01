@@ -363,8 +363,10 @@
               if (count > 0) {
                   counter.textContent = count;
                   counter.style.display = 'inline-block';
+                  counter.style.visibility = 'visible';
               } else {
                   counter.style.display = 'none';
+                  counter.style.visibility = 'hidden';
               }
           }
       });
@@ -374,16 +376,20 @@
       if (notificationBell) {
           if (count > 0) {
               notificationBell.style.display = 'inline-block';
+              notificationBell.style.visibility = 'visible';
               // Garantir que a bola vermelha está visível
               const badge = notificationBell.querySelector('.badge');
               if (badge) {
                   badge.style.display = 'inline-block';
+                  badge.style.visibility = 'visible';
+                  badge.textContent = count;
               }
           } else {
               // Não esconder o sino, apenas a bola vermelha
               const badge = notificationBell.querySelector('.badge');
               if (badge) {
                   badge.style.display = 'none';
+                  badge.style.visibility = 'hidden';
               }
           }
       }
