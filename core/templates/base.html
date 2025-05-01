@@ -312,11 +312,9 @@
                 <div class="notification-bell">
                     <a href="{% url 'notifications:list' %}" class="btn btn-link position-relative">
                         <i class="fas fa-bell text-white" style="font-size: 1.5rem;"></i>
-                        {% if request.unread_notifications_count > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-counter">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-counter" style="display: none;">
                             {{ request.unread_notifications_count }}
                         </span>
-                        {% endif %}
                     </a>
                 </div>
                 {% endif %}
@@ -344,6 +342,14 @@
 
   <!-- WebSocket para notificações em tempo real -->
   <script>
+  // Função para animar a bola de notificação
+  function animateNotificationBadge(badge) {
+      badge.style.display = 'inline-block';
+      badge.style.animation = 'none';
+      badge.offsetHeight; // Trigger reflow
+      badge.style.animation = 'pulse 0.5s ease-in-out';
+  }
+
   // Função para atualizar todos os contadores de notificação
   function updateAllNotificationCounters(count) {
       console.log('Atualizando contadores com count:', count);
@@ -363,10 +369,9 @@
               if (count > 0) {
                   counter.textContent = count;
                   counter.style.display = 'inline-block';
-                  counter.style.visibility = 'visible';
+                  animateNotificationBadge(counter);
               } else {
                   counter.style.display = 'none';
-                  counter.style.visibility = 'hidden';
               }
           }
       });
@@ -374,22 +379,14 @@
       // Atualizar a bola vermelha de notificação
       const notificationBell = document.querySelector('.notification-bell');
       if (notificationBell) {
-          if (count > 0) {
-              notificationBell.style.display = 'inline-block';
-              notificationBell.style.visibility = 'visible';
-              // Garantir que a bola vermelha está visível
-              const badge = notificationBell.querySelector('.badge');
-              if (badge) {
-                  badge.style.display = 'inline-block';
-                  badge.style.visibility = 'visible';
+          const badge = notificationBell.querySelector('.badge');
+          if (badge) {
+              if (count > 0) {
                   badge.textContent = count;
-              }
-          } else {
-              // Não esconder o sino, apenas a bola vermelha
-              const badge = notificationBell.querySelector('.badge');
-              if (badge) {
+                  badge.style.display = 'inline-block';
+                  animateNotificationBadge(badge);
+              } else {
                   badge.style.display = 'none';
-                  badge.style.visibility = 'hidden';
               }
           }
       }
@@ -427,43 +424,7 @@
 
       socket.onclose = function(e) {
           console.log('WebSocket desconectado, tentando reconectar...');
-          // Removido o reload automático para não atualizar a página
-          // setTimeout(function() {
-          //     console.log('Reconectando WebSocket...');
-          //     window.location.reload();
-          // }, 3000);
       };
-
-      // Marcar notificação como lida quando visualizada
-      const markNotificationAsRead = function(notificationId) {
-          console.log('Marcando notificação como lida:', notificationId);
-          fetch(`/notifications/${notificationId}/mark-as-read/`, {
-              method: 'POST',
-              headers: {
-                  'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                  'Content-Type': 'application/json'
-              }
-          })
-          .then(response => response.json())
-          .then(data => {
-              console.log('Resposta da marcação como lida:', data);
-              if (data.status === 'success') {
-                  updateAllNotificationCounters(data.unread_count);
-              }
-          })
-          .catch(error => {
-              console.error('Erro ao marcar notificação como lida:', error);
-          });
-      };
-
-      // Adicionar evento de clique para marcar notificações como lidas
-      document.addEventListener('click', function(e) {
-          const notificationElement = e.target.closest('[data-notification-id]');
-          if (notificationElement) {
-              const notificationId = notificationElement.dataset.notificationId;
-              markNotificationAsRead(notificationId);
-          }
-      });
   });
   </script>
 </body>
