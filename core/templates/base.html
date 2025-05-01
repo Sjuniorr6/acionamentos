@@ -366,6 +366,16 @@
               }
           }
       });
+      
+      // Atualizar a bola vermelha de notificação
+      const notificationBell = document.querySelector('.notification-bell');
+      if (notificationBell) {
+          if (count > 0) {
+              notificationBell.style.display = 'inline-block';
+          } else {
+              notificationBell.style.display = 'none';
+          }
+      }
   }
 
   // Conectar ao WebSocket quando a página carregar
