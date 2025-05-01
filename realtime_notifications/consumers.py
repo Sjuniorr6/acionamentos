@@ -15,6 +15,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
             
+            # Adicionar ao grupo global
+            await self.channel_layer.group_add(
+                "notifications_all",
+                self.channel_name
+            )
+            
             await self.accept()
             
             # Enviar contagem inicial
@@ -29,6 +35,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             # Remover do grupo do usuário
             await self.channel_layer.group_discard(
                 self.user_group_name,
+                self.channel_name
+            )
+            
+            # Remover do grupo global
+            await self.channel_layer.group_discard(
+                "notifications_all",
                 self.channel_name
             )
 
