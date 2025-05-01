@@ -41,7 +41,7 @@ class Notification(models.Model):
         for user in User.objects.all():
             unread_count = Notification.objects.filter(recipient=user, read=False).count()
             async_to_sync(channel_layer.group_send)(
-                f"user_{user.id}",
+                "notifications_all",  # Grupo global para todos os usuários
                 {
                     "type": "notification_message",
                     "count": unread_count

@@ -10,10 +10,10 @@ def send_notification(user, title, message):
         message=message
     )
 
-    # Enviar a notificação via WebSocket
+    # Enviar a notificação via WebSocket para todos os usuários conectados
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        f"notifications_{user.id}",
+        "notifications_all",  # Grupo global para todos os usuários
         {
             "type": "notification_message",
             "message": {
