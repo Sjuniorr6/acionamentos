@@ -172,7 +172,7 @@
       </a>
     </li>
     {% endif %}
-    {% if user.groups.filter.name == 'Gerência' %}
+    {% if user.groups.filter.name == 'gerencia' or user.is_superuser %}
     <li>
       <a href="{% url 'notifications:list' %}" class="position-relative">
         <i class="bi bi-bell"></i>
