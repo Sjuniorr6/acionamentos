@@ -172,7 +172,6 @@
       </a>
     </li>
     {% endif %}
-    {% if perms.realtime_notifications.view_notification %}
     <li>
       <a href="{% url 'notifications:list' %}" class="position-relative">
         <i class="bi bi-bell"></i>
@@ -184,7 +183,6 @@
         {% endif %}
       </a>
     </li>
-    {% endif %}
     <!-- Botão Sair -->
     <li style="margin-top: 10px">
       <form action="{% url 'logout' %}" method="POST" style="display: inline">

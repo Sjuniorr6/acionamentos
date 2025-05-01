@@ -309,14 +309,12 @@
                 </a>
                
                 <div class="notification-bell">
-                  {% if perms.formacompanhamento.view_agente %}
                     <a href="{% url 'notifications:list' %}" class="btn btn-link position-relative">
                         <i class="fas fa-bell text-white" style="font-size: 1.5rem;"></i>
                         {% if request.unread_notifications_count > 0 %}
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-counter">
                             {{ request.unread_notifications_count }}
                         </span>
-                        {% endif %}
                         {% endif %}
                     </a>
                 </div>
@@ -380,6 +378,7 @@
 
       socket.onopen = function(e) {
           console.log('WebSocket conectado com sucesso');
+          console.log('Usuário conectado:', '{{ user.username }}');
       };
 
       socket.onmessage = function(e) {
@@ -387,6 +386,7 @@
           try {
               const data = JSON.parse(e.data);
               if (data.type === 'notification_message') {
+                  console.log('Notificação recebida:', data);
                   updateAllNotificationCounters(data.count);
               }
           } catch (error) {
