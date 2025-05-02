@@ -119,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'pt-br'          # Idioma: Português do Brasil
 TIME_ZONE = 'America/Sao_Paulo'    # Fuso horário: São Paulo
 USE_I18N = True
-USE_TZ = False
+USE_TZ = True  # Enable timezone support
 
 # Configuração dos arquivos estáticos
 STATIC_URL = '/static/'

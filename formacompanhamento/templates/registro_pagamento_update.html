@@ -858,12 +858,17 @@ style="{% if form.prestador3.value %}display: block;{% else %}display: none;{% e
     // 1) Função para registrar a data/hora atual
     function registrarDataHora(inputId, btnId) {
       var agora = new Date();
-      var ano = agora.getFullYear();
-      var mes = ("0" + (agora.getMonth() + 1)).slice(-2);
-      var dia = ("0" + agora.getDate()).slice(-2);
-      var hora = ("0" + agora.getHours()).slice(-2);
-      var minutos = ("0" + agora.getMinutes()).slice(-2);
-      var segundos = ("0" + agora.getSeconds()).slice(-2);
+      // Ajusta para o fuso horário de São Paulo (UTC-3)
+      var offset = -3; // Horário de Brasília
+      var utc = agora.getTime() + (agora.getTimezoneOffset() * 60000);
+      var brasil = new Date(utc + (3600000 * offset));
+      
+      var ano = brasil.getFullYear();
+      var mes = ("0" + (brasil.getMonth() + 1)).slice(-2);
+      var dia = ("0" + brasil.getDate()).slice(-2);
+      var hora = ("0" + brasil.getHours()).slice(-2);
+      var minutos = ("0" + brasil.getMinutes()).slice(-2);
+      var segundos = ("0" + brasil.getSeconds()).slice(-2);
       var dataHoraFormatada = ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
 
       var inputField = document.getElementById(inputId);
