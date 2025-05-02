@@ -316,17 +316,13 @@ document.getElementById("{{ form.servicos.id_for_label }}").addEventListener("ch
 // Função registrarDataHora (inalterada)
 function registrarDataHora(inputId, btnId) {
     var agora = new Date();
-    // Ajusta para o fuso horário de São Paulo (UTC-3)
-    var offset = -3; // Horário de Brasília
-    var utc = agora.getTime() + (agora.getTimezoneOffset() * 60000);
-    var brasil = new Date(utc + (3600000 * offset));
-    
-    var ano = brasil.getFullYear();
-    var mes = ("0" + (brasil.getMonth() + 1)).slice(-2);
-    var dia = ("0" + brasil.getDate()).slice(-2);
-    var hora = ("0" + brasil.getHours()).slice(-2);
-    var minutos = ("0" + brasil.getMinutes()).slice(-2);
-    var segundos = ("0" + brasil.getSeconds()).slice(-2);
+    // Envia a data/hora em UTC para que o Django faça a conversão correta
+    var ano = agora.getUTCFullYear();
+    var mes = ("0" + (agora.getUTCMonth() + 1)).slice(-2);
+    var dia = ("0" + agora.getUTCDate()).slice(-2);
+    var hora = ("0" + agora.getUTCHours()).slice(-2);
+    var minutos = ("0" + agora.getUTCMinutes()).slice(-2);
+    var segundos = ("0" + agora.getUTCSeconds()).slice(-2);
     var dataHoraFormatada = ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
     console.log("[registrarDataHora] Input ID:", inputId, "Valor calculado:", dataHoraFormatada);
     

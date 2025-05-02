@@ -154,6 +154,7 @@ form .form-control {
                     <th>Chegada</th>
                     <th>Data/Hora Final</th>
                     <th>Prestador</th>
+                    <th>Placa</th>
                     <th>Lat/Long do Agente</th>
                     <th>Solicitante</th>
                     <th>Qtd. Agentes</th>
@@ -191,6 +192,7 @@ form .form-control {
                         <td>{{ registro.data_hora_chegada|date:"d/m/Y H:i" }}</td>
                         <td>{{ registro.data_hora_final|date:"d/m/Y H:i" }}</td>
                         <td>{{ registro.prestador }}</td>
+                        <td>{{ registro.placas1 }}</td>
                         <td class="prestador-endereco" data-prestador="{{ registro.prestador }}"></td>
                         <td>{{ registro.solicitante }}</td>
                         <td>{{ registro.quantidade_agentes }}</td>
