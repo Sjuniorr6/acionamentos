@@ -127,6 +127,9 @@ form .form-control {
             <input class="form-control" type="text" name="prestador" placeholder="Filtrar por Prestador" value="{{ request.GET.prestador }}">
         </div>
         <div class="col-md-2">
+            <input class="form-control" type="text" name="placas1" placeholder="Filtrar por Placas" value="{{ request.GET.placas1 }}">
+        </div>
+        <div class="col-md-2">
             <select class="form-control" name="status">
                 <option value="">Filtrar por Status</option>
                 {% for status in status_choices %}

@@ -91,6 +91,7 @@ class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, Lis
         filtro_cliente = self.request.GET.get('cliente', '').strip()
         filtro_prestador = self.request.GET.get('prestador', '').strip()
         filtro_status = self.request.GET.get('status', '').strip()
+        filtro_placa = self.request.GET.get('placas1', '').strip()
 
         # Se o campo "id" for um número, filtra por ID exato
         if filtro_id.isdigit():
@@ -120,7 +121,8 @@ class RegistroPagamentoListView(LoginRequiredMixin, PermissionRequiredMixin, Lis
             registro.km_excedente = registro.calcular_km_excedente()
             registro.valor_total_km_excedente = registro.calcular_valor_total_km_excedente()
             registro.total_acionamento = registro.calcular_total_acionamento()
-
+        if filtro_placa:
+            queryset = queryset.filter(placas1__iexact=filtro_placa)
         return queryset
 
 
