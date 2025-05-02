@@ -3,6 +3,7 @@
 
 {% block content %}
 {% include "components/_header.html" %}
+{% block extra_head %}
 <style>
 /* Estilos para o alerta de erro */
 #error-alert {
@@ -94,7 +95,7 @@ form .form-control {
 .my-btn-secondary { background-color: #83b9a2; color: #fff; }
 .my-btn:hover { opacity: 0.9; }
 </style>
-
+{% endblock %}
 <!-- Alerta de erro fixo -->
 <div id="error-alert" class="alert alert-danger text-center" role="alert"></div>
 
