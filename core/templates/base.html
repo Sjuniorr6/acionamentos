@@ -307,7 +307,7 @@
                 <a href="{% url 'formacompanhamento:ocorrencia_transporte_create' %}" class="btn btn-link text-white me-3" title="Nova Ocorrência de Transporte">
                     <i class="bi bi-truck" style="font-size: 1.5rem;"></i>
                 </a>
-               
+               {% if perms.notifications.view_notification %}
                 <div class="notification-bell">
                     <a href="{% url 'notifications:list' %}" class="btn btn-link position-relative">
                         <i class="fas fa-bell text-white" style="font-size: 1.5rem;"></i>
