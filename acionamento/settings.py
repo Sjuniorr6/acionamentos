@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'channels',  # Django Channels
     'realtime_notifications',  # Nosso novo app
+    'django_celery_beat',
+    'django_celery_results',
 ]
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -91,12 +93,12 @@ DATABASES = {
         'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
         'OPTIONS': {
-    'sslmode': 'verify-full',
-    'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
-}
-        
+            'sslmode': 'verify-full',
+            'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
+            'options': '-c timezone=America/Sao_Paulo'
         }
     }
+}
 
 
 # Validação de senhas
@@ -157,3 +159,8 @@ CHANNEL_LAYERS = {
 # Configurações do Celery
 CELERY_BROKER_URL = "rediss://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0?ssl_cert_reqs=CERT_NONE"
 CELERY_RESULT_BACKEND = "rediss://master.redis-gsacionamento3.7vyl5x.use1.cache.amazonaws.com:6379/0?ssl_cert_reqs=CERT_NONE"
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
