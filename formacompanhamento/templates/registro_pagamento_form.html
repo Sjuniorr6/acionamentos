@@ -25,12 +25,45 @@ form input, form select, form textarea {
     width: 100% !important;
 }
 
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.alert-danger {
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
 </style>
 
 <div class="container mt-4">
   <h3 class="text-white">
     {% if form.instance.pk %}Editar Pagamento{% else %}Novo Acionamento{% endif %}
   </h3>
+
+  <!-- Exibição de erros gerais do formulário -->
+  {% if form.errors %}
+  <div class="alert alert-danger">
+    <h4 class="alert-heading">Por favor, corrija os seguintes erros:</h4>
+    <ul class="mb-0">
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
   <div class="card mb-4">
     <div class="card-body">
       <form method="post" action="{% url 'formacompanhamento:registro_pagamento_create' %}" enctype="multipart/form-data">
@@ -39,17 +72,21 @@ form input, form select, form textarea {
         <!-- CAMPOS CLIENTE E PRESTADOR -->
         <h4 class="mt-2">Tipo de Serviço</h4>
         <div class="row mb-3">
-          <div class="col-md-4">
+          <div class="col-md-4 form-group">
             <label for="id_tipo_servicos" class="form-label">Tipo de Serviço</label>
-            {{ form.tipo_servicos.errors }}
-            {{ form.tipo_servicos }}
+            {{ form.tipo_servicos|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% if form.tipo_servicos.errors %}
+              <div class="error-message">{{ form.tipo_servicos.errors.0 }}</div>
+            {% endif %}
           </div></div>
         <h4 class="mt-2">Dados do Cliente</h4>
         <div class="row mb-3">
-          <div class="col-md-4">
+          <div class="col-md-4 form-group">
             <label for="id_cliente" class="form-label">Cliente</label>
-            {{ form.cliente.errors }}
-            {{ form.cliente }}
+            {{ form.cliente|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% if form.cliente.errors %}
+              <div class="error-message">{{ form.cliente.errors.0 }}</div>
+            {% endif %}
           </div>
           <div class="col-md-4">
             <label for="id_protocolo" class="form-label">Protocolo</label>
@@ -133,7 +170,10 @@ form input, form select, form textarea {
         <div class="row mb-3">
           <div class="col-md-2">
             <label for="id_prestador" class="form-label">Prestador</label>
-            {{ form.prestador }}
+            {{ form.prestador|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% if form.prestador.errors %}
+              <div class="error-message">{{ form.prestador.errors.0 }}</div>
+            {% endif %}
           </div>
           <div class="col-md-2">
             <label for="id_acionamento" class="form-label">Valor de Acionamento</label>

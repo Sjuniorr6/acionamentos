@@ -14,10 +14,43 @@
 form input, form select, form textarea {
     width: 100% !important;
 }
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.alert-danger {
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
 </style>
 
 <div class="container mt-5">
   <h2 class="text-white">Cadastro de Prestador</h2>
+  
+  <!-- Exibição de erros gerais do formulário -->
+  {% if form.errors %}
+  <div class="alert alert-danger">
+    <h4 class="alert-heading">Por favor, corrija os seguintes erros:</h4>
+    <ul class="mb-0">
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
   <div class="card shadow-lg">
     <div class="card-body">
       <form id="prestadorForm" method="post" enctype="multipart/form-data" novalidate>
@@ -25,26 +58,26 @@ form input, form select, form textarea {
 
         <!-- Linha 1: Nome, CPF/CNPJ e Vencimento CNH -->
         <div class="row mb-3">
-          <div class="col-md-4">
+          <div class="col-md-4 form-group">
             <label for="{{ form.Nome.id_for_label }}" class="form-label">Nome</label>
-            {{ form.Nome }}
-            {% for error in form.Nome.errors %}
-              <div class="text-danger">{{ error }}</div>
-            {% endfor %}
+            {{ form.Nome|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% if form.Nome.errors %}
+              <div class="error-message">{{ form.Nome.errors.0 }}</div>
+            {% endif %}
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 form-group">
             <label for="{{ form.cpf_cnpj.id_for_label }}" class="form-label">CPF/CNPJ</label>
-            {{ form.cpf_cnpj }}
-            {% for error in form.cpf_cnpj.errors %}
-              <div class="text-danger">{{ error }}</div>
-            {% endfor %}
+            {{ form.cpf_cnpj|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% if form.cpf_cnpj.errors %}
+              <div class="error-message">{{ form.cpf_cnpj.errors.0 }}</div>
+            {% endif %}
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 form-group">
             <label for="{{ form.vencimento_cnh.id_for_label }}" class="form-label">Vencimento CNH</label>
-            {{ form.vencimento_cnh }}
-            {% for error in form.vencimento_cnh.errors %}
-              <div class="text-danger">{{ error }}</div>
-            {% endfor %}
+            {{ form.vencimento_cnh|add_class:"form-control"|add_error_class:"is-invalid" }}
+            {% if form.vencimento_cnh.errors %}
+              <div class="error-message">{{ form.vencimento_cnh.errors.0 }}</div>
+            {% endif %}
           </div>
         </div>
 

@@ -10,121 +10,261 @@
     margin: auto; /* Centraliza o container */
     padding: 20px; /* Adiciona um espaçamento interno */
   }
-  </style>
+  
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .is-invalid {
+    border-color: #dc3545;
+  }
+  
+  .alert-danger {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+</style>
 
 <div class="container mt-5">
   <h1 class="text-white">Cadastro de Clientes</h1>
+  
+  <!-- Exibição de erros gerais do formulário -->
+  {% if form.errors %}
+  <div class="alert alert-danger">
+    <h4 class="alert-heading">Por favor, corrija os seguintes erros:</h4>
+    <ul class="mb-0">
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  
   <div class="container py-4 bg-white shadow-sm rounded text-dark">
     <h2>{% if form.instance.pk %}Editar Cliente{% else %}Novo Cliente{% endif %}</h2>
-    <form method="post" novalidate enctype="multipart/form-data">
+    <form method="post" novalidate enctype="multipart/form-data" id="clienteForm">
       {% csrf_token %}
       
       <!-- Linha 1: Nome, CNPJ e Telefone -->
       <div class="row mb-3">
-        <div class="col-md-2">
+        <div class="col-md-2 form-group">
           <label for="id_razao_social" class="form-label">Razão Social</label>
-          {{ form.razao_social|add_class:"form-control" }}
+          {{ form.razao_social|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.razao_social.errors %}
+            <div class="error-message">{{ form.razao_social.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 form-group">
           <label for="id_nome" class="form-label">Nome Fantasia</label>
-          {{ form.nome|add_class:"form-control" }}
+          {{ form.nome|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.nome.errors %}
+            <div class="error-message">{{ form.nome.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 form-group">
           <label for="id_cnpj" class="form-label">CNPJ</label>
-          {{ form.cnpj|add_class:"form-control" }}
+          {{ form.cnpj|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.cnpj.errors %}
+            <div class="error-message">{{ form.cnpj.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 form-group">
           <label for="id_atividade_principal" class="form-label">Atividade Principal</label>
-          {{ form.atividade_principal|add_class:"form-control" }}
+          {{ form.atividade_principal|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.atividade_principal.errors %}
+            <div class="error-message">{{ form.atividade_principal.errors.0 }}</div>
+          {% endif %}
         </div>
-          <div class="col-md-2">
-            <label for="id_inscricao_estadual" class="form-label">Inscrição Estadual</label>
-            {{ form.inscricao_estadual|add_class:"form-control" }}
-          </div>
-            <div class="col-md-2">
-              <label for="id_inscricao_municipal" class="form-label">Inscrição Municipal</label>
-              {{ form.inscricao_municipal|add_class:"form-control" }}
-           
-            
-          
+        <div class="col-md-2 form-group">
+          <label for="id_inscricao_estadual" class="form-label">Inscrição Estadual</label>
+          {{ form.inscricao_estadual|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.inscricao_estadual.errors %}
+            <div class="error-message">{{ form.inscricao_estadual.errors.0 }}</div>
+          {% endif %}
         </div>
-       
+        <div class="col-md-2 form-group">
+          <label for="id_inscricao_municipal" class="form-label">Inscrição Municipal</label>
+          {{ form.inscricao_municipal|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.inscricao_municipal.errors %}
+            <div class="error-message">{{ form.inscricao_municipal.errors.0 }}</div>
+          {% endif %}
+        </div>
       </div>
       <div class="row mb-3">
-      
-        <div class="col-md-4">
-          <label for="id_endereco" class="form-label">Endereço</label>
-          {{ form.endereco|add_class:"form-control" }}
-        </div>
-        <div class="col-md-2">
-          <label for="id_cep" class="form-label">CEP</label>
-          {{ form.cep|add_class:"form-control" }}
-        </div>
-        <div class="col-md-1">
-          <label for="id_estado" class="form-label">Estado</label>
-          {{ form.estado|add_class:"form-control" }}
-        </div>
-     
-        <div class="col-md-2">
-          <label for="id_cidade" class="form-label">Cidade</label>
-          {{ form.cidade|add_class:"form-control" }}
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-2 form-group">
           <label for="id_telefone" class="form-label">Telefone</label>
-          {{ form.telefone|add_class:"form-control" }}
-          <hr>
+          {{ form.telefone|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.telefone.errors %}
+            <div class="error-message">{{ form.telefone.errors.0 }}</div>
+          {% endif %}
         </div>
-      </div>   
-<h3>Representantes</h3>
+        <div class="col-md-2 form-group">
+          <label for="id_email" class="form-label">Email</label>
+          {{ form.email|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.email.errors %}
+            <div class="error-message">{{ form.email.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_cep" class="form-label">CEP</label>
+          {{ form.cep|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.cep.errors %}
+            <div class="error-message">{{ form.cep.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_estado" class="form-label">Estado</label>
+          {{ form.estado|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.estado.errors %}
+            <div class="error-message">{{ form.estado.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_cidade" class="form-label">Cidade</label>
+          {{ form.cidade|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.cidade.errors %}
+            <div class="error-message">{{ form.cidade.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_bairro" class="form-label">Bairro</label>
+          {{ form.bairro|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.bairro.errors %}
+            <div class="error-message">{{ form.bairro.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
       <div class="row mb-3">
-
-        <div class="col-md-3">
-          <label for="id_representante_legal" class="form-label"> Representante Legal</label>
-          {{ form.representante_legal|add_class:"form-control" }}<br>
+        <div class="col-md-4 form-group">
+          <label for="id_endereco" class="form-label">Endereço</label>
+          {{ form.endereco|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.endereco.errors %}
+            <div class="error-message">{{ form.endereco.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-3">
-          <label for="id_contato_legal" class="form-label"> Telefone</label>
-          {{ form.contato_legal|add_class:"form-control" }}<br>
+        <div class="col-md-2 form-group">
+          <label for="id_numero" class="form-label">Número</label>
+          {{ form.numero|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.numero.errors %}
+            <div class="error-message">{{ form.numero.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-3">
-          <label for="id_email_legal" class="form-label"> E-mail</label>
-          {{ form.email_legal|add_class:"form-control" }}<br>
+        <div class="col-md-2 form-group">
+          <label for="id_complemento" class="form-label">Complemento</label>
+          {{ form.complemento|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.complemento.errors %}
+            <div class="error-message">{{ form.complemento.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-3">
-          <label for="id_cpf_cnpj" class="form-label"> CPF/CNPJ</label>
-          {{ form.cpf_cnpj|add_class:"form-control" }}
-          <br>
+        <div class="col-md-2 form-group">
+          <label for="id_representante" class="form-label">Representante</label>
+          {{ form.representante|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.representante.errors %}
+            <div class="error-message">{{ form.representante.errors.0 }}</div>
+          {% endif %}
         </div>
-
-        <div class="row mb-3">
-
-        <div class="col-md-2">
-          <label for="id_representante_financeiro" class="form-label"> Financeiro</label>
-          {{ form.representante_financeiro|add_class:"form-control" }}
+        <div class="col-md-2 form-group">
+          <label for="id_cargo" class="form-label">Cargo</label>
+          {{ form.cargo|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.cargo.errors %}
+            <div class="error-message">{{ form.cargo.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-2">
-          <label for="id_contato_financeiro" class="form-label"> Contato Financeiro</label>
-          {{ form.contato_financeiro|add_class:"form-control" }}
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-2 form-group">
+          <label for="id_telefone_representante" class="form-label">Telefone Representante</label>
+          {{ form.telefone_representante|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.telefone_representante.errors %}
+            <div class="error-message">{{ form.telefone_representante.errors.0 }}</div>
+          {% endif %}
         </div>
-        
-        <div class="col-md-2">
-          <label for="id_email_financeiro" class="form-label"> E-mail Financeiro</label>
-          {{ form.email_financeiro|add_class:"form-control" }}
+        <div class="col-md-2 form-group">
+          <label for="id_email_representante" class="form-label">Email Representante</label>
+          {{ form.email_representante|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.email_representante.errors %}
+            <div class="error-message">{{ form.email_representante.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-2">
-          <label for="id_representante_operacional" class="form-label"> Operacional</label>
-          {{ form.representante_operacional|add_class:"form-control" }}
+        <div class="col-md-2 form-group">
+          <label for="id_observacoes" class="form-label">Observações</label>
+          {{ form.observacoes|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.observacoes.errors %}
+            <div class="error-message">{{ form.observacoes.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-2">
-          <label for="id_contato_operacional" class="form-label"> Contato Operacional</label>
-          {{ form.contato_operacional|add_class:"form-control" }}
+        <div class="col-md-2 form-group">
+          <label for="id_status" class="form-label">Status</label>
+          {{ form.status|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.status.errors %}
+            <div class="error-message">{{ form.status.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-2">
-          <label for="id_email_operacional" class="form-label"> E-mail Operacional</label>
-          {{ form.email_operacional|add_class:"form-control" }}
+        <div class="col-md-2 form-group">
+          <label for="id_prioridade" class="form-label">Prioridade</label>
+          {{ form.prioridade|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.prioridade.errors %}
+            <div class="error-message">{{ form.prioridade.errors.0 }}</div>
+          {% endif %}
         </div>
+        <div class="col-md-2 form-group">
+          <label for="id_ultimo_contato" class="form-label">Último Contato</label>
+          {{ form.ultimo_contato|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.ultimo_contato.errors %}
+            <div class="error-message">{{ form.ultimo_contato.errors.0 }}</div>
+          {% endif %}
         </div>
-        
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-2 form-group">
+          <label for="id_proximo_contato" class="form-label">Próximo Contato</label>
+          {{ form.proximo_contato|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.proximo_contato.errors %}
+            <div class="error-message">{{ form.proximo_contato.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_acao" class="form-label">Ação</label>
+          {{ form.acao|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.acao.errors %}
+            <div class="error-message">{{ form.acao.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_agente" class="form-label">Agente</label>
+          {{ form.agente|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.agente.errors %}
+            <div class="error-message">{{ form.agente.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_prestador1" class="form-label">Prestador 1</label>
+          {{ form.prestador1|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.prestador1.errors %}
+            <div class="error-message">{{ form.prestador1.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_prestador2" class="form-label">Prestador 2</label>
+          {{ form.prestador2|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.prestador2.errors %}
+            <div class="error-message">{{ form.prestador2.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-2 form-group">
+          <label for="id_prestador3" class="form-label">Prestador 3</label>
+          {{ form.prestador3|add_class:"form-control"|add_error_class:"is-invalid" }}
+          {% if form.prestador3.errors %}
+            <div class="error-message">{{ form.prestador3.errors.0 }}</div>
+          {% endif %}
+        </div>
       </div>
       <hr>
 
