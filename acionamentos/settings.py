@@ -1,4 +1,14 @@
 import os
+from datetime import datetime
+import pytz
+
+# Configurações de fuso horário
+TIME_ZONE = 'America/Sao_Paulo'
+USE_TZ = True
+
+# Configuração para usar o fuso horário local para entrada de dados
+USE_L10N = True
+USE_I18N = True
 
 LOGGING = {
     'version': 1,
@@ -31,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'core',
     'formacompanhamento',
     'realtime_notifications',
