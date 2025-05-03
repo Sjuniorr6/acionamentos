@@ -164,14 +164,15 @@
       </a>
     </li>
     {% endif %}
-    {% if perms.formacompanhamento.view_ocorrenciatransporte %}
+   
     <li>
       <a href="{% url 'formacompanhamento:ocorrencia_transporte_list' %}">
         <i class="bi bi-truck"></i>
         <span class="menu-text">Ocorrências</span>
       </a>
     </li>
-    {% endif %}
+   
+    {% if perms.formacompanhamento.view_ocorrenciatransporte %}
     <li>
       <a href="{% url 'notifications:list' %}" class="position-relative">
         <i class="bi bi-bell"></i>
@@ -183,6 +184,7 @@
         {% endif %}
       </a>
     </li>
+    {% endif %}
     <!-- Botão Sair -->
     <li style="margin-top: 10px">
       <form action="{% url 'logout' %}" method="POST" style="display: inline">
