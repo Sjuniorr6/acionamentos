@@ -827,16 +827,16 @@ form input, form select, form textarea {
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     // ======================================================
-    // 1) Função para registrar a data/hora atual
+    // 1) Função para registrar a data/hora atual (agora LOCAL, não UTC)
     function registrarDataHora(inputId, btnId) {
       var agora = new Date();
-      // Envia a data/hora em UTC para que o Django faça a conversão correta
-      var ano = agora.getUTCFullYear();
-      var mes = ("0" + (agora.getUTCMonth() + 1)).slice(-2);
-      var dia = ("0" + agora.getUTCDate()).slice(-2);
-      var hora = ("0" + agora.getUTCHours()).slice(-2);
-      var minutos = ("0" + agora.getUTCMinutes()).slice(-2);
-      var segundos = ("0" + agora.getUTCSeconds()).slice(-2);
+      // Envia a data/hora LOCAL do navegador
+      var ano = agora.getFullYear();
+      var mes = ("0" + (agora.getMonth() + 1)).slice(-2);
+      var dia = ("0" + agora.getDate()).slice(-2);
+      var hora = ("0" + agora.getHours()).slice(-2);
+      var minutos = ("0" + agora.getMinutes()).slice(-2);
+      var segundos = ("0" + agora.getSeconds()).slice(-2);
       var dataHoraFormatada = ano + "-" + mes + "-" + dia + " " + hora + ":" + minutos + ":" + segundos;
 
       var inputField = document.getElementById(inputId);
