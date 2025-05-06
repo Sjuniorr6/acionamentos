@@ -1,13 +1,64 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 {% include "components/_header.html" %}
 <div class="container mt-4">
-    <h2 class="text-center">Atualizar Cliente</h2>
+    <h2 class="text-center">Atualizar Prestador</h2>
 
-    <form method="post" class="card p-4 shadow-sm">
+    <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <!-- Campos de imagem -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Foto do Prestador</h5>
+                        {% if object.foto %}
+                            <img src="{{ object.foto.url }}" alt="Foto atual" class="img-thumbnail mb-2" style="max-width: 200px;">
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="{{ form.foto.id_for_label }}">Nova Foto</label>
+                            {{ form.foto }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">CNH</h5>
+                        {% if object.cnh %}
+                            <img src="{{ object.cnh.url }}" alt="CNH atual" class="img-thumbnail mb-2" style="max-width: 200px;">
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="{{ form.cnh.id_for_label }}">Nova CNH</label>
+                            {{ form.cnh }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outros campos do formulário -->
+        <div class="row">
+            {% for field in form %}
+                {% if field.name != 'foto' and field.name != 'cnh' %}
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
 
         <div class="text-center mt-3">
             <button type="submit" class="btn btn-success">Salvar Alterações</button>
@@ -15,4 +66,18 @@
         </div>
     </form>
 </div>
+
+<style>
+    .form-control {
+        margin-bottom: 10px;
+    }
+    .img-thumbnail {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
+    .card {
+        margin-bottom: 20px;
+    }
+</style>
 {% endblock %}
