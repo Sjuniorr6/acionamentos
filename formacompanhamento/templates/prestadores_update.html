@@ -9,37 +9,7 @@
     <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
         {% csrf_token %}
         
-        <!-- Campos de imagem -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Foto do Prestador</h5>
-                        {% if object.foto %}
-                            <img src="{{ object.foto.url }}" alt="Foto atual" class="img-thumbnail mb-2" style="max-width: 200px;">
-                        {% endif %}
-                        <div class="form-group">
-                            <label for="{{ form.foto.id_for_label }}">Nova Foto</label>
-                            {{ form.foto }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">CNH</h5>
-                        {% if object.cnh %}
-                            <img src="{{ object.cnh.url }}" alt="CNH atual" class="img-thumbnail mb-2" style="max-width: 200px;">
-                        {% endif %}
-                        <div class="form-group">
-                            <label for="{{ form.cnh.id_for_label }}">Nova CNH</label>
-                            {{ form.cnh }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Outros campos do formulário -->
         <div class="row">
@@ -59,6 +29,37 @@
                 {% endif %}
             {% endfor %}
         </div>
+                <!-- Campos de imagem -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Foto do Prestador</h5>
+                                {% if object.foto %}
+                                    <img src="{{ object.foto.url }}" alt="Foto atual" class="img-thumbnail mb-2" style="max-width: 200px;">
+                                {% endif %}
+                                <div class="form-group">
+                                    <label for="{{ form.foto.id_for_label }}">Nova Foto</label>
+                                    {{ form.foto }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">CNH</h5>
+                                {% if object.cnh %}
+                                    <img src="{{ object.cnh.url }}" alt="CNH atual" class="img-thumbnail mb-2" style="max-width: 200px;">
+                                {% endif %}
+                                <div class="form-group">
+                                    <label for="{{ form.cnh.id_for_label }}">Nova CNH</label>
+                                    {{ form.cnh }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
         <div class="text-center mt-3">
             <button type="submit" class="btn btn-success">Salvar Alterações</button>
