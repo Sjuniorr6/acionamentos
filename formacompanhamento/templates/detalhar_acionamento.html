@@ -466,8 +466,8 @@ document.addEventListener("DOMContentLoaded", function() {
         </thead>
         <tbody>
           <tr>
-            <td>${data_hora_inicial || "—"}</td>
-            <td>${data_hora_final || "—"}</td>
+            <td>${data_hora_inicial ? formatDateTime(data_hora_inicial) : "—"}</td>
+            <td>${data_hora_final ? formatDateTime(data_hora_final) : "—"}</td>
             <td>${formatDecimalHours(parseFloat(horaExcedenteCliente))}</td>
             <td>${formatDecimalHours(parseFloat(horaTotalCliente))}</td>
             <td>R$ ${parseFloat(custoAgentes).toFixed(2)}</td>
