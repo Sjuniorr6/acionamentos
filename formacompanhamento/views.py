@@ -1212,6 +1212,61 @@ def detalhar_acionamento_endpoint(request, pk):
             return default
         return str(value).strip()
 
+    def parse_decimal(value):
+        if not value or str(value).strip().lower() == "não informado":
+            return Decimal('0.00')
+        try:
+            return Decimal(str(value).replace(',', '.'))
+        except:
+            return Decimal('0.00')
+
+    def diferenca_horas(inicio, fim):
+        if not inicio or not fim:
+            return Decimal('0.00')
+        try:
+            i = datetime.strptime(str(inicio), '%Y-%m-%d %H:%M:%S')
+            f = datetime.strptime(str(fim), '%Y-%m-%d %H:%M:%S')
+            if f < i:
+                return Decimal('0.00')
+            diff = f - i
+            return Decimal(diff.total_seconds()) / Decimal('3600')
+        except:
+            return Decimal('0.00')
+
+    def calcular_total_cliente(cliente_data, agentes):
+        total = Decimal('0.00')
+        for ag in agentes:
+            motivo = ag.get('motivo', '')
+            km_total = parse_decimal(ag.get('km_total', '0'))
+            horas_decimais = diferenca_horas(ag.get('data_hora_inicial'), ag.get('data_hora_final'))
+            custo_excedente = Decimal('0.00')
+            fixed_activation = Decimal('0.00')
+
+            if motivo == "Antenista":
+                km_exced = max(km_total - parse_decimal(cliente_data.get('franquia_km_antenista', '0')), Decimal('0.00'))
+                hora_exced = max(horas_decimais - parse_decimal(cliente_data.get('franquia_hora_antenista', '0')), Decimal('0.00'))
+                val_km = parse_decimal(cliente_data.get('valorkm_antenista', '0'))
+                val_hora = parse_decimal(cliente_data.get('valorh_antenista', '0'))
+                fixed_activation = parse_decimal(cliente_data.get('valor_antenista', '0'))
+                custo_excedente = (km_exced * val_km) + (hora_exced * val_hora)
+            elif motivo == "Pronta Resposta Armado":
+                km_exced = max(km_total - parse_decimal(cliente_data.get('franquia_km_armado', '0')), Decimal('0.00'))
+                hora_exced = max(horas_decimais - parse_decimal(cliente_data.get('franquia_hora_armado', '0')), Decimal('0.00'))
+                val_km = parse_decimal(cliente_data.get('valorkm_armado', '0'))
+                val_hora = parse_decimal(cliente_data.get('valorh_armado', '0'))
+                fixed_activation = parse_decimal(cliente_data.get('valor_prontaresposta_armado', '0'))
+                custo_excedente = (km_exced * val_km) + (hora_exced * val_hora)
+            elif motivo == "Pronta Resposta Desarmado":
+                km_exced = max(km_total - parse_decimal(cliente_data.get('franquia_km_desarmado', '0')), Decimal('0.00'))
+                hora_exced = max(horas_decimais - parse_decimal(cliente_data.get('franquia_hora_desarmado', '0')), Decimal('0.00'))
+                val_km = parse_decimal(cliente_data.get('valorkm_desarmado', '0'))
+                val_hora = parse_decimal(cliente_data.get('valorh_desarmado', '0'))
+                fixed_activation = parse_decimal(cliente_data.get('valor_prontaresposta_desarmado', '0'))
+                custo_excedente = (km_exced * val_km) + (hora_exced * val_hora)
+
+            total += custo_excedente + fixed_activation
+        return total
+
     # 1) Montar o dicionário do CLIENTE
     cliente_data = {
         "nome": format_field(cliente.nome),
@@ -1349,11 +1404,16 @@ def detalhar_acionamento_endpoint(request, pk):
             }
             agentes_adicionais_data.append(agente_data)
 
+    # Calcular o total do cliente
+    todos_agentes = [agente_principal_data] + agentes_adicionais_data
+    total_cliente = calcular_total_cliente(cliente_data, todos_agentes)
+
     # 4) Montar o JSON final
     data = {
         "cliente": cliente_data,
         "agente_principal": agente_principal_data,
         "agentes_adicionais": agentes_adicionais_data,
+        "total_cliente": str(total_cliente),  # Convertendo para string para garantir serialização JSON
     }
     return JsonResponse(data)
 

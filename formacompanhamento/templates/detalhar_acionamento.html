@@ -228,7 +228,8 @@ document.addEventListener("DOMContentLoaded", function() {
       // Quando todos os prestadores forem carregados, calculamos totals
       Promise.all(promises).then(() => {
         const todosAgentes = [agentePrincipal, ...adicionais];
-        const totalCliente = calcularTotalCliente(cliente, todosAgentes);
+        // Usar o total_cliente calculado no backend
+        const totalCliente = parseFloat(data.total_cliente) || 0;
 
         // Calcula hora total e excedente
         const { horaTotalCliente, horaExcedenteCliente } = calcularHorasCliente(todosAgentes, cliente);
