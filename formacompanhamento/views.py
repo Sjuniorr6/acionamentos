@@ -1548,6 +1548,196 @@ def ocorrencia_transporte_delete(request, pk):
         return redirect('formacompanhamento:ocorrencia_transporte_list')
     return render(request, 'formacompanhamento/ocorrencia_transporte_confirm_delete.html', {'object': ocorrencia})
 
+from django.views.decorators.http import require_GET
+from django.http import JsonResponse
+from .models import RegistroPagamento
+
+@require_GET
+def api_todos_acionamentos(request):
+    from decimal import Decimal
+    from django.utils.dateparse import parse_datetime
+    from django.utils.timezone import is_naive, make_aware
+
+    def format_field(value, default="Não informado"):
+        return str(value) if value is not None else default
+
+    def format_datetime_field(dt):
+        if not dt:
+            return ""
+        if isinstance(dt, str):
+            return dt
+        try:
+            if is_naive(dt):
+                dt = make_aware(dt)
+            return dt.isoformat()
+        except Exception:
+            return str(dt)
+
+    def parse_decimal(value):
+        if not value or value == "Não informado":
+            return Decimal('0')
+        try:
+            return Decimal(str(value).replace(',', '.'))
+        except Exception:
+            return Decimal('0')
+
+    def diferenca_horas(inicio, fim):
+        if not inicio or not fim:
+            return Decimal('0')
+        try:
+            if isinstance(inicio, str):
+                inicio = parse_datetime(inicio)
+            if isinstance(fim, str):
+                fim = parse_datetime(fim)
+            if not inicio or not fim:
+                return Decimal('0')
+            diff = fim - inicio
+            return Decimal(str(diff.total_seconds() / 3600))
+        except Exception:
+            return Decimal('0')
+
+    def calcular_total_cliente(cliente_data, agentes):
+        total = Decimal('0')
+        for agente in agentes:
+            motivo = agente.get('motivo', '')
+            km_total = parse_decimal(agente.get('km_total'))
+            horas_decimais = diferenca_horas(agente.get('data_hora_inicial'), agente.get('data_hora_final'))
+            if motivo == "Antenista":
+                km_exced = max(km_total - parse_decimal(cliente_data.get('franquia_km_antenista')), Decimal('0'))
+                hora_exced = max(horas_decimais - parse_decimal(cliente_data.get('franquia_hora_antenista')), Decimal('0'))
+                val_km = parse_decimal(cliente_data.get('valorkm_antenista'))
+                val_hora = parse_decimal(cliente_data.get('valorh_antenista'))
+                fixed_activation = parse_decimal(cliente_data.get('valor_antenista'))
+            elif motivo == "Pronta Resposta Armado":
+                km_exced = max(km_total - parse_decimal(cliente_data.get('franquia_km_armado')), Decimal('0'))
+                hora_exced = max(horas_decimais - parse_decimal(cliente_data.get('franquia_hora_armado')), Decimal('0'))
+                val_km = parse_decimal(cliente_data.get('valorkm_armado'))
+                val_hora = parse_decimal(cliente_data.get('valorh_armado'))
+                fixed_activation = parse_decimal(cliente_data.get('valor_prontaresposta_armado'))
+            elif motivo == "Pronta Resposta Desarmado":
+                km_exced = max(km_total - parse_decimal(cliente_data.get('franquia_km_desarmado')), Decimal('0'))
+                hora_exced = max(horas_decimais - parse_decimal(cliente_data.get('franquia_hora_desarmado')), Decimal('0'))
+                val_km = parse_decimal(cliente_data.get('valorkm_desarmado'))
+                val_hora = parse_decimal(cliente_data.get('valorh_desarmado'))
+                fixed_activation = parse_decimal(cliente_data.get('valor_prontaresposta_desarmado'))
+            else:
+                continue
+            custo_excedente = (km_exced * val_km) + (hora_exced * val_hora)
+            total += custo_excedente + fixed_activation
+        return str(total)
+
+    def calcular_horas_cliente(agentes, cliente):
+        hora_total_cliente = Decimal('0')
+        hora_excedente_cliente = Decimal('0')
+        for ag in agentes:
+            horas_decimais = diferenca_horas(ag.get('data_hora_inicial'), ag.get('data_hora_final'))
+            hora_total_cliente += horas_decimais
+            franquia_hora_cliente = Decimal('0')
+            motivo = ag.get('motivo', '')
+            if motivo == "Antenista":
+                franquia_hora_cliente = parse_decimal(cliente.get('franquia_hora_antenista'))
+            elif motivo == "Pronta Resposta Armado":
+                franquia_hora_cliente = parse_decimal(cliente.get('franquia_hora_armado'))
+            elif motivo == "Pronta Resposta Desarmado":
+                franquia_hora_cliente = parse_decimal(cliente.get('franquia_hora_desarmado'))
+            hora_exced = horas_decimais - franquia_hora_cliente
+            if hora_exced < 0:
+                hora_exced = Decimal('0')
+            hora_excedente_cliente += hora_exced
+        return str(hora_total_cliente), str(hora_excedente_cliente)
+
+    registros = RegistroPagamento.objects.all()
+    resultado = []
+    for registro in registros:
+        cliente = registro.cliente
+        cliente_data = {
+            'id': cliente.id,
+            'nome': format_field(cliente.nome),
+            'cnpj': format_field(cliente.cnpj),
+            'telefone': format_field(cliente.telefone),
+            'banco': format_field(cliente.banco),
+            'agencia': format_field(cliente.agencia),
+            'conta': format_field(cliente.conta),
+            'servicos': format_field(cliente.servicos),
+            'valor_prontaresposta_armado': format_field(cliente.valor_prontaresposta_armado),
+            'franquia_hora_armado': format_field(cliente.franquia_hora_armado),
+            'franquia_km_armado': format_field(cliente.franquia_km_armado),
+            'valorkm_armado': format_field(cliente.valorkm_armado),
+            'valorh_armado': format_field(cliente.valorh_armado),
+            'valor_prontaresposta_desarmado': format_field(cliente.valor_prontaresposta_desarmado),
+            'franquia_hora_desarmado': format_field(cliente.franquia_hora_desarmado),
+            'franquia_km_desarmado': format_field(cliente.franquia_km_desarmado),
+            'valorkm_desarmado': format_field(cliente.valorkm_desarmado),
+            'valorh_desarmado': format_field(cliente.valorh_desarmado),
+            'valor_antenista': format_field(cliente.valor_antenista),
+            'franquia_hora_antenista': format_field(cliente.franquia_hora_antenista),
+            'franquia_km_antenista': format_field(cliente.franquia_km_antenista),
+            'valorkm_antenista': format_field(cliente.valorkm_antenista),
+            'valorh_antenista': format_field(cliente.valorh_antenista),
+        }
+        agente_principal = {
+            'id_acionamento': registro.id,
+            'id_prestador': registro.prestador.id if registro.prestador else None,
+            'nome': format_field(registro.prestador.Nome if registro.prestador else None),
+            'cpf_cnpj': format_field(registro.prestador.cpf_cnpj if registro.prestador else None),
+            'telefone': format_field(registro.prestador.telefone if registro.prestador else None),
+            'banco': format_field(registro.prestador.banco if registro.prestador else None),
+            'agencia': format_field(registro.prestador.agencia if registro.prestador else None),
+            'conta': format_field(registro.prestador.conta if registro.prestador else None),
+            'servicos': format_field(registro.prestador.servicos if registro.prestador else None),
+            'motivo': format_field(registro.motivo),
+            'data_hora_inicial': format_datetime_field(registro.data_hora_inicial),
+            'data_hora_final': format_datetime_field(registro.data_hora_final),
+            'hora_excedente': str(registro.hora_excedente) if registro.hora_excedente is not None else "0",
+            'hora_total': str(registro.hora_total) if registro.hora_total is not None else "0",
+            'km_total': str(registro.km_total) if registro.km_total is not None else "0",
+            'km_excedente': str(registro.km_excedente) if registro.km_excedente is not None else "0",
+        }
+        agentes_adicionais = []
+        for idx, prestador in enumerate([registro.prestador1, registro.prestador2, registro.prestador3], start=1):
+            if prestador:
+                agentes_adicionais.append({
+                    'id_acionamento': registro.id,
+                    'id_prestador': prestador.id,
+                    'nome': format_field(prestador.Nome),
+                    'cpf_cnpj': format_field(prestador.cpf_cnpj),
+                    'telefone': format_field(prestador.telefone),
+                    'banco': format_field(prestador.banco),
+                    'agencia': format_field(prestador.agencia),
+                    'conta': format_field(prestador.conta),
+                    'servicos': format_field(prestador.servicos),
+                    'motivo': format_field(getattr(registro, f'motivo{idx}', None)),
+                    'data_hora_inicial': format_datetime_field(getattr(registro, f'data_hora_inicial{idx}', None)),
+                    'data_hora_final': format_datetime_field(getattr(registro, f'data_hora_final{idx}', None)),
+                    'hora_excedente': str(getattr(registro, f'hora_excedente{idx}', 0) or "0"),
+                    'hora_total': str(getattr(registro, f'hora_total{idx}', 0) or "0"),
+                    'km_total': str(getattr(registro, f'km_total{idx}', 0) or "0"),
+                    'km_excedente': str(getattr(registro, f'km_excedente{idx}', 0) or "0"),
+                })
+        todos_agentes = [agente_principal] + agentes_adicionais
+        total_cliente = calcular_total_cliente(cliente_data, todos_agentes)
+        hora_total_cliente, hora_excedente_cliente = calcular_horas_cliente(todos_agentes, cliente_data)
+        # Imagens
+        imagens = []
+        for i in range(1, 46):
+            img = getattr(registro, f'imagem{i}', None)
+            if img:
+                imagens.append(request.build_absolute_uri(img.url))
+        resultado.append({
+            'id_acionamento': registro.id,
+            'cliente': cliente_data,
+            'agente_principal': agente_principal,
+            'agentes_adicionais': agentes_adicionais,
+            'total_cliente': total_cliente,
+            'hora_total_cliente': hora_total_cliente,
+            'hora_excedente_cliente': hora_excedente_cliente,
+            'status': registro.status,
+            'data_hora_inicial': agente_principal['data_hora_inicial'],
+            'data_hora_final': agente_principal['data_hora_final'],
+            'imagens': imagens,
+        })
+    return JsonResponse({'acionamentos': resultado})
+
 
 
 

@@ -113,6 +113,7 @@ path('api/prestadores/enderecos/', all_prestadores_addresses, name='all_prestado
     path('ocorrencia-transporte/nova/', views.ocorrencia_transporte_create, name='ocorrencia_transporte_create'),
     path('ocorrencia-transporte/<int:pk>/editar/', views.ocorrencia_transporte_update, name='ocorrencia_transporte_update'),
     path('ocorrencia-transporte/<int:pk>/excluir/', views.ocorrencia_transporte_delete, name='ocorrencia_transporte_delete'),
+    path('api/todos_acionamentos/', views.api_todos_acionamentos, name='api_todos_acionamentos'),
 ]
 
 # Servir arquivos de mídia apenas em modo de desenvolvimento
