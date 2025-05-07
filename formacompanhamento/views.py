@@ -1205,10 +1205,26 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .models import RegistroPagamento
 
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import is_naive, make_aware
+
 @require_GET
 def detalhar_acionamento_endpoint(request, pk):
     def format_field(value, default="Não informado"):
         return str(value) if value is not None else default
+
+    def format_datetime_field(dt):
+        if not dt:
+            return ""
+        if isinstance(dt, str):
+            return dt
+        try:
+            # Garante que está em formato ISO
+            if is_naive(dt):
+                dt = make_aware(dt)
+            return dt.isoformat()
+        except Exception:
+            return str(dt)
 
     def parse_decimal(value):
         if not value or value == "Não informado":
@@ -1222,9 +1238,13 @@ def detalhar_acionamento_endpoint(request, pk):
         if not inicio or not fim:
             return Decimal('0')
         try:
-            inicio_dt = datetime.strptime(str(inicio), '%Y-%m-%d %H:%M:%S')
-            fim_dt = datetime.strptime(str(fim), '%Y-%m-%d %H:%M:%S')
-            diff = fim_dt - inicio_dt
+            if isinstance(inicio, str):
+                inicio = parse_datetime(inicio)
+            if isinstance(fim, str):
+                fim = parse_datetime(fim)
+            if not inicio or not fim:
+                return Decimal('0')
+            diff = fim - inicio
             return Decimal(str(diff.total_seconds() / 3600))
         except (ValueError, TypeError):
             return Decimal('0')
@@ -1235,7 +1255,6 @@ def detalhar_acionamento_endpoint(request, pk):
             motivo = agente.get('motivo', '')
             km_total = parse_decimal(agente.get('km_total'))
             horas_decimais = diferenca_horas(agente.get('data_hora_inicial'), agente.get('data_hora_final'))
-            
             if motivo == "Antenista":
                 km_exced = max(km_total - parse_decimal(cliente_data.get('franquia_km_antenista')), Decimal('0'))
                 hora_exced = max(horas_decimais - parse_decimal(cliente_data.get('franquia_hora_antenista')), Decimal('0'))
@@ -1256,14 +1275,11 @@ def detalhar_acionamento_endpoint(request, pk):
                 fixed_activation = parse_decimal(cliente_data.get('valor_prontaresposta_desarmado'))
             else:
                 continue
-
             custo_excedente = (km_exced * val_km) + (hora_exced * val_hora)
             total += custo_excedente + fixed_activation
-
         return total
 
     registro = get_object_or_404(RegistroPagamento, pk=pk)
-    
     # Dados do Cliente
     cliente_data = {
         'nome': format_field(registro.cliente.nome),
@@ -1289,8 +1305,7 @@ def detalhar_acionamento_endpoint(request, pk):
         'valorkm_antenista': format_field(registro.cliente.valorkm_antenista),
         'valorh_antenista': format_field(registro.cliente.valorh_antenista),
     }
-
-    # Dados do Agente Principal
+    # Agente Principal
     agente_principal = {
         'id_prestador': registro.prestador.id if registro.prestador else None,
         'nome': format_field(registro.prestador.Nome if registro.prestador else None),
@@ -1301,11 +1316,12 @@ def detalhar_acionamento_endpoint(request, pk):
         'conta': format_field(registro.prestador.conta if registro.prestador else None),
         'servicos': format_field(registro.prestador.servicos if registro.prestador else None),
         'motivo': format_field(registro.motivo),
-        'data_hora_inicial': registro.data_hora_inicial,
-        'data_hora_final': registro.data_hora_final,
-        'km_total': format_field(registro.km_total),
-        'km_excedente': format_field(registro.km_excedente),
-        'hora_excedente': format_field(registro.hora_excedente),
+        'data_hora_inicial': format_datetime_field(registro.data_hora_inicial),
+        'data_hora_final': format_datetime_field(registro.data_hora_final),
+        'hora_excedente': str(registro.hora_excedente) if registro.hora_excedente is not None else "0",
+        'hora_total': str(registro.hora_total) if registro.hora_total is not None else "0",
+        'km_total': str(registro.km_total) if registro.km_total is not None else "0",
+        'km_excedente': str(registro.km_excedente) if registro.km_excedente is not None else "0",
         'valor_prontaresposta_armado': format_field(registro.prestador.valor_prontaresposta_armado if registro.prestador else None),
         'franquia_hora_armado': format_field(registro.prestador.franquia_hora_armado if registro.prestador else None),
         'franquia_km_armado': format_field(registro.prestador.franquia_km_armado if registro.prestador else None),
@@ -1322,110 +1338,45 @@ def detalhar_acionamento_endpoint(request, pk):
         'valorkm_antenista': format_field(registro.prestador.valorkm_antenista if registro.prestador else None),
         'valorh_antenista': format_field(registro.prestador.valorh_antenista if registro.prestador else None),
     }
-
-    # Dados dos Agentes Adicionais
+    # Agentes Adicionais
     agentes_adicionais = []
-    if registro.prestador1:
-        agentes_adicionais.append({
-            'id_prestador': registro.prestador1.id,
-            'nome': format_field(registro.prestador1.Nome),
-            'cpf_cnpj': format_field(registro.prestador1.cpf_cnpj),
-            'telefone': format_field(registro.prestador1.telefone),
-            'banco': format_field(registro.prestador1.banco),
-            'agencia': format_field(registro.prestador1.agencia),
-            'conta': format_field(registro.prestador1.conta),
-            'servicos': format_field(registro.prestador1.servicos),
-            'motivo': format_field(registro.motivo1),
-            'data_hora_inicial': registro.data_hora_inicial1,
-            'data_hora_final': registro.data_hora_final1,
-            'km_total': format_field(registro.km_total1),
-            'km_excedente': format_field(registro.km_excedente1),
-            'hora_excedente': format_field(registro.hora_excedente1),
-            'valor_prontaresposta_armado': format_field(registro.prestador1.valor_prontaresposta_armado),
-            'franquia_hora_armado': format_field(registro.prestador1.franquia_hora_armado),
-            'franquia_km_armado': format_field(registro.prestador1.franquia_km_armado),
-            'valorkm_armado': format_field(registro.prestador1.valorkm_armado),
-            'valorh_armado': format_field(registro.prestador1.valorh_armado),
-            'valor_prontaresposta_desarmado': format_field(registro.prestador1.valor_prontaresposta_desarmado),
-            'franquia_hora_desarmado': format_field(registro.prestador1.franquia_hora_desarmado),
-            'franquia_km_desarmado': format_field(registro.prestador1.franquia_km_desarmado),
-            'valorkm_desarmado': format_field(registro.prestador1.valorkm_desarmado),
-            'valorh_desarmado': format_field(registro.prestador1.valorh_desarmado),
-            'valor_antenista': format_field(registro.prestador1.valor_antenista),
-            'franquia_hora_antenista': format_field(registro.prestador1.franquia_hora_antenista),
-            'franquia_km_antenista': format_field(registro.prestador1.franquia_km_antenista),
-            'valorkm_antenista': format_field(registro.prestador1.valorkm_antenista),
-            'valorh_antenista': format_field(registro.prestador1.valorh_antenista),
-        })
-    if registro.prestador2:
-        agentes_adicionais.append({
-            'id_prestador': registro.prestador2.id,
-            'nome': format_field(registro.prestador2.Nome),
-            'cpf_cnpj': format_field(registro.prestador2.cpf_cnpj),
-            'telefone': format_field(registro.prestador2.telefone),
-            'banco': format_field(registro.prestador2.banco),
-            'agencia': format_field(registro.prestador2.agencia),
-            'conta': format_field(registro.prestador2.conta),
-            'servicos': format_field(registro.prestador2.servicos),
-            'motivo': format_field(registro.motivo2),
-            'data_hora_inicial': registro.data_hora_inicial2,
-            'data_hora_final': registro.data_hora_final2,
-            'km_total': format_field(registro.km_total2),
-            'km_excedente': format_field(registro.km_excedente2),
-            'hora_excedente': format_field(registro.hora_excedente2),
-            'valor_prontaresposta_armado': format_field(registro.prestador2.valor_prontaresposta_armado),
-            'franquia_hora_armado': format_field(registro.prestador2.franquia_hora_armado),
-            'franquia_km_armado': format_field(registro.prestador2.franquia_km_armado),
-            'valorkm_armado': format_field(registro.prestador2.valorkm_armado),
-            'valorh_armado': format_field(registro.prestador2.valorh_armado),
-            'valor_prontaresposta_desarmado': format_field(registro.prestador2.valor_prontaresposta_desarmado),
-            'franquia_hora_desarmado': format_field(registro.prestador2.franquia_hora_desarmado),
-            'franquia_km_desarmado': format_field(registro.prestador2.franquia_km_desarmado),
-            'valorkm_desarmado': format_field(registro.prestador2.valorkm_desarmado),
-            'valorh_desarmado': format_field(registro.prestador2.valorh_desarmado),
-            'valor_antenista': format_field(registro.prestador2.valor_antenista),
-            'franquia_hora_antenista': format_field(registro.prestador2.franquia_hora_antenista),
-            'franquia_km_antenista': format_field(registro.prestador2.franquia_km_antenista),
-            'valorkm_antenista': format_field(registro.prestador2.valorkm_antenista),
-            'valorh_antenista': format_field(registro.prestador2.valorh_antenista),
-        })
-    if registro.prestador3:
-        agentes_adicionais.append({
-            'id_prestador': registro.prestador3.id,
-            'nome': format_field(registro.prestador3.Nome),
-            'cpf_cnpj': format_field(registro.prestador3.cpf_cnpj),
-            'telefone': format_field(registro.prestador3.telefone),
-            'banco': format_field(registro.prestador3.banco),
-            'agencia': format_field(registro.prestador3.agencia),
-            'conta': format_field(registro.prestador3.conta),
-            'servicos': format_field(registro.prestador3.servicos),
-            'motivo': format_field(registro.motivo3),
-            'data_hora_inicial': registro.data_hora_inicial3,
-            'data_hora_final': registro.data_hora_final3,
-            'km_total': format_field(registro.km_total3),
-            'km_excedente': format_field(registro.km_excedente3),
-            'hora_excedente': format_field(registro.hora_excedente3),
-            'valor_prontaresposta_armado': format_field(registro.prestador3.valor_prontaresposta_armado),
-            'franquia_hora_armado': format_field(registro.prestador3.franquia_hora_armado),
-            'franquia_km_armado': format_field(registro.prestador3.franquia_km_armado),
-            'valorkm_armado': format_field(registro.prestador3.valorkm_armado),
-            'valorh_armado': format_field(registro.prestador3.valorh_armado),
-            'valor_prontaresposta_desarmado': format_field(registro.prestador3.valor_prontaresposta_desarmado),
-            'franquia_hora_desarmado': format_field(registro.prestador3.franquia_hora_desarmado),
-            'franquia_km_desarmado': format_field(registro.prestador3.franquia_km_desarmado),
-            'valorkm_desarmado': format_field(registro.prestador3.valorkm_desarmado),
-            'valorh_desarmado': format_field(registro.prestador3.valorh_desarmado),
-            'valor_antenista': format_field(registro.prestador3.valor_antenista),
-            'franquia_hora_antenista': format_field(registro.prestador3.franquia_hora_antenista),
-            'franquia_km_antenista': format_field(registro.prestador3.franquia_km_antenista),
-            'valorkm_antenista': format_field(registro.prestador3.valorkm_antenista),
-            'valorh_antenista': format_field(registro.prestador3.valorh_antenista),
-        })
-
+    for idx, prestador in enumerate([registro.prestador1, registro.prestador2, registro.prestador3], start=1):
+        if prestador:
+            agentes_adicionais.append({
+                'id_prestador': prestador.id,
+                'nome': format_field(prestador.Nome),
+                'cpf_cnpj': format_field(prestador.cpf_cnpj),
+                'telefone': format_field(prestador.telefone),
+                'banco': format_field(prestador.banco),
+                'agencia': format_field(prestador.agencia),
+                'conta': format_field(prestador.conta),
+                'servicos': format_field(prestador.servicos),
+                'motivo': format_field(getattr(registro, f'motivo{idx}', None)),
+                'data_hora_inicial': format_datetime_field(getattr(registro, f'data_hora_inicial{idx}', None)),
+                'data_hora_final': format_datetime_field(getattr(registro, f'data_hora_final{idx}', None)),
+                'hora_excedente': str(getattr(registro, f'hora_excedente{idx}', 0) or "0"),
+                'hora_total': str(getattr(registro, f'hora_total{idx}', 0) or "0"),
+                'km_total': str(getattr(registro, f'km_total{idx}', 0) or "0"),
+                'km_excedente': str(getattr(registro, f'km_excedente{idx}', 0) or "0"),
+                'valor_prontaresposta_armado': format_field(prestador.valor_prontaresposta_armado),
+                'franquia_hora_armado': format_field(prestador.franquia_hora_armado),
+                'franquia_km_armado': format_field(prestador.franquia_km_armado),
+                'valorkm_armado': format_field(prestador.valorkm_armado),
+                'valorh_armado': format_field(prestador.valorh_armado),
+                'valor_prontaresposta_desarmado': format_field(prestador.valor_prontaresposta_desarmado),
+                'franquia_hora_desarmado': format_field(prestador.franquia_hora_desarmado),
+                'franquia_km_desarmado': format_field(prestador.franquia_km_desarmado),
+                'valorkm_desarmado': format_field(prestador.valorkm_desarmado),
+                'valorh_desarmado': format_field(prestador.valorh_desarmado),
+                'valor_antenista': format_field(prestador.valor_antenista),
+                'franquia_hora_antenista': format_field(prestador.franquia_hora_antenista),
+                'franquia_km_antenista': format_field(prestador.franquia_km_antenista),
+                'valorkm_antenista': format_field(prestador.valorkm_antenista),
+                'valorh_antenista': format_field(prestador.valorh_antenista),
+            })
     # Calcula o total do cliente
     todos_agentes = [agente_principal] + agentes_adicionais
     total_cliente = calcular_total_cliente(cliente_data, todos_agentes)
-
     return JsonResponse({
         'cliente': cliente_data,
         'agente_principal': agente_principal,
