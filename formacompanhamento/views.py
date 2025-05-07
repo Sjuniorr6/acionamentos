@@ -1354,11 +1354,13 @@ def detalhar_acionamento_endpoint(request, pk):
         'franquia_km_antenista': format_field(registro.prestador.franquia_km_antenista if registro.prestador else None),
         'valorkm_antenista': format_field(registro.prestador.valorkm_antenista if registro.prestador else None),
         'valorh_antenista': format_field(registro.prestador.valorh_antenista if registro.prestador else None),
+        'id_acionamento': registro.id,
     }
     agentes_adicionais = []
     for idx, prestador in enumerate([registro.prestador1, registro.prestador2, registro.prestador3], start=1):
         if prestador:
             agentes_adicionais.append({
+                'id_acionamento': registro.id,  # Se cada adicional tiver um id diferente, ajuste aqui
                 'id_prestador': prestador.id,
                 'nome': format_field(prestador.Nome),
                 'cpf_cnpj': format_field(prestador.cpf_cnpj),
@@ -1403,7 +1405,8 @@ def detalhar_acionamento_endpoint(request, pk):
         'hora_excedente_cliente': hora_excedente_cliente,
         'custo_agentes': str(custo_agentes),
         'data_hora_inicial': agente_principal['data_hora_inicial'] or "—",
-        'data_hora_final': agente_principal['data_hora_final'] or "—"
+        'data_hora_final': agente_principal['data_hora_final'] or "—",
+        'id_acionamento': registro.id,
     })
 
 def faturar(request, pk):
