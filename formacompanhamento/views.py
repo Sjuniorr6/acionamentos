@@ -1219,7 +1219,6 @@ def detalhar_acionamento_endpoint(request, pk):
         if isinstance(dt, str):
             return dt
         try:
-            # Garante que está em formato ISO
             if is_naive(dt):
                 dt = make_aware(dt)
             return dt.isoformat()
@@ -1279,8 +1278,27 @@ def detalhar_acionamento_endpoint(request, pk):
             total += custo_excedente + fixed_activation
         return total
 
+    def calcular_horas_cliente(agentes, cliente):
+        hora_total_cliente = Decimal('0')
+        hora_excedente_cliente = Decimal('0')
+        for ag in agentes:
+            horas_decimais = diferenca_horas(ag.get('data_hora_inicial'), ag.get('data_hora_final'))
+            hora_total_cliente += horas_decimais
+            franquia_hora_cliente = Decimal('0')
+            motivo = ag.get('motivo', '')
+            if motivo == "Antenista":
+                franquia_hora_cliente = parse_decimal(cliente.get('franquia_hora_antenista'))
+            elif motivo == "Pronta Resposta Armado":
+                franquia_hora_cliente = parse_decimal(cliente.get('franquia_hora_armado'))
+            elif motivo == "Pronta Resposta Desarmado":
+                franquia_hora_cliente = parse_decimal(cliente.get('franquia_hora_desarmado'))
+            hora_exced = horas_decimais - franquia_hora_cliente
+            if hora_exced < 0:
+                hora_exced = Decimal('0')
+            hora_excedente_cliente += hora_exced
+        return str(hora_total_cliente), str(hora_excedente_cliente)
+
     registro = get_object_or_404(RegistroPagamento, pk=pk)
-    # Dados do Cliente
     cliente_data = {
         'nome': format_field(registro.cliente.nome),
         'cnpj': format_field(registro.cliente.cnpj),
@@ -1305,7 +1323,6 @@ def detalhar_acionamento_endpoint(request, pk):
         'valorkm_antenista': format_field(registro.cliente.valorkm_antenista),
         'valorh_antenista': format_field(registro.cliente.valorh_antenista),
     }
-    # Agente Principal
     agente_principal = {
         'id_prestador': registro.prestador.id if registro.prestador else None,
         'nome': format_field(registro.prestador.Nome if registro.prestador else None),
@@ -1338,7 +1355,6 @@ def detalhar_acionamento_endpoint(request, pk):
         'valorkm_antenista': format_field(registro.prestador.valorkm_antenista if registro.prestador else None),
         'valorh_antenista': format_field(registro.prestador.valorh_antenista if registro.prestador else None),
     }
-    # Agentes Adicionais
     agentes_adicionais = []
     for idx, prestador in enumerate([registro.prestador1, registro.prestador2, registro.prestador3], start=1):
         if prestador:
@@ -1374,14 +1390,20 @@ def detalhar_acionamento_endpoint(request, pk):
                 'valorkm_antenista': format_field(prestador.valorkm_antenista),
                 'valorh_antenista': format_field(prestador.valorh_antenista),
             })
-    # Calcula o total do cliente
     todos_agentes = [agente_principal] + agentes_adicionais
     total_cliente = calcular_total_cliente(cliente_data, todos_agentes)
+    hora_total_cliente, hora_excedente_cliente = calcular_horas_cliente(todos_agentes, cliente_data)
+    custo_agentes = sum([parse_decimal(ag.get('total', '0')) for ag in todos_agentes])
     return JsonResponse({
         'cliente': cliente_data,
         'agente_principal': agente_principal,
         'agentes_adicionais': agentes_adicionais,
-        'total_cliente': str(total_cliente)
+        'total_cliente': str(total_cliente),
+        'hora_total_cliente': hora_total_cliente,
+        'hora_excedente_cliente': hora_excedente_cliente,
+        'custo_agentes': str(custo_agentes),
+        'data_hora_inicial': agente_principal['data_hora_inicial'] or "—",
+        'data_hora_final': agente_principal['data_hora_final'] or "—"
     })
 
 def faturar(request, pk):

@@ -227,17 +227,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // Quando todos os prestadores forem carregados, calculamos totals
       Promise.all(promises).then(() => {
-        const todosAgentes = [agentePrincipal, ...adicionais];
-        // Usar o total_cliente calculado no backend
+        // Usar os valores calculados do backend
         const totalCliente = parseFloat(data.total_cliente) || 0;
-
-        // Calcula hora total e excedente
-        const { horaTotalCliente, horaExcedenteCliente } = calcularHorasCliente(todosAgentes, cliente);
+        const horaTotalCliente = data.hora_total_cliente || "0";
+        const horaExcedenteCliente = data.hora_excedente_cliente || "0";
+        const custoAgentes = data.custo_agentes || "0";
+        const dataHoraInicial = data.data_hora_inicial || "—";
+        const dataHoraFinal = data.data_hora_final || "—";
 
         // Monta "Dados do Acionamento"
         const acionamentoBody = document.getElementById("acionamento-body");
         acionamentoBody.innerHTML = criarAcionamentoHTML(
-          agentePrincipal, todosAgentes, totalCliente, horaTotalCliente, horaExcedenteCliente
+          dataHoraInicial,
+          dataHoraFinal,
+          horaExcedenteCliente,
+          horaTotalCliente,
+          custoAgentes,
+          totalCliente
         );
 
         // Atualiza total do Cliente no card
@@ -248,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Monta tabela de Agentes
         const agentesTable = document.getElementById("agentes-table");
-        agentesTable.innerHTML = criarAgentesTableHTML(todosAgentes);
+        agentesTable.innerHTML = criarAgentesTableHTML([agentePrincipal, ...adicionais]);
       });
     })
     .catch(error => {
@@ -445,13 +451,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // ---------------------------------------------------------
   //  Criar HTML do Acionamento (tabela)
   // ---------------------------------------------------------
-  function criarAcionamentoHTML(agentePrincipal, todosAgentes, totalCliente, horaTotalCliente, horaExcedenteCliente) {
-    if (!agentePrincipal || !agentePrincipal.data_hora_inicial || !agentePrincipal.data_hora_final) {
-      return `<p class="text-danger">Erro: Dados do acionamento não encontrados.</p>`;
-    }
-
-    const custoAgentes = todosAgentes.reduce((acc, ag) => acc + (ag.total || 0), 0);
-
+  function criarAcionamentoHTML(data_hora_inicial, data_hora_final, horaExcedenteCliente, horaTotalCliente, custoAgentes, totalCliente) {
     return `
       <table class="table table-bordered table-sm text-white">
         <thead>
@@ -466,12 +466,12 @@ document.addEventListener("DOMContentLoaded", function() {
         </thead>
         <tbody>
           <tr>
-            <td>${formatDateTime(agentePrincipal.data_hora_inicial)}</td>
-            <td>${formatDateTime(agentePrincipal.data_hora_final)}</td>
-            <td>${formatDecimalHours(horaExcedenteCliente)}</td>
-            <td>${formatDecimalHours(horaTotalCliente)}</td>
-            <td>R$ ${custoAgentes.toFixed(2)}</td>
-            <td>R$ ${totalCliente.toFixed(2)}</td>
+            <td>${data_hora_inicial || "—"}</td>
+            <td>${data_hora_final || "—"}</td>
+            <td>${formatDecimalHours(parseFloat(horaExcedenteCliente))}</td>
+            <td>${formatDecimalHours(parseFloat(horaTotalCliente))}</td>
+            <td>R$ ${parseFloat(custoAgentes).toFixed(2)}</td>
+            <td>R$ ${parseFloat(totalCliente).toFixed(2)}</td>
           </tr>
         </tbody>
       </table>
