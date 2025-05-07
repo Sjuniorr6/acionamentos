@@ -1649,6 +1649,9 @@ def api_todos_acionamentos(request):
     registros = RegistroPagamento.objects.all()
     resultado = []
     for registro in registros:
+        if not registro.cliente:
+            continue  # Skip records without a client
+            
         cliente = registro.cliente
         cliente_data = {
             'id': cliente.id,
