@@ -1266,8 +1266,9 @@ def detalhar_acionamento_endpoint(request, pk):
                 hora_exc = Decimal('0')
         else:
             hora_exc = parse_decimal(agente.get('hora_excedente'))
-        # Trunca para 2 casas decimais (minutos inteiros)
-        hora_exc = (hora_exc * 60).to_integral_value(rounding='ROUND_FLOOR') / Decimal('60')
+        # Trunca para minutos inteiros (nunca fração de minuto)
+        minutos_inteiros = int((hora_exc * 60).to_integral_value(rounding='ROUND_FLOOR'))
+        hora_exc = Decimal(minutos_inteiros) / Decimal('60')
         km_exc = parse_decimal(agente.get('km_excedente'))
         total = Decimal('0')
         if motivo == "Antenista":
