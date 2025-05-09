@@ -1256,8 +1256,8 @@ def detalhar_acionamento_endpoint(request, pk):
     def calcular_total_agente(motivo, agente, prestador):
         hora_exc = parse_decimal(agente.get('hora_excedente'))
         print(f"[DEBUG] hora_excedente recebida para agente {agente.get('nome')}: {hora_exc}")
-        # Zere se for menor que 1 minuto (0.0167 horas)
-        if hora_exc < Decimal('0.0167'):
+        # Zere se for menor que 50 segundos (0.0139 horas)
+        if hora_exc < Decimal('0.0139'):
             hora_exc = Decimal('0')
         # Trunca para minutos inteiros (descarta fração de minuto)
         minutos_inteiros = int(hora_exc * 60)
