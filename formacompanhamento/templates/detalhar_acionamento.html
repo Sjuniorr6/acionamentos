@@ -407,7 +407,15 @@ document.addEventListener("DOMContentLoaded", function() {
       html += mostrarOuOmitir("Data/Hora Inicial", formatDateTime(agenteData.data_hora_inicial));
       html += mostrarOuOmitir("Data/Hora Final", formatDateTime(agenteData.data_hora_final));
       html += mostrarOuOmitir("KM Total", agenteData.km_total);
-      html += mostrarOuOmitir("KM Excedente", agenteData.km_excedente);
+      // Calcule o KM Excedente corretamente
+      let franquiaKm = 0;
+      if (motivo === "Antenista") franquiaKm = parseDecimal(dadosPrestador.franquia_km_antenista);
+      else if (motivo === "Pronta Resposta Armado") franquiaKm = parseDecimal(dadosPrestador.franquia_km_armado);
+      else if (motivo === "Pronta Resposta Desarmado") franquiaKm = parseDecimal(dadosPrestador.franquia_km_desarmado);
+      const kmTotal = parseDecimal(agenteData.km_total);
+      let kmExcedente = kmTotal - franquiaKm;
+      if (kmExcedente < 0) kmExcedente = 0;
+      html += mostrarOuOmitir("KM Excedente", kmExcedente.toFixed(2));
 
       // Hora total e excedente
       const horaTotalDecimal = diferencaHoras(agenteData.data_hora_inicial, agenteData.data_hora_final);
