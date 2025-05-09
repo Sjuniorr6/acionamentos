@@ -1243,8 +1243,12 @@ def detalhar_acionamento_endpoint(request, pk):
                 fim = parse_datetime(fim)
             if not inicio or not fim:
                 return Decimal('0')
+            # Calcula a diferença total em minutos, ignora os segundos
             diff = fim - inicio
-            return Decimal(str(diff.total_seconds() / 3600))
+            total_minutes = int(diff.total_seconds() // 60)
+            horas = total_minutes // 60
+            minutos = total_minutes % 60
+            return Decimal(horas) + (Decimal(minutos) / Decimal('60'))
         except (ValueError, TypeError):
             return Decimal('0')
 
@@ -1621,9 +1625,13 @@ def api_todos_acionamentos(request):
                 fim = parse_datetime(fim)
             if not inicio or not fim:
                 return Decimal('0')
+            # Calcula a diferença total em minutos, ignora os segundos
             diff = fim - inicio
-            return Decimal(str(diff.total_seconds() / 3600))
-        except Exception:
+            total_minutes = int(diff.total_seconds() // 60)
+            horas = total_minutes // 60
+            minutos = total_minutes % 60
+            return Decimal(horas) + (Decimal(minutos) / Decimal('60'))
+        except (ValueError, TypeError):
             return Decimal('0')
 
     def calcular_total_cliente(cliente_data, agentes):
