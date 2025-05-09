@@ -1255,11 +1255,10 @@ def detalhar_acionamento_endpoint(request, pk):
 
     def calcular_total_agente(motivo, agente, prestador):
         hora_exc = parse_decimal(agente.get('hora_excedente'))
-        # Trunca para minutos inteiros (nunca fração de minuto)
-        minutos_inteiros = int((hora_exc * 60).to_integral_value(rounding='ROUND_FLOOR'))
+        # Trunca para minutos inteiros (descarta fração de minuto)
+        minutos_inteiros = int(hora_exc * 60)
         hora_exc = Decimal(minutos_inteiros) / Decimal('60')
-        # Se hora_exc for menor que 0.01 (menos de 1 minuto), zere
-        if hora_exc < Decimal('0.01'):
+        if minutos_inteiros == 0:
             hora_exc = Decimal('0')
         km_exc = parse_decimal(agente.get('km_excedente'))
         total = Decimal('0')
@@ -1278,7 +1277,7 @@ def detalhar_acionamento_endpoint(request, pk):
             valor_km = parse_decimal(prestador.get('valorkm_desarmado'))
             valor_fixo = parse_decimal(prestador.get('valor_prontaresposta_desarmado'))
             total = (hora_exc * valor_hora) + (km_exc * valor_km) + valor_fixo
-        return total
+        return int(total)
 
     def calcular_total_cliente(cliente_data, agentes):
         total = Decimal('0')
@@ -1390,9 +1389,9 @@ def detalhar_acionamento_endpoint(request, pk):
         'id_acionamento': registro.id,
     }
     # Calcular total do agente principal
-    agente_principal['total'] = int(calcular_total_agente(
+    agente_principal['total'] = calcular_total_agente(
         agente_principal['motivo'], agente_principal, agente_principal
-    ))
+    )
 
     agentes_adicionais = []
     for idx, prestador in enumerate([registro.prestador1, registro.prestador2, registro.prestador3], start=1):
@@ -1431,7 +1430,7 @@ def detalhar_acionamento_endpoint(request, pk):
                 'valorh_antenista': format_field(prestador.valorh_antenista),
             }
             # Calcular total do agente adicional
-            ag['total'] = int(calcular_total_agente(ag['motivo'], ag, ag))
+            ag['total'] = calcular_total_agente(ag['motivo'], ag, ag)
             agentes_adicionais.append(ag)
     todos_agentes = [agente_principal] + agentes_adicionais
     total_cliente = calcular_total_cliente(cliente_data, todos_agentes)
