@@ -1254,12 +1254,12 @@ def detalhar_acionamento_endpoint(request, pk):
             return Decimal('0')
 
     def calcular_total_agente(motivo, agente, prestador):
-        # Use EXCLUSIVAMENTE o valor do campo hora_excedente já processado
         hora_exc = parse_decimal(agente.get('hora_excedente'))
         # Trunca para minutos inteiros (nunca fração de minuto)
         minutos_inteiros = int((hora_exc * 60).to_integral_value(rounding='ROUND_FLOOR'))
         hora_exc = Decimal(minutos_inteiros) / Decimal('60')
-        if hora_exc == 0:
+        # Se hora_exc for menor que 0.01 (menos de 1 minuto), zere
+        if hora_exc < Decimal('0.01'):
             hora_exc = Decimal('0')
         km_exc = parse_decimal(agente.get('km_excedente'))
         total = Decimal('0')
