@@ -1254,16 +1254,20 @@ def detalhar_acionamento_endpoint(request, pk):
             return Decimal('0')
 
     def calcular_total_agente(motivo, agente, prestador):
-        hora_exc = parse_decimal(agente.get('hora_excedente'))
-        print(f"[DEBUG] hora_excedente recebida para agente {agente.get('nome')}: {hora_exc}")
-        # Zere se for menor que 59 segundos (0.0164 horas)
-        if hora_exc < Decimal('0.0164'):
+        # Calcule hora_excedente no backend
+        data_hora_inicial = agente.get('data_hora_inicial')
+        data_hora_final = agente.get('data_hora_final')
+        franquia = parse_decimal(agente.get('franquia_hora')) if agente.get('franquia_hora') else Decimal('0')
+        hora_total = diferenca_horas(data_hora_inicial, data_hora_final)
+        hora_exc = hora_total - franquia
+        if hora_exc < 0:
             hora_exc = Decimal('0')
-        # Trunca para minutos inteiros (descarta fração de minuto)
+        # Trunca para minutos inteiros
         minutos_inteiros = int(hora_exc * 60)
         hora_exc = Decimal(minutos_inteiros) / Decimal('60')
         if minutos_inteiros == 0:
             hora_exc = Decimal('0')
+        print(f"[DEBUG] hora_total: {hora_total}, franquia: {franquia}, hora_excedente calculada: {hora_exc}")
         km_exc = parse_decimal(agente.get('km_excedente'))
         total = Decimal('0')
         if motivo == "Antenista":
