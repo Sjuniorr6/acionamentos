@@ -1248,6 +1248,27 @@ def detalhar_acionamento_endpoint(request, pk):
         except (ValueError, TypeError):
             return Decimal('0')
 
+    def calcular_total_agente(motivo, agente, prestador):
+        hora_exc = parse_decimal(agente.get('hora_excedente'))
+        km_exc = parse_decimal(agente.get('km_excedente'))
+        total = Decimal('0')
+        if motivo == "Antenista":
+            valor_hora = parse_decimal(prestador.get('valorh_antenista'))
+            valor_km = parse_decimal(prestador.get('valorkm_antenista'))
+            valor_fixo = parse_decimal(prestador.get('valor_antenista'))
+            total = (hora_exc * valor_hora) + (km_exc * valor_km) + valor_fixo
+        elif motivo == "Pronta Resposta Armado":
+            valor_hora = parse_decimal(prestador.get('valorh_armado'))
+            valor_km = parse_decimal(prestador.get('valorkm_armado'))
+            valor_fixo = parse_decimal(prestador.get('valor_prontaresposta_armado'))
+            total = (hora_exc * valor_hora) + (km_exc * valor_km) + valor_fixo
+        elif motivo == "Pronta Resposta Desarmado":
+            valor_hora = parse_decimal(prestador.get('valorh_desarmado'))
+            valor_km = parse_decimal(prestador.get('valorkm_desarmado'))
+            valor_fixo = parse_decimal(prestador.get('valor_prontaresposta_desarmado'))
+            total = (hora_exc * valor_hora) + (km_exc * valor_km) + valor_fixo
+        return total
+
     def calcular_total_cliente(cliente_data, agentes):
         total = Decimal('0')
         for agente in agentes:
@@ -1323,6 +1344,7 @@ def detalhar_acionamento_endpoint(request, pk):
         'valorkm_antenista': format_field(registro.cliente.valorkm_antenista),
         'valorh_antenista': format_field(registro.cliente.valorh_antenista),
     }
+    # Agente principal
     agente_principal = {
         'id_prestador': registro.prestador.id if registro.prestador else None,
         'nome': format_field(registro.prestador.Nome if registro.prestador else None),
@@ -1356,10 +1378,15 @@ def detalhar_acionamento_endpoint(request, pk):
         'valorh_antenista': format_field(registro.prestador.valorh_antenista if registro.prestador else None),
         'id_acionamento': registro.id,
     }
+    # Calcular total do agente principal
+    agente_principal['total'] = float(calcular_total_agente(
+        agente_principal['motivo'], agente_principal, agente_principal
+    ))
+
     agentes_adicionais = []
     for idx, prestador in enumerate([registro.prestador1, registro.prestador2, registro.prestador3], start=1):
         if prestador:
-            agentes_adicionais.append({
+            ag = {
                 'id_acionamento': registro.id,  # Se cada adicional tiver um id diferente, ajuste aqui
                 'id_prestador': prestador.id,
                 'nome': format_field(prestador.Nome),
@@ -1391,11 +1418,14 @@ def detalhar_acionamento_endpoint(request, pk):
                 'franquia_km_antenista': format_field(prestador.franquia_km_antenista),
                 'valorkm_antenista': format_field(prestador.valorkm_antenista),
                 'valorh_antenista': format_field(prestador.valorh_antenista),
-            })
+            }
+            # Calcular total do agente adicional
+            ag['total'] = float(calcular_total_agente(ag['motivo'], ag, ag))
+            agentes_adicionais.append(ag)
     todos_agentes = [agente_principal] + agentes_adicionais
     total_cliente = calcular_total_cliente(cliente_data, todos_agentes)
     hora_total_cliente, hora_excedente_cliente = calcular_horas_cliente(todos_agentes, cliente_data)
-    custo_agentes = sum([parse_decimal(ag.get('total', '0')) for ag in todos_agentes])
+    custo_agentes = sum([parse_decimal(str(ag.get('total', '0'))) for ag in todos_agentes])
     return JsonResponse({
         'cliente': cliente_data,
         'agente_principal': agente_principal,
