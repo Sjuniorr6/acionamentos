@@ -1394,7 +1394,7 @@ def detalhar_acionamento_endpoint(request, pk):
         'id_acionamento': registro.id,
     }
     # Calcular total do agente principal
-    agente_principal['total'] = float(calcular_total_agente(
+    agente_principal['total'] = int(calcular_total_agente(
         agente_principal['motivo'], agente_principal, agente_principal
     ))
 
@@ -1435,7 +1435,7 @@ def detalhar_acionamento_endpoint(request, pk):
                 'valorh_antenista': format_field(prestador.valorh_antenista),
             }
             # Calcular total do agente adicional
-            ag['total'] = float(calcular_total_agente(ag['motivo'], ag, ag))
+            ag['total'] = int(calcular_total_agente(ag['motivo'], ag, ag))
             agentes_adicionais.append(ag)
     todos_agentes = [agente_principal] + agentes_adicionais
     total_cliente = calcular_total_cliente(cliente_data, todos_agentes)
