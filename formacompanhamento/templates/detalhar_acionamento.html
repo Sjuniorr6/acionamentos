@@ -350,6 +350,21 @@ document.addEventListener("DOMContentLoaded", function() {
   // ---------------------------------------------------------
   //  Criar HTML do Agente (OMITINDO campos vazios)
   // ---------------------------------------------------------
+  function calcularHoraExcedenteJS(data_hora_inicial, data_hora_final, franquia) {
+    if (!data_hora_inicial || !data_hora_final) return 0.0;
+    const i = new Date(data_hora_inicial);
+    const f = new Date(data_hora_final);
+    if (isNaN(i) || isNaN(f) || f < i) return 0.0;
+    const diffMs = f - i;
+    const diffMinutes = Math.floor(diffMs / 60000); // minutos inteiros
+    const horasDecimais = diffMinutes / 60;
+    let horaExced = horasDecimais - parseFloat(franquia || 0);
+    if (horaExced < 0) horaExced = 0;
+    // Trunca para minutos inteiros
+    const minutosInteiros = Math.floor(horaExced * 60);
+    return minutosInteiros / 60;
+  }
+
   function criarAgenteHTML(dadosPrestador, motivo, agenteData = null) {
     let html = "";
     // Dados básicos
@@ -389,7 +404,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Se existe agenteData, mostra horários e total
     if (agenteData) {
       html += "<hr>";
-
       html += mostrarOuOmitir("Data/Hora Inicial", formatDateTime(agenteData.data_hora_inicial));
       html += mostrarOuOmitir("Data/Hora Final", formatDateTime(agenteData.data_hora_final));
       html += mostrarOuOmitir("KM Total", agenteData.km_total);
@@ -397,22 +411,43 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // Hora total e excedente
       const horaTotalDecimal = diferencaHoras(agenteData.data_hora_inicial, agenteData.data_hora_final);
-      const horaExcedDecimal = parseDecimal(agenteData.hora_excedente || "0");
+      let franquia = 0;
+      if (motivo === "Antenista") franquia = parseDecimal(dadosPrestador.franquia_hora_antenista);
+      else if (motivo === "Pronta Resposta Armado") franquia = parseDecimal(dadosPrestador.franquia_hora_armado);
+      else if (motivo === "Pronta Resposta Desarmado") franquia = parseDecimal(dadosPrestador.franquia_hora_desarmado);
+      const horaExcedDecimal = calcularHoraExcedenteJS(agenteData.data_hora_inicial, agenteData.data_hora_final, franquia);
 
       const horaTotalString = formatDecimalHours(horaTotalDecimal);
       const horaExcedString = formatDecimalHours(horaExcedDecimal);
 
-      // Se não for zero, exibe
       if (horaTotalString !== "00:00:00") {
         html += `<p><strong>Hora Total (Agente):</strong> ${horaTotalString}</p>`;
       }
       if (horaExcedString !== "00:00:00") {
         html += `<p><strong>Hora Excedente (Agente):</strong> ${horaExcedString}</p>`;
+      } else {
+        html += `<p><strong>Hora Excedente (Agente):</strong> 00:00</p>`;
       }
 
       // Total do Agente
-      const totalAgente = agenteData.total || 0.0;
-      html += `<hr><p><strong>Total do Agente:</strong> R$ ${totalAgente.toFixed(2)}</p>`;
+      let valorHora = 0;
+      let valorFixo = 0;
+      let valorKm = 0;
+      if (motivo === "Antenista") {
+        valorHora = parseDecimal(dadosPrestador.valorh_antenista);
+        valorFixo = parseDecimal(dadosPrestador.valor_antenista);
+        valorKm = parseDecimal(dadosPrestador.valorkm_antenista);
+      } else if (motivo === "Pronta Resposta Armado") {
+        valorHora = parseDecimal(dadosPrestador.valorh_armado);
+        valorFixo = parseDecimal(dadosPrestador.valor_prontaresposta_armado);
+        valorKm = parseDecimal(dadosPrestador.valorkm_armado);
+      } else if (motivo === "Pronta Resposta Desarmado") {
+        valorHora = parseDecimal(dadosPrestador.valorh_desarmado);
+        valorFixo = parseDecimal(dadosPrestador.valor_prontaresposta_desarmado);
+        valorKm = parseDecimal(dadosPrestador.valorkm_desarmado);
+      }
+      const totalAgente = Math.floor((horaExcedDecimal * valorHora) + (parseDecimal(agenteData.km_excedente) * valorKm) + valorFixo);
+      html += `<hr><p><strong>Total do Agente:</strong> R$ ${totalAgente}</p>`;
     }
 
     return html;
