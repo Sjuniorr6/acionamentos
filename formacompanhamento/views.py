@@ -1245,9 +1245,10 @@ def detalhar_acionamento_endpoint(request, pk):
                 return Decimal('0')
             # Calcula a diferença total em minutos, ignora os segundos
             diff = fim - inicio
-            total_minutes = int(diff.total_seconds() // 60)
+            total_minutes = int(diff.total_seconds() // 60)  # só minutos inteiros
             horas = total_minutes // 60
             minutos = total_minutes % 60
+            # Retorna decimal com precisão de 2 casas, mas sem fração de minuto
             return Decimal(horas) + (Decimal(minutos) / Decimal('60'))
         except (ValueError, TypeError):
             return Decimal('0')
@@ -1265,6 +1266,8 @@ def detalhar_acionamento_endpoint(request, pk):
                 hora_exc = Decimal('0')
         else:
             hora_exc = parse_decimal(agente.get('hora_excedente'))
+        # Trunca para 2 casas decimais (minutos inteiros)
+        hora_exc = (hora_exc * 60).to_integral_value(rounding='ROUND_FLOOR') / Decimal('60')
         km_exc = parse_decimal(agente.get('km_excedente'))
         total = Decimal('0')
         if motivo == "Antenista":
