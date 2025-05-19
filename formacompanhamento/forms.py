@@ -630,7 +630,11 @@ class ClientesAcionamentoForm(forms.ModelForm):
 
     def clean_nome(self):
         """Validação personalizada para o campo nome."""
-        nome = self.cleaned_data.get('nome', '').strip()
+        nome = self.cleaned_data.get('nome')
+        if nome is not None:
+            nome = nome.strip()
+        else:
+            nome = ''
         if len(nome) < 3:
             raise forms.ValidationError("O nome deve ter pelo menos 3 caracteres.")
         return nome
