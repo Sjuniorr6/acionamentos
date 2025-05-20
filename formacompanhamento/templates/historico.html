@@ -35,6 +35,14 @@
                value="{{ request.GET.prestador }}">
       </div>
       <div class="col-md-3">
+        <!-- Campo para filtrar por Prestador -->
+        <input class="form-control" 
+               type="text" 
+               name="Placa" 
+               placeholder="Filtrar por Placa"
+               value="{{ request.GET.placas1 }}">
+      </div>
+      <div class="col-md-3">
         <!-- Botão de envio -->
         <button class="btn btn-primary w-100" type="submit">Filtrar</button>
       </div>
@@ -77,6 +85,7 @@
                     <p class="mb-1"><strong>Prestador:</strong> {{ registro.prestador }}</p>
                     <p class="mb-1"><strong>Solicitante:</strong> {{ registro.solicitante }}</p>
                     <p class="mb-1"><strong>Quantidade de Agentes:</strong> {{ registro.quantidade_agentes }}</p>
+                    <p class="mb-1"><strong>Placa:</strong> {{ registro.placas1 }}</p>
                     
                     <p class="mb-1">Status:
                         {% if registro.status == 'Pendente' %}

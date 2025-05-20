@@ -152,6 +152,7 @@ class RegistroPagamentohListView(LoginRequiredMixin, PermissionRequiredMixin, Li
         filtro_id = self.request.GET.get('id', '').strip()
         filtro_cliente = self.request.GET.get('cliente', '').strip()
         filtro_prestador = self.request.GET.get('prestador', '').strip()
+        filtro_placas = self.request.GET.get('placas1', '').strip()
 
         # Se o campo "id" for um número, filtra por ID exato
         if filtro_id.isdigit():
@@ -164,7 +165,8 @@ class RegistroPagamentohListView(LoginRequiredMixin, PermissionRequiredMixin, Li
         # Se tiver texto no campo "prestador", filtra (case-insensitive)
         if filtro_prestador:
             queryset = queryset.filter(prestador__Nome__icontains=filtro_prestador)
-
+        if filtro_placas: 
+            queryset = queryset.filter(placas__placas1__intains=filtro_prestador)
         # Mantém a lógica de atributos calculados dinamicamente
         for registro in queryset:
             registro.hora_total = registro.calcular_hora_total()
