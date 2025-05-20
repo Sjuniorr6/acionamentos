@@ -145,29 +145,31 @@ class RegistroPagamentohListView(LoginRequiredMixin, PermissionRequiredMixin, Li
     permission_required = "formacompanhamento.view_agentes"
 
     def get_queryset(self):
-        # Pega o queryset inicial
         queryset = super().get_queryset()
 
-        # Captura parâmetros de busca via GET
+    # Captura parâmetros de busca via GET
         filtro_id = self.request.GET.get('id', '').strip()
         filtro_cliente = self.request.GET.get('cliente', '').strip()
         filtro_prestador = self.request.GET.get('prestador', '').strip()
         filtro_placas = self.request.GET.get('placas1', '').strip()
 
-        # Se o campo "id" for um número, filtra por ID exato
+    # Filtra por ID exato se for um número
         if filtro_id.isdigit():
             queryset = queryset.filter(id=filtro_id)
 
-        # Se tiver texto no campo "cliente", filtra (case-insensitive)
+    # Filtra por cliente (case-insensitive)
         if filtro_cliente:
             queryset = queryset.filter(cliente__nome__icontains=filtro_cliente)
 
-        # Se tiver texto no campo "prestador", filtra (case-insensitive)
+    # Filtra por prestador (case-insensitive)
         if filtro_prestador:
             queryset = queryset.filter(prestador__Nome__icontains=filtro_prestador)
-        if filtro_placas: 
-            queryset = queryset.filter(placas__placas1__intains=filtro_prestador)
-        # Mantém a lógica de atributos calculados dinamicamente
+
+    # Filtra por placas1 (case-insensitive)
+        if filtro_placas:
+            queryset = queryset.filter(placas1__icontains=filtro_placas)
+
+    # Cálculo de atributos adicionais
         for registro in queryset:
             registro.hora_total = registro.calcular_hora_total()
             registro.valor_total_hora_excedente = registro.calcular_valor_total_hora_excedente()
@@ -177,6 +179,7 @@ class RegistroPagamentohListView(LoginRequiredMixin, PermissionRequiredMixin, Li
             registro.total_acionamento = registro.calcular_total_acionamento()
 
         return queryset
+
 
 
 
