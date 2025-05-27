@@ -109,7 +109,7 @@ class clientes_acionamento(models.Model):
     
     
     endereco = models.CharField(max_length=100, null=True, blank=True)
-    cep = models.CharField(max_length=100)
+    cep = models.CharField(max_length=100, null=True, blank=True)
     dias_a_faturar = models.CharField(max_length=100, null=True, blank=True)
 
     data_de_fechamento = models.DateField(
