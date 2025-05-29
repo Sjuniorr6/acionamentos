@@ -293,7 +293,7 @@ def registro_pagamento_update(request, pk):
         AgentePagamentoFormSet = formset_factory(AgentePagamentoForm, extra=0, max_num=3)
         formset = AgentePagamentoFormSet(initial=initial_data, prefix="agentes")
     
-    return render(request, 'registro_pagamento_form.html', {'form': form, 'formset': formset})
+    return render(request, 'registro_pagamento_update.html', {'form': form, 'formset': formset})
 
 from datetime import timedelta
 from django.urls import reverse_lazy
