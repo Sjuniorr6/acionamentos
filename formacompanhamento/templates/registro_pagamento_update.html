@@ -466,10 +466,11 @@
                 <h3>_________________________________________________________________________________</h3>
                 <!-- IMAGENS -->
                 <h4 class="mt-4">Imagens</h4>
-                <div id="imagens-groups">
+                <button type="button" id="btnAdicionarImagens" class="btn btn-secondary mb-3">Adicionar Imagens</button>
+                <div id="imagens-groups" style="display: none;">
                 
                   <!-- Grupo 1: imagem1 a imagem6 -->
-                  <div class="row mb-3 image-group" style="display: none;">
+                  <div class="row mb-3 image-group">
                     <div class="col-md-2">
                       <label for="id_imagem1" class="form-label">Imagem 1</label>
                       {{ form.imagem1 }}
@@ -497,7 +498,7 @@
                   </div>
                 
                   <!-- Grupo 2: imagem7 a imagem12 -->
-                  <div class="row mb-3 image-group" style="display: none;">
+                  <div class="row mb-3 image-group">
                     <div class="col-md-2">
                       <label for="id_imagem7" class="form-label">Imagem 7</label>
                       {{ form.imagem7 }}
@@ -525,7 +526,7 @@
                   </div>
                 
                   <!-- Grupo 3: imagem13 a imagem18 -->
-                  <div class="row mb-3 image-group" style="display: none;">
+                  <div class="row mb-3 image-group">
                     <div class="col-md-2">
                       <label for="id_imagem13" class="form-label">Imagem 13</label>
                       {{ form.imagem13 }}
@@ -553,7 +554,7 @@
                   </div>
                 
                   <!-- Grupo 4: imagem19 a imagem24 -->
-                  <div class="row mb-3 image-group" style="display: none;">
+                  <div class="row mb-3 image-group">
                     <div class="col-md-2">
                       <label for="id_imagem19" class="form-label">Imagem 19</label>
                       {{ form.imagem19 }}
@@ -581,7 +582,7 @@
                   </div>
                 
                   <!-- Grupo 5: imagem25 a imagem30 -->
-                  <div class="row mb-3 image-group" style="display: none;">
+                  <div class="row mb-3 image-group">
                     <div class="col-md-2">
                       <label for="id_imagem25" class="form-label">Imagem 25</label>
                       {{ form.imagem25 }}
@@ -607,7 +608,8 @@
                       {{ form.imagem30 }}
                     </div>
                   </div>
-                
+                </div>
+
                 <div class="d-flex justify-content-between mt-4">
                     <button type="submit" class="btn btn-primary">Salvar</button>
                     <a href="{% url 'formacompanhamento:registro_pagamento_list' %}" class="btn btn-secondary">Cancelar e Voltar</a>
@@ -1073,6 +1075,56 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
+    // Função para verificar e mostrar grupos de imagens que têm arquivos
+    function checkImageGroups() {
+        const imageGroups = document.querySelectorAll('.image-group');
+        imageGroups.forEach(group => {
+            const inputs = group.querySelectorAll('input[type="file"]');
+            let hasFiles = false;
+            
+            inputs.forEach(input => {
+                if (input.files && input.files.length > 0) {
+                    hasFiles = true;
+                }
+            });
+            
+            // Se o grupo tem arquivos ou está em modo de edição (update), mostra o grupo
+            if (hasFiles || window.location.pathname.includes('update')) {
+                group.style.display = 'flex';
+            } else {
+                group.style.display = 'none';
+            }
+        });
+    }
+
+    // Adiciona listeners para os inputs de arquivo
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', checkImageGroups);
+    });
+
+    // Verifica os grupos ao carregar a página
+    checkImageGroups();
+
+    // Controle de visibilidade dos grupos de imagens
+    const btnAdicionarImagens = document.getElementById('btnAdicionarImagens');
+    const imagensGroups = document.getElementById('imagens-groups');
+    
+    if (btnAdicionarImagens && imagensGroups) {
+        // Verifica se já existem imagens carregadas
+        const hasImages = document.querySelectorAll('input[type="file"]').length > 0;
+        
+        // Se estiver em modo de edição ou tiver imagens, mostra o grupo
+        if (window.location.pathname.includes('update') || hasImages) {
+            imagensGroups.style.display = 'block';
+            btnAdicionarImagens.style.display = 'none';
+        }
+        
+        btnAdicionarImagens.addEventListener('click', function() {
+            imagensGroups.style.display = 'block';
+            this.style.display = 'none';
+        });
+    }
+
 });
 </script>
     
