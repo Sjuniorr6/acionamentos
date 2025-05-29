@@ -466,8 +466,10 @@
                 <h3>_________________________________________________________________________________</h3>
                 <!-- IMAGENS -->
                 <h4 class="mt-4">Imagens</h4>
-                <button type="button" id="btnAdicionarImagens" class="btn btn-secondary mb-3">Adicionar Imagens</button>
-                <div id="imagens-groups" style="display: none;">
+                <button type="button" id="btnAdicionarImagens" class="btn btn-primary mb-3">
+                    <i class="fas fa-camera"></i> Adicionar Imagens
+                </button>
+                <div id="imagens-groups">
                 
                   <!-- Grupo 1: imagem1 a imagem6 -->
                   <div class="row mb-3 image-group">
@@ -1110,15 +1112,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const imagensGroups = document.getElementById('imagens-groups');
     
     if (btnAdicionarImagens && imagensGroups) {
-        // Verifica se já existem imagens carregadas
-        const hasImages = document.querySelectorAll('input[type="file"]').length > 0;
+        // Esconde os grupos de imagens inicialmente
+        imagensGroups.style.display = 'none';
         
-        // Se estiver em modo de edição ou tiver imagens, mostra o grupo
-        if (window.location.pathname.includes('update') || hasImages) {
-            imagensGroups.style.display = 'block';
-            btnAdicionarImagens.style.display = 'none';
-        }
+        // Mostra o botão
+        btnAdicionarImagens.style.display = 'inline-block';
         
+        // Adiciona o evento de clique
         btnAdicionarImagens.addEventListener('click', function() {
             imagensGroups.style.display = 'block';
             this.style.display = 'none';
