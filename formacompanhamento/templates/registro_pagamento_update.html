@@ -469,7 +469,7 @@
                 <button type="button" id="btnAdicionarImagens" class="btn btn-primary btn-sm mb-3">
                     <i class="fas fa-camera"></i> Adicionar Imagens
                 </button>
-                <div id="imagens-groups" style="display: none;">
+                <div id="imagens-groups" class="d-none">
                 
                   <!-- Grupo 1: imagem1 a imagem6 -->
                   <div class="row mb-3 image-group">
@@ -1112,16 +1112,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const imagensGroups = document.getElementById('imagens-groups');
     
     if (btnAdicionarImagens && imagensGroups) {
-        // Garante que o botão esteja visível
-        btnAdicionarImagens.style.display = 'inline-block';
-        
-        // Adiciona o evento de clique
         btnAdicionarImagens.addEventListener('click', function() {
-            if (imagensGroups.style.display === 'none') {
-                imagensGroups.style.display = 'block';
+            if (imagensGroups.classList.contains('d-none')) {
+                imagensGroups.classList.remove('d-none');
                 this.innerHTML = '<i class="fas fa-camera"></i> Ocultar Imagens';
             } else {
-                imagensGroups.style.display = 'none';
+                imagensGroups.classList.add('d-none');
                 this.innerHTML = '<i class="fas fa-camera"></i> Adicionar Imagens';
             }
         });
