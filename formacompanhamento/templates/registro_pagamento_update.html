@@ -142,7 +142,7 @@
                 <h5>Agentes Adicionais</h5>
                 <div id="agentes-container">
                     <!-- Bloco para Agente Adicional 1 -->
-                    <div class="agente-dinamico" id="agente1" style="display: {% if form.instance.prestador1 %}block{% else %}none{% endif %};">
+                    <div class="agente-dinamico{% if not form.instance.prestador1 %} d-none{% endif %}" id="agente1">
                         <!-- Linha 1: Prestador, Acionamento, Franquia de KM, Franquia Hora, Valor Hora Excedente e Hora Excedente -->
                         <div class="row mb-3">
                             <div class="col-md-3">
@@ -231,7 +231,7 @@
                 </div>
                 <!-- Bloco para Agente Adicional 2 -->
                 <div id="agentes-container">
-                    <div class="agente-dinamico" id="agente2" style="display: {% if form.instance.prestador2 %}block{% else %}none{% endif %};">
+                    <div class="agente-dinamico{% if not form.instance.prestador2 %} d-none{% endif %}" id="agente2">
                         <h3>_______________________________________________________________________________</h3>
                         <div class="row mb-3">
                             <div class="col-md-3">
@@ -318,7 +318,7 @@
                 <h3>_________________________________________________________________________________</h3>
                 <!-- Bloco para Agente Adicional 3 -->
                 <div id="agentes-container">
-                    <div class="agente-dinamico" id="agente3" style="display: {% if form.instance.prestador3 %}block{% else %}none{% endif %};">
+                    <div class="agente-dinamico{% if not form.instance.prestador3 %} d-none{% endif %}" id="agente3">
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <label for="id_prestador3" class="form-label">Prestador</label>
