@@ -469,7 +469,7 @@
                 <div id="imagens-groups">
                 
                   <!-- Grupo 1: imagem1 a imagem6 -->
-                  <div class="row mb-3 image-group">
+                  <div class="row mb-3 image-group" style="display: none;">
                     <div class="col-md-2">
                       <label for="id_imagem1" class="form-label">Imagem 1</label>
                       {{ form.imagem1 }}
@@ -497,7 +497,7 @@
                   </div>
                 
                   <!-- Grupo 2: imagem7 a imagem12 -->
-                  <div class="row mb-3 image-group">
+                  <div class="row mb-3 image-group" style="display: none;">
                     <div class="col-md-2">
                       <label for="id_imagem7" class="form-label">Imagem 7</label>
                       {{ form.imagem7 }}
@@ -525,7 +525,7 @@
                   </div>
                 
                   <!-- Grupo 3: imagem13 a imagem18 -->
-                  <div class="row mb-3 image-group">
+                  <div class="row mb-3 image-group" style="display: none;">
                     <div class="col-md-2">
                       <label for="id_imagem13" class="form-label">Imagem 13</label>
                       {{ form.imagem13 }}
@@ -553,7 +553,7 @@
                   </div>
                 
                   <!-- Grupo 4: imagem19 a imagem24 -->
-                  <div class="row mb-3 image-group">
+                  <div class="row mb-3 image-group" style="display: none;">
                     <div class="col-md-2">
                       <label for="id_imagem19" class="form-label">Imagem 19</label>
                       {{ form.imagem19 }}
@@ -581,7 +581,7 @@
                   </div>
                 
                   <!-- Grupo 5: imagem25 a imagem30 -->
-                  <div class="row mb-3 image-group">
+                  <div class="row mb-3 image-group" style="display: none;">
                     <div class="col-md-2">
                       <label for="id_imagem25" class="form-label">Imagem 25</label>
                       {{ form.imagem25 }}
@@ -608,6 +608,11 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Botão para exibir os grupos progressivamente -->
+                <button type="button" class="btn btn-primary" onclick="showMoreImages()">
+                  Adicionar fotos
+                </button>
 
                 <div class="d-flex justify-content-between mt-4">
                     <button type="submit" class="btn btn-primary">Salvar</button>
@@ -1119,6 +1124,19 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
+    // Controle de visibilidade dos grupos de imagens
+    let currentGroupIndex = 0;
+    function showMoreImages() {
+        const groups = document.querySelectorAll('.image-group');
+        if (currentGroupIndex < groups.length) {
+            groups[currentGroupIndex].style.display = 'flex';
+            currentGroupIndex++;
+        }
+    }
+    window.showMoreImages = showMoreImages;
+    // Exibe o primeiro grupo ao carregar, se desejar
+    showMoreImages();
 
 });
 </script>
