@@ -28,6 +28,7 @@
                                         <th><i class="bi bi-speedometer2 me-1"></i>KM Final</th>
                                         <th><i class="bi bi-geo-alt me-1"></i>Local</th>
                                         <th><i class="bi bi-camera me-1"></i>Foto</th>
+                                        <th><i class="bi bi-currency-dollar me-1"></i>Valor</th>
                                         <th><i class="bi bi-gear me-1"></i>Ações</th>
                                     </tr>
                                 </thead>
@@ -97,6 +98,22 @@
                                             </div>
                                         </td>
                                         <td>
+                                            {% if esporadico.valor_atribuido %}
+                                                <div class="d-flex flex-column">
+                                                    <span class="badge bg-primary mb-1">
+                                                        Atrib: R$ {{ esporadico.valor_atribuido|floatformat:2 }}
+                                                    </span>
+                                                    {% if esporadico.valor_calculado %}
+                                                        <span class="badge bg-success">
+                                                            Total: R$ {{ esporadico.valor_calculado|floatformat:2 }}
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
                                             <div class="btn-group" role="group">
                                                 <a href="{% url 'esporadico_update' esporadico.pk %}" 
                                                    class="btn btn-sm btn-outline-primary" 
@@ -109,6 +126,13 @@
                                                    onclick="return confirm('Tem certeza que deseja excluir este acionamento?')">
                                                     <i class="bi bi-trash"></i>
                                                 </a>
+                                                {% if perms.formacompanhamento.view_prestadores %}
+                                                <a href="{% url 'esporadico_atribuir_valor' esporadico.pk %}" 
+                                                   class="btn btn-sm btn-outline-success" 
+                                                   title="Atribuir Valor">
+                                                    <i class="bi bi-currency-dollar"></i>
+                                                </a>
+                                                {% endif %}
                                             </div>
                                         </td>
                                     </tr>

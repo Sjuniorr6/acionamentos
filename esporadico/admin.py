@@ -4,7 +4,7 @@ from .forms import EsporadicoCreateForm, EsporadicoUpdateForm
 
 @admin.register(Esporadico)
 class EsporadicoAdmin(admin.ModelAdmin):
-    list_display = ['nome_central', 'data_acionamento', 'km_inicial', 'km_final', 'local_acionamento', 'criado_por']
+    list_display = ['nome_central', 'data_acionamento', 'km_inicial', 'km_final', 'local_acionamento', 'criado_por', 'valor_atribuido', 'valor_calculado']
     list_filter = ['data_acionamento', 'nome_central', 'criado_por']
     search_fields = ['nome_central', 'local_acionamento', 'criado_por__username']
     readonly_fields = ['data_acionamento', 'criado_por']
@@ -24,11 +24,17 @@ class EsporadicoAdmin(admin.ModelAdmin):
         ('Quilometragem', {
             'fields': ('km_inicial', 'km_final')
         }),
+        ('Horários', {
+            'fields': ('hora_inicial', 'hora_final')
+        }),
         ('Localização', {
             'fields': ('local_acionamento',)
         }),
         ('Documentação', {
             'fields': ('foto_inicial',)
+        }),
+        ('Valor', {
+            'fields': ('valor_atribuido', 'valor_calculado')
         }),
     )
     

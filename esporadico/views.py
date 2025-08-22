@@ -4,8 +4,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required, permission_required
 from .models import Esporadico, FotoEsporadico
-from .forms import EsporadicoCreateForm, EsporadicoUpdateForm, FotoEsporadicoFormSet
+from .forms import EsporadicoCreateForm, EsporadicoUpdateForm, FotoEsporadicoFormSet, AtribuirValorForm
 
 # Create your views here.
 class EsporadicoCreateView(LoginRequiredMixin, CreateView):
@@ -63,4 +64,24 @@ class EsporadicoDeleteView(LoginRequiredMixin, DeleteView):
     
     def get_queryset(self):
         # Filtrar apenas os registros criados pelo usuário atual
-        return Esporadico.objects.filter(criado_por=self.request.user)    
+        return Esporadico.objects.filter(criado_por=self.request.user)
+
+@login_required
+@permission_required('formacompanhamento.view_prestadores')
+def atribuir_valor_view(request, pk):
+    esporadico = get_object_or_404(Esporadico, pk=pk)
+    
+    if request.method == 'POST':
+        form = AtribuirValorForm(request.POST, instance=esporadico)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Valor atribuído com sucesso para {esporadico.nome_central}!')
+            return redirect('esporadico_list')
+    else:
+        form = AtribuirValorForm(instance=esporadico)
+    
+    context = {
+        'form': form,
+        'esporadico': esporadico,
+    }
+    return render(request, 'esporadico_atribuir_valor.html', context)    

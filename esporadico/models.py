@@ -10,6 +10,10 @@ class Esporadico(models.Model):
     km_final = models.IntegerField(null=True, blank=True)
     local_acionamento = models.CharField(max_length=255, null=True, blank=True)
     criado_por = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Criado por', related_name='esporadicos_criados', null=True, blank=True)
+    hora_inicial = models.TimeField(null=True, blank=True, verbose_name='Hora Inicial')
+    hora_final = models.TimeField(null=True, blank=True, verbose_name='Hora Final')
+    valor_atribuido = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Valor Atribuído')
+    valor_calculado = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, verbose_name='Valor Calculado')
     
     class Meta:
         verbose_name = 'Acionamento Esporádico'
@@ -26,6 +30,41 @@ class Esporadico(models.Model):
             total += 1
         total += self.fotos_adicionais.count()
         return total
+    
+    def diferenca_horas(self):
+        """Calcula a diferença em horas entre hora_final e hora_inicial"""
+        if self.hora_inicial and self.hora_final:
+            from datetime import datetime, timedelta
+            # Criar datetime base para calcular a diferença
+            base_date = datetime.now().date()
+            inicio = datetime.combine(base_date, self.hora_inicial)
+            fim = datetime.combine(base_date, self.hora_final)
+            
+            # Se a hora final for menor que a inicial, assumir que passou para o dia seguinte
+            if fim < inicio:
+                fim += timedelta(days=1)
+            
+            diferenca = fim - inicio
+            return round(diferenca.total_seconds() / 3600, 2)  # Retorna em horas com 2 casas decimais
+        return 0
+    
+    def diferenca_km(self):
+        """Calcula a diferença em KM entre km_final e km_inicial"""
+        if self.km_inicial and self.km_final:
+            return self.km_final - self.km_inicial
+        return 0
+    
+    def calcular_valor_total(self):
+        """Calcula o valor total: valor_atribuido × diferenca_horas × diferenca_km"""
+        if self.valor_atribuido:
+            return self.valor_atribuido * self.diferenca_horas() * self.diferenca_km()
+        return 0
+    
+    def save(self, *args, **kwargs):
+        """Sobrescreve o método save para calcular automaticamente o valor_calculado"""
+        if self.valor_atribuido:
+            self.valor_calculado = self.calcular_valor_total()
+        super().save(*args, **kwargs)
 
 class FotoEsporadico(models.Model):
     esporadico = models.ForeignKey(Esporadico, on_delete=models.CASCADE, related_name='fotos_adicionais')

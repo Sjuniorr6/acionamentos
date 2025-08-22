@@ -86,9 +86,14 @@ WSGI_APPLICATION = 'acionamento.wsgi.application'
 
 
 # Configuração do banco de dados (SQLite para desenvolvimento)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-
-# Configuração PostgreSQL (comentada para desenvolvimento local)
+#Configuração PostgreSQL (comentada para desenvolvimento local)
 DATABASES = {
      'default': {
          'ENGINE': 'django.db.backends.postgresql',

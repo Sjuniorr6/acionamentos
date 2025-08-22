@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Atribuir Valor - {{ esporadico.nome_central }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Cabeçalho da Página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-dark mb-1">
+                        <i class="bi bi-currency-dollar text-success me-2"></i>
+                        Atribuir Valor
+                    </h2>
+                    <p class="text-muted mb-0">{{ esporadico.nome_central }}</p>
+                </div>
+                <a href="{% url 'esporadico_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Voltar
+                </a>
+            </div>
+
+            <!-- Card Principal -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calculator me-2"></i>
+                        Cálculos e Valor
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Informações do Acionamento -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Informações do Acionamento
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Central:</strong> {{ esporadico.nome_central }}<br>
+                                    <strong>Data:</strong> {{ esporadico.data_acionamento|date:"d/m/Y H:i" }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Local:</strong> {{ esporadico.local_acionamento|default:"Não informado" }}<br>
+                                    <strong>Criado por:</strong> {{ esporadico.criado_por.get_full_name|default:esporadico.criado_por.username }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos de Diferença (Somente Leitura) -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.diferenca_horas.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-clock me-1"></i>{{ form.diferenca_horas.label }}
+                                </label>
+                                {{ form.diferenca_horas }}
+                                {% if form.diferenca_horas.errors %}
+                                    <div class="text-danger small">{{ form.diferenca_horas.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        {% if esporadico.hora_inicial and esporadico.hora_final %}
+                                            Calculado: {{ esporadico.hora_inicial|time:"H:i" }} → {{ esporadico.hora_final|time:"H:i" }}
+                                        {% else %}
+                                            Horas inicial e final não informadas
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.diferenca_km.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-speedometer2 me-1"></i>{{ form.diferenca_km.label }}
+                                </label>
+                                {{ form.diferenca_km }}
+                                {% if form.diferenca_km.errors %}
+                                    <div class="text-danger small">{{ form.diferenca_km.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        {% if esporadico.km_inicial and esporadico.km_final %}
+                                            Calculado: {{ esporadico.km_inicial }} → {{ esporadico.km_final }}
+                                        {% else %}
+                                            KM inicial e final não informados
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                                                 <!-- Campo de Valor -->
+                         <div class="mb-4">
+                             <label for="{{ form.valor_atribuido.id_for_label }}" class="form-label fw-bold">
+                                 <i class="bi bi-currency-dollar me-1"></i>{{ form.valor_atribuido.label }} *
+                             </label>
+                             {{ form.valor_atribuido }}
+                             {% if form.valor_atribuido.errors %}
+                                 <div class="text-danger small">{{ form.valor_atribuido.errors.0 }}</div>
+                             {% endif %}
+                             <div class="form-text">
+                                 <small class="text-muted">Digite o valor a ser atribuído para este acionamento</small>
+                             </div>
+                         </div>
+
+                         <!-- Campo Calculado -->
+                         <div class="mb-4">
+                             <label class="form-label fw-bold">
+                                 <i class="bi bi-calculator me-1"></i>Valor Calculado
+                             </label>
+                             <div class="form-control bg-success text-white" id="valor-calculado" style="font-weight: bold; font-size: 1.1rem; text-align: center; border: 2px solid #28a745;">
+                                 R$ 0,00
+                             </div>
+                             <div class="form-text">
+                                 <small class="text-muted">
+                                     <i class="bi bi-info-circle me-1"></i>
+                                     Cálculo: Valor × {{ esporadico.diferenca_horas|default:0 }}h × {{ esporadico.diferenca_km|default:0 }}km
+                                 </small>
+                             </div>
+                         </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-between">
+                                <a href="{% url 'esporadico_list' %}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle me-1"></i>Atribuir Valor
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card de Ajuda -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title text-dark">
+                        <i class="bi bi-question-circle me-2 text-info"></i>
+                        Como funciona?
+                    </h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check2 text-success me-2"></i>
+                            A diferença em horas é calculada automaticamente
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check2 text-success me-2"></i>
+                            A diferença em KM é calculada automaticamente
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check2 text-success me-2"></i>
+                            Você deve informar apenas o valor a ser atribuído
+                        </li>
+                        <li>
+                            <i class="bi bi-check2 text-success me-2"></i>
+                            O valor será salvo e associado ao acionamento
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    border: none;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    border: none;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    padding: 12px 15px;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.form-label {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.shadow-lg {
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+ .list-unstyled li {
+     font-size: 14px;
+     color: #6c757d;
+ }
+ </style>
+
+ <script>
+ document.addEventListener('DOMContentLoaded', function() {
+     const valorInput = document.getElementById('{{ form.valor_atribuido.id_for_label }}');
+     const valorCalculado = document.getElementById('valor-calculado');
+     
+     // Obter valores das diferenças (já calculados no servidor)
+     const diferencaHoras = parseFloat(document.getElementById('{{ form.diferenca_horas.id_for_label }}').value) || 0;
+     const diferencaKm = parseInt(document.getElementById('{{ form.diferenca_km.id_for_label }}').value) || 0;
+     
+     function calcularValor() {
+         const valor = parseFloat(valorInput.value) || 0;
+         const resultado = valor * diferencaHoras * diferencaKm;
+         
+         // Formatar o resultado como moeda brasileira
+         const resultadoFormatado = resultado.toLocaleString('pt-BR', {
+             style: 'currency',
+             currency: 'BRL',
+             minimumFractionDigits: 2,
+             maximumFractionDigits: 2
+         });
+         
+         valorCalculado.textContent = resultadoFormatado;
+         
+         // Mudar estilo baseado no valor
+         if (resultado > 0) {
+             valorCalculado.style.backgroundColor = '#28a745'; // Verde
+             valorCalculado.style.color = 'white';
+             valorCalculado.style.fontWeight = 'bold';
+             valorCalculado.style.borderColor = '#28a745';
+         } else if (valor > 0) {
+             valorCalculado.style.backgroundColor = '#ffc107'; // Amarelo (valor digitado mas resultado 0)
+             valorCalculado.style.color = '#212529';
+             valorCalculado.style.fontWeight = 'bold';
+             valorCalculado.style.borderColor = '#ffc107';
+         } else {
+             valorCalculado.style.backgroundColor = '#6c757d'; // Cinza
+             valorCalculado.style.color = 'white';
+             valorCalculado.style.fontWeight = 'normal';
+             valorCalculado.style.borderColor = '#6c757d';
+         }
+         
+         // Adicionar tooltip com detalhes do cálculo
+         valorCalculado.title = `Cálculo: R$ ${valor.toFixed(2)} × ${diferencaHoras}h × ${diferencaKm}km = ${resultadoFormatado}`;
+     }
+     
+     // Calcular quando o valor for digitado
+     valorInput.addEventListener('input', calcularValor);
+     
+     // Calcular inicialmente
+     calcularValor();
+ });
+ </script>
+ {% endblock %}
