@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CustomLoginView,CustomLogoutView,HomeView,RegisterView
+from .views import CustomLoginView,CustomLogoutView,HomeView,RegisterView,AdminCreateUserView
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.conf import settings
@@ -8,7 +8,8 @@ urlpatterns = [
     path('', CustomLoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('Home', HomeView.as_view(), name='home'),
-     path('register/', RegisterView.as_view(), name='register'),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('create-user/', AdminCreateUserView.as_view(), name='admin_create_user'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 ] 
 if settings.DEBUG:

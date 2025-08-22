@@ -3,10 +3,12 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from realtime_notifications.models import Notification
 from django.contrib.auth import login
+from django.contrib import messages
+from .forms import CustomUserCreationForm
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'
@@ -31,7 +33,7 @@ class HomeView(LoginRequiredMixin, TemplateView):
 
 class RegisterView(CreateView):
     template_name = 'register.html'
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')  # Redireciona após o cadastro
 
     def form_valid(self, form):
@@ -44,3 +46,20 @@ class RegisterView(CreateView):
         """Se o formulário for inválido, exibe os erros"""
         print("Formulário inválido:", form.errors)  # Debug no terminal
         return self.render_to_response(self.get_context_data(form=form))
+
+class AdminCreateUserView(LoginRequiredMixin, CreateView):
+    template_name = 'create_user.html'
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('home')
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Verificar se o usuário é superusuário"""
+        if not request.user.is_superuser:
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        """Salva o usuário sem fazer login"""
+        user = form.save()
+        messages.success(self.request, f'Usuário "{user.username}" criado com sucesso e adicionado ao grupo "pa"!')
+        return super().form_valid(form)

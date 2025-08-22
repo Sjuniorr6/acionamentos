@@ -4,10 +4,10 @@ from .forms import EsporadicoCreateForm, EsporadicoUpdateForm
 
 @admin.register(Esporadico)
 class EsporadicoAdmin(admin.ModelAdmin):
-    list_display = ['nome_central', 'data_acionamento', 'km_inicial', 'km_final', 'local_acionamento']
-    list_filter = ['data_acionamento', 'nome_central']
-    search_fields = ['nome_central', 'local_acionamento']
-    readonly_fields = ['data_acionamento']
+    list_display = ['nome_central', 'data_acionamento', 'km_inicial', 'km_final', 'local_acionamento', 'criado_por']
+    list_filter = ['data_acionamento', 'nome_central', 'criado_por']
+    search_fields = ['nome_central', 'local_acionamento', 'criado_por__username']
+    readonly_fields = ['data_acionamento', 'criado_por']
     ordering = ['-data_acionamento']
     
     def get_form(self, request, obj=None, **kwargs):
@@ -19,7 +19,7 @@ class EsporadicoAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Informações Básicas', {
-            'fields': ('nome_central', 'data_acionamento')
+            'fields': ('nome_central', 'data_acionamento', 'criado_por')
         }),
         ('Quilometragem', {
             'fields': ('km_inicial', 'km_final')

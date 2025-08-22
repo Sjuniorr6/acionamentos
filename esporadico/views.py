@@ -2,25 +2,39 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from .models import Esporadico, FotoEsporadico
 from .forms import EsporadicoCreateForm, EsporadicoUpdateForm, FotoEsporadicoFormSet
 
 # Create your views here.
-class EsporadicoCreateView(CreateView):
+class EsporadicoCreateView(LoginRequiredMixin, CreateView):
     model = Esporadico
     form_class = EsporadicoCreateForm
     template_name = 'esporadico_form.html'
     success_url = reverse_lazy('esporadico_list')
+    
+    def form_valid(self, form):
+        form.instance.criado_por = self.request.user
+        return super().form_valid(form)
 
-class EsporadicoListView(ListView):
+class EsporadicoListView(LoginRequiredMixin, ListView):
     model = Esporadico
     template_name = 'esporadico_list.html'
     context_object_name = 'object_list'
     ordering = ['-data_acionamento']
     paginate_by = 20
+    
+    def get_queryset(self):
+        # Filtrar apenas os registros criados pelo usuário atual
+        return Esporadico.objects.filter(criado_por=self.request.user).order_by('-data_acionamento')
 
 def esporadico_update_view(request, pk):
     esporadico = get_object_or_404(Esporadico, pk=pk)
+    
+    # Verificar se o usuário é o criador do registro
+    if esporadico.criado_por != request.user:
+        raise PermissionDenied("Você não tem permissão para editar este registro.")
     
     if request.method == 'POST':
         form = EsporadicoUpdateForm(request.POST, request.FILES, instance=esporadico)
@@ -42,7 +56,11 @@ def esporadico_update_view(request, pk):
     }
     return render(request, 'esporadico_form.html', context)
 
-class EsporadicoDeleteView(DeleteView):
+class EsporadicoDeleteView(LoginRequiredMixin, DeleteView):
     model = Esporadico
     template_name = 'esporadico_confirm_delete.html'
-    success_url = reverse_lazy('esporadico_list')    
+    success_url = reverse_lazy('esporadico_list')
+    
+    def get_queryset(self):
+        # Filtrar apenas os registros criados pelo usuário atual
+        return Esporadico.objects.filter(criado_por=self.request.user)    

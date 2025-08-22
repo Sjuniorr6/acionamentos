@@ -179,12 +179,14 @@
         <span class="menu-text">Ocorrências</span>
       </a>
     </li>
+    {% if perms.esporadico.view_esporadico %}
     <li>
       <a href="{% url 'esporadico_list' %}">
         <i class="bi bi-calendar-event"></i>
         <span class="menu-text">Esporádicos</span>
       </a>
     </li>
+    {% endif %}
    
     {% if perms.formacompanhamento.view_ocorrenciatransporte %}
     <li>
@@ -196,6 +198,15 @@
           {{ request.unread_notifications_count }}
         </span>
         {% endif %}
+      </a>
+    </li>
+    {% endif %}
+    
+    {% if user.is_superuser %}
+    <li>
+      <a href="{% url 'admin_create_user' %}">
+        <i class="bi bi-person-plus"></i>
+        <span class="menu-text">Criar Usuário</span>
       </a>
     </li>
     {% endif %}
