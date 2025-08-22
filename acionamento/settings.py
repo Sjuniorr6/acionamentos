@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'realtime_notifications',  # Nosso novo app
     'django_celery_beat',
     'django_celery_results',
+    'esporadico',
 ]
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -84,19 +85,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'acionamento.wsgi.application'
 
 # Configuração do banco de dados (SQLite para desenvolvimento)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',  # ou o nome do banco que você definiu
+#         'USER': 'postgres',  # ou o usuário mestre que você criou
+#         'PASSWORD': '44523913',
+#         'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
+#         'PORT': '5432',
+#         'OPTIONS': {
+#             'sslmode': 'verify-full',
+#             'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
+#             'options': '-c timezone=America/Sao_Paulo'
+#         }
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # ou o nome do banco que você definiu
-        'USER': 'postgres',  # ou o usuário mestre que você criou
-        'PASSWORD': '44523913',
-        'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'verify-full',
-            'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
-            'options': '-c timezone=America/Sao_Paulo'
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

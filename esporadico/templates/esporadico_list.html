@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Acionamentos Esporádicos{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-list-ul me-2"></i>Acionamentos Esporádicos
+                    </h4>
+                    <a href="{% url 'esporadico_create' %}" class="btn btn-light">
+                        <i class="bi bi-plus-circle me-1"></i>Novo Acionamento
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    {% if object_list %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="bi bi-building me-1"></i>Central</th>
+                                        <th><i class="bi bi-calendar me-1"></i>Data</th>
+                                        <th><i class="bi bi-speedometer2 me-1"></i>KM Inicial</th>
+                                        <th><i class="bi bi-speedometer2 me-1"></i>KM Final</th>
+                                        <th><i class="bi bi-geo-alt me-1"></i>Local</th>
+                                        <th><i class="bi bi-camera me-1"></i>Foto</th>
+                                        <th><i class="bi bi-gear me-1"></i>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for esporadico in object_list %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ esporadico.nome_central }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ esporadico.data_acionamento|date:"d/m/Y H:i" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if esporadico.km_inicial %}
+                                                <span class="badge bg-secondary">{{ esporadico.km_inicial }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if esporadico.km_final %}
+                                                <span class="badge bg-secondary">{{ esporadico.km_final }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if esporadico.local_acionamento %}
+                                                <small>{{ esporadico.local_acionamento }}</small>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% if esporadico.foto_inicial %}
+                                                    <img src="{{ esporadico.foto_inicial.url }}" 
+                                                         alt="Foto inicial" 
+                                                         class="img-thumbnail foto-preview" 
+                                                         style="width: 40px; height: 30px; object-fit: cover;"
+                                                         data-bs-toggle="modal" 
+                                                         data-bs-target="#imageModal{{ esporadico.id }}"
+                                                         title="Foto inicial">
+                                                {% endif %}
+                                                
+                                                {% for foto in esporadico.fotos_adicionais.all %}
+                                                    <img src="{{ foto.foto.url }}" 
+                                                         alt="{{ foto.descricao|default:'Foto adicional' }}" 
+                                                         class="img-thumbnail foto-preview" 
+                                                         style="width: 40px; height: 30px; object-fit: cover;"
+                                                         data-bs-toggle="modal" 
+                                                         data-bs-target="#imageModal{{ esporadico.id }}"
+                                                         title="{{ foto.descricao|default:'Foto adicional' }}">
+                                                {% endfor %}
+                                                
+                                                {% if not esporadico.foto_inicial and not esporadico.fotos_adicionais.all %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                                
+                                                {% if esporadico.fotos_adicionais.count > 0 %}
+                                                    <small class="badge bg-primary ms-1">
+                                                        +{{ esporadico.fotos_adicionais.count }}
+                                                    </small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'esporadico_update' esporadico.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'esporadico_delete' esporadico.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger" 
+                                                   title="Excluir"
+                                                   onclick="return confirm('Tem certeza que deseja excluir este acionamento?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Modal para visualizar imagens -->
+                                    {% if esporadico.foto_inicial or esporadico.fotos_adicionais.all %}
+                                    <div class="modal fade" id="imageModal{{ esporadico.id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-xl">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">
+                                                        <i class="bi bi-images me-2"></i>Fotos - {{ esporadico.nome_central }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        {% if esporadico.foto_inicial %}
+                                                        <div class="col-md-6 col-lg-4 mb-3">
+                                                            <div class="card h-100">
+                                                                <img src="{{ esporadico.foto_inicial.url }}" 
+                                                                     alt="Foto inicial" 
+                                                                     class="card-img-top" 
+                                                                     style="height: 200px; object-fit: cover;">
+                                                                <div class="card-body p-2">
+                                                                    <h6 class="card-title mb-0">
+                                                                        <i class="bi bi-camera me-1"></i>Foto Inicial
+                                                                    </h6>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endif %}
+                                                        
+                                                        {% for foto in esporadico.fotos_adicionais.all %}
+                                                        <div class="col-md-6 col-lg-4 mb-3">
+                                                            <div class="card h-100">
+                                                                <img src="{{ foto.foto.url }}" 
+                                                                     alt="{{ foto.descricao|default:'Foto adicional' }}" 
+                                                                     class="card-img-top" 
+                                                                     style="height: 200px; object-fit: cover;">
+                                                                <div class="card-body p-2">
+                                                                    <h6 class="card-title mb-1">
+                                                                        <i class="bi bi-camera-fill me-1"></i>Foto Adicional
+                                                                    </h6>
+                                                                    {% if foto.descricao %}
+                                                                        <p class="card-text small text-muted mb-0">{{ foto.descricao }}</p>
+                                                                    {% endif %}
+                                                                    <small class="text-muted">{{ foto.data_upload|date:"d/m/Y H:i" }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox display-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">Nenhum acionamento encontrado</h4>
+                            <p class="text-muted">Clique no botão "Novo Acionamento" para começar.</p>
+                            <a href="{% url 'esporadico_create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-1"></i>Criar Primeiro Acionamento
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    border: none;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.btn-group .btn {
+    border-radius: 6px;
+    margin: 0 2px;
+}
+
+.badge {
+    font-size: 0.8rem;
+}
+
+.img-thumbnail {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.img-thumbnail:hover {
+    transform: scale(1.1);
+}
+
+.modal-content {
+    border-radius: 15px;
+    border: none;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+.foto-preview {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border: 1px solid #dee2e6;
+}
+
+.foto-preview:hover {
+    transform: scale(1.1);
+    border-color: #007bff;
+    z-index: 2;
+    position: relative;
+}
+
+.d-flex.gap-1 {
+    gap: 0.25rem !important;
+    align-items: center;
+}
+
+.badge {
+    font-size: 0.7rem;
+}
+</style>
+{% endblock %}

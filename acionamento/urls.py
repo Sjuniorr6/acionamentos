@@ -11,7 +11,7 @@ urlpatterns = [
     path('api/todos_acionamentos/', api_todos_acionamentos, name='api_todos_acionamentos'),
     path('formacompanhamento/', include('formacompanhamento.urls')),
     path('api/registro_pagamento/<int:pk>/detalhes/', detalhar_acionamento_endpoint, name='detalhar_acionamento_endpoint'),
-
+    path('esporadico/', include('esporadico.urls')),
 ]
 
 # Configuração para servir arquivos de mídia no modo DEBUG

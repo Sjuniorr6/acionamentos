@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        Editar Acionamento Esporádico
+    {% else %}
+        Novo Acionamento Esporádico
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-truck me-2"></i>
+                        {% if form.instance.pk %}
+                            Editar Acionamento Esporádico
+                        {% else %}
+                            Novo Acionamento Esporádico
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Nome da Central -->
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.nome_central.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-building me-1"></i>Nome da Central *
+                                </label>
+                                {{ form.nome_central }}
+                                {% if form.nome_central.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.nome_central.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- KM Inicial -->
+                            <div class="{% if form.instance.pk %}col-md-6{% else %}col-12{% endif %} mb-3">
+                                <label for="{{ form.km_inicial.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-speedometer2 me-1"></i>KM Inicial
+                                </label>
+                                {{ form.km_inicial }}
+                                {% if form.km_inicial.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.km_inicial.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- KM Final - Apenas na edição -->
+                            {% if form.instance.pk %}
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.km_final.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-speedometer2 me-1"></i>KM Final
+                                </label>
+                                {{ form.km_final }}
+                                {% if form.km_final.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.km_final.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Local do Acionamento -->
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.local_acionamento.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-geo-alt me-1"></i>Local do Acionamento
+                                </label>
+                                {{ form.local_acionamento }}
+                                {% if form.local_acionamento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.local_acionamento.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Foto Inicial -->
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.foto_inicial.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-camera me-1"></i>Foto Inicial
+                                </label>
+                                {{ form.foto_inicial }}
+                                {% if form.foto_inicial.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.foto_inicial.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                {% if form.instance.foto_inicial %}
+                                    <div class="mt-2">
+                                        <small class="text-muted">Foto atual:</small>
+                                        <img src="{{ form.instance.foto_inicial.url }}" 
+                                             alt="Foto atual" 
+                                             class="img-thumbnail mt-1" 
+                                             style="max-width: 200px; max-height: 150px;">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Fotos Adicionais - Apenas na edição -->
+                        {% if form.instance.pk and formset %}
+                        <div class="card mt-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-images me-2"></i>Fotos Adicionais
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {{ formset.management_form }}
+                                
+                                <!-- Fotos existentes -->
+                                {% for form_foto in formset %}
+                                    <div class="foto-form-row border rounded p-3 mb-3" data-form-index="{{ forloop.counter0 }}">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-camera-fill me-1"></i>Foto
+                                                </label>
+                                                {{ form_foto.foto }}
+                                                {% if form_foto.foto.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form_foto.foto.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <!-- Preview da foto existente -->
+                                                {% if form_foto.instance.foto %}
+                                                    <div class="mt-2">
+                                                        <small class="text-muted">Foto atual:</small>
+                                                        <img src="{{ form_foto.instance.foto.url }}" 
+                                                             alt="Foto atual" 
+                                                             class="img-thumbnail mt-1" 
+                                                             style="max-width: 150px; max-height: 100px;">
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">
+                                                    <i class="bi bi-text-left me-1"></i>Descrição
+                                                </label>
+                                                {{ form_foto.descricao }}
+                                                {% if form_foto.descricao.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form_foto.descricao.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="col-md-2 text-center">
+                                                {% if form_foto.instance.pk %}
+                                                    <label class="form-label fw-bold text-danger">
+                                                        <i class="bi bi-trash me-1"></i>Excluir
+                                                    </label>
+                                                    {{ form_foto.DELETE }}
+                                                {% else %}
+                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-foto-form">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Campos ocultos do formset -->
+                                        {% for hidden in form_foto.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                                
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn btn-outline-primary" id="add-foto-form">
+                                        <i class="bi bi-plus-circle me-1"></i>Adicionar Mais Fotos
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Botões de Ação -->
+                        <div class="row mt-4">
+                            <div class="col-12 d-flex justify-content-between">
+                                <a href="{% url 'esporadico_list' %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i>Voltar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    {% if form.instance.pk %}
+                                        Atualizar
+                                    {% else %}
+                                        Salvar
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    border: none;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.invalid-feedback {
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+.form-label {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.foto-form-row {
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6 !important;
+    transition: all 0.3s ease;
+}
+
+.foto-form-row:hover {
+    border-color: #007bff !important;
+    box-shadow: 0 2px 4px rgba(0,123,255,0.1);
+}
+
+#add-foto-form {
+    border: 2px dashed #007bff;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+#add-foto-form:hover {
+    background: #007bff;
+    color: white;
+}
+
+.remove-foto-form {
+    border: 2px solid #dc3545;
+    transition: all 0.3s ease;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addButton = document.getElementById('add-foto-form');
+    
+    if (addButton) {
+        addButton.addEventListener('click', function() {
+            addNewFotoForm();
+        });
+    }
+    
+    // Event delegation para botões de remover
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-foto-form') || 
+            e.target.parentElement.classList.contains('remove-foto-form')) {
+            e.preventDefault();
+            removeFotoForm(e.target.closest('.foto-form-row'));
+        }
+    });
+    
+    function addNewFotoForm() {
+        const formContainer = document.querySelector('#add-foto-form').closest('.card-body');
+        const totalForms = document.getElementById('id_fotos_adicionais-TOTAL_FORMS');
+        const formIndex = parseInt(totalForms.value);
+        
+        const newFormHtml = `
+            <div class="foto-form-row border rounded p-3 mb-3" data-form-index="${formIndex}">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-camera-fill me-1"></i>Foto
+                        </label>
+                        <input type="file" name="fotos_adicionais-${formIndex}-foto" class="form-control" accept="image/*" id="id_fotos_adicionais-${formIndex}-foto">
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-text-left me-1"></i>Descrição
+                        </label>
+                        <input type="text" name="fotos_adicionais-${formIndex}-descricao" class="form-control" placeholder="Descrição da foto (opcional)" id="id_fotos_adicionais-${formIndex}-descricao">
+                    </div>
+                    
+                    <div class="col-md-2 text-center">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-foto-form">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <input type="hidden" name="fotos_adicionais-${formIndex}-id" id="id_fotos_adicionais-${formIndex}-id">
+            </div>
+        `;
+        
+        // Inserir antes do botão "Adicionar Mais Fotos"
+        const addButtonContainer = document.querySelector('#add-foto-form').parentElement.parentElement;
+        addButtonContainer.insertAdjacentHTML('beforebegin', newFormHtml);
+        
+        // Atualizar o contador de formulários
+        totalForms.value = formIndex + 1;
+    }
+    
+    function removeFotoForm(formRow) {
+        formRow.remove();
+        
+        // Reindexar os formulários restantes
+        const remainingForms = document.querySelectorAll('.foto-form-row');
+        const totalForms = document.getElementById('id_fotos_adicionais-TOTAL_FORMS');
+        
+        remainingForms.forEach((form, index) => {
+            form.setAttribute('data-form-index', index);
+            
+            // Atualizar nomes e IDs dos campos
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/fotos_adicionais-\d+-/, `fotos_adicionais-${index}-`);
+                }
+                if (input.id) {
+                    input.id = input.id.replace(/id_fotos_adicionais-\d+-/, `id_fotos_adicionais-${index}-`);
+                }
+            });
+        });
+        
+        totalForms.value = remainingForms.length;
+    }
+});
+</script>
+{% endblock %}
