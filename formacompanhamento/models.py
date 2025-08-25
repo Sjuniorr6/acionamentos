@@ -210,6 +210,7 @@ class RegistroPagamento(models.Model):
     services = [
         ('Roubo', 'Roubo'),
         ('Preservação', 'Preservação'),
+        ('Esporadico', 'Esporadico'),
         
     ]
     rastreador1 = [
