@@ -195,6 +195,10 @@ USE_I18N = True
 USE_TZ = False  # Desabilitar timezone support para salvar diretamente em Brasília
 USE_L10N = True  # Use localização para formatação de datas
 
+# Configuração para forçar fuso horário local
+import os
+os.environ['TZ'] = 'America/Sao_Paulo'
+
 # Configuração para usar o fuso horário local para entrada de dados
 DATETIME_FORMAT = 'd/m/Y H:i:s'
 DATE_FORMAT = 'd/m/Y'

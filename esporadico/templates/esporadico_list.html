@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load timezone_filters %}
 
 {% block title %}Lista de Acionamentos Esporádicos{% endblock %}
 
@@ -40,8 +41,12 @@
                                         </td>
                                         <td>
                                             <span class="badge bg-info">
-                                                {{ esporadico.data_acionamento|date:"d/m/Y H:i" }}
+                                                {{ esporadico.data_acionamento|local_datetime:"d/m/Y H:i" }}
                                             </span>
+                                            <br>
+                                            <small class="text-muted">
+                                                <code>{{ esporadico.data_acionamento|debug_datetime }}</code>
+                                            </small>
                                         </td>
                                         <td>
                                             {% if esporadico.km_inicial %}

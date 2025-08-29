@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required, permission_required
+from django.conf import settings
+from datetime import datetime
 from .models import Esporadico, FotoEsporadico
 from .forms import EsporadicoCreateForm, EsporadicoUpdateForm, FotoEsporadicoFormSet, AtribuirValorForm
 
@@ -84,4 +86,6 @@ def atribuir_valor_view(request, pk):
         'form': form,
         'esporadico': esporadico,
     }
-    return render(request, 'esporadico_atribuir_valor.html', context)    
+    return render(request, 'esporadico_atribuir_valor.html', context)
+
+    
