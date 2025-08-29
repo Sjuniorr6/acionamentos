@@ -1,25 +1,119 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+
 {% block content %}
 {% include "components/_header.html" %}
+
+<style>
+  .container {
+    max-width: 80%; /* Adjust as needed */
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  form input, form select, form textarea {
+    width: 100% !important;
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  .is-invalid {
+    border-color: #dc3545;
+  }
+
+  .alert-danger {
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+</style>
 <div class="container mt-4">
-    <h3 class="display-4">Editar Pagamento</h3>
+    <h3 class="text-white">Editar Pagamento</h3>
+
+    <!-- Exibição de erros gerais do formulário -->
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <h4 class="alert-heading">Por favor, corrija os seguintes erros:</h4>
+        <ul class="mb-0">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
     <div class="card mb-4">
         <div class="card-body">
             <form method="post" action="{% url 'formacompanhamento:registro_pagamento_update' form.instance.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 <!-- CAMPOS CLIENTE E PRESTADOR -->
+                <h4 class="mt-2">Tipo de Serviço</h4>
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="id_cliente" class="form-label">Cliente</label>
-                        {{ form.cliente.errors }}
-                        {{ form.cliente }}
+                    <div class="col-md-4 form-group">
+                        <label for="id_tipo_servicos" class="form-label">Tipo de Serviço</label>
+                        {{ form.tipo_servicos|add_class:"form-control"|add_error_class:"is-invalid" }}
+                        {% if form.tipo_servicos.errors %}
+                            <div class="error-message">{{ form.tipo_servicos.errors.0 }}</div>
+                        {% endif %}
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <h4 class="mt-2">Dados do Cliente</h4>
+                <div class="row mb-3">
+                    <div class="col-md-4 form-group">
+                        <label for="id_cliente" class="form-label">Cliente</label>
+                        {{ form.cliente|add_class:"form-control"|add_error_class:"is-invalid" }}
+                        {% if form.cliente.errors %}
+                            <div class="error-message">{{ form.cliente.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
                         <label for="id_protocolo" class="form-label">Protocolo</label>
                         {{ form.protocolo }}
                     </div>
+                    <div class="col-md-4">
+                        <label for="id_endereco" class="form-label">Endereço</label>
+                        {{ form.endereco }}
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- DADOS DO ACIONAMENTO -->
+                <h4 class="mt-2">Dados do Acionamento</h4>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="id_solicitante" class="form-label">Solicitante</label>
+                        {{ form.solicitante }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_tipo_contato" class="form-label">Tipo de Contato</label>
+                        {{ form.tipo_contato }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_motivo" class="form-label">Motivo</label>
+                        <div class="input-group">
+                          {{ form.motivo|add_class:"form-control border-danger" }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_quantidade_agentes" class="form-label">Quantidade de Agentes</label>
+                        {{ form.quantidade_agentes }}
+                    </div>
+                </div>
+                <h3>_________________________________________________________________________________</h3>
+                <!-- DADOS DA OPERAÇÃO -->
+                <h4 class="mt-4">Dados da Operação</h4>
+                <!-- Bloco do Agente Principal (Sempre visível) -->
+                <div class="row mb-3">
                     <div class="col-md-2">
                         <label for="id_prestador" class="form-label">Prestador</label>
                         {{ form.prestador }}
@@ -45,39 +139,6 @@
                         {{ form.valor_km_excedente }}
                     </div>
                 </div>
-                <h3>_________________________________________________________________________________</h3>
-                <!-- DADOS DO ACIONAMENTO -->
-                <h4 class="mt-2">Dados do Acionamento</h4>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="id_solicitante" class="form-label">Solicitante</label>
-                        {{ form.solicitante }}
-                    </div>
-                    <div class="col-md-2">
-                        <label for="id_tipo_contato" class="form-label">Tipo de Contato</label>
-                        {{ form.tipo_contato }}
-                    </div>
-                    <div class="col-md-2">
-                        <label for="id_motivo" class="form-label">Motivo</label>
-                        <div class="input-group">
-                          {# Campo individual para o motivo do agente adicional 1 #}
-                          {{ form.motivo|add_class:"form-control border-danger" }}
-                        </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="id_quantidade_agentes" class="form-label">Quantidade de Agentes</label>
-                        {{ form.quantidade_agentes }}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="id_endereco" class="form-label">Endereço</label>
-                        {{ form.endereco }}
-                    </div>
-                </div>
-                <h3>_________________________________________________________________________________</h3>
-                <!-- DADOS DA OPERAÇÃO -->
-                <h4 class="mt-4">Dados da Operação</h4>
-                <!-- Bloco do Agente Principal (Sempre visível) -->
                 <div class="row mb-3">
                     <!-- Linha 1: Início de Operação, SLA, Previsão de Chegada, Data e Hora (Chegada), Final de Operação -->
                     <div class="col-md-3">
@@ -138,12 +199,13 @@
                     </div>
                 </div>
                 <h3>_________________________________________________________________________________</h3>
-                <!-- CAMPOS DINÂMICOS PARA AGENTES ADICIONAIS -->
+                <!-- Botão de adicionar agentes -->
+                <button type="button" id="btnAdicionarAgente" class="btn btn-secondary mb-3">Adicionar Agente</button>
+
                 <h5>Agentes Adicionais</h5>
                 <div id="agentes-container">
                     <!-- Bloco para Agente Adicional 1 -->
-                    <div class="agente-dinamico{% if not form.instance.prestador1 %} d-none{% endif %}" id="agente1">
-                        <!-- Linha 1: Prestador, Acionamento, Franquia de KM, Franquia Hora, Valor Hora Excedente e Hora Excedente -->
+                    <div class="agente-dinamico" id="agente1" style="display: none;">
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <label for="id_prestador1" class="form-label">Prestador</label>
@@ -170,7 +232,6 @@
                                 {{ form.hora_excedente1 }}
                             </div>
                         </div>
-                        <!-- Linha 2: Início de Operação, Data e Hora (Chegada) e Final de Operação -->
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="id_data_hora_inicial1" class="form-label">Início de Operação 1</label>
@@ -194,7 +255,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Linha 3: Km Inicial, Km Final e KM Total -->
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="id_km_inicial1" class="form-label">Km Inicial 1</label>
@@ -209,7 +269,6 @@
                                 {{ form.km_total1 }}
                             </div>
                         </div>
-                        <!-- Linha 4: KM Excedente, Valor KM Excedente e (opcionalmente) Hora Total -->
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <label for="id_km_excedente1" class="form-label">KM Excedente 1</label>
@@ -220,18 +279,20 @@
                                 {{ form.valor_km_excedente1 }}
                             </div>
                             <div class="col-md-2">
+                                <label for="id_hora_total1" class="form-label">Hora Total 1</label>
+                                <input type="text" name="hora_total1" id="id_hora_total1" class="form-control" placeholder="Hora Total" readonly>
+                            </div>
+                            <div class="col-md-2">
                                 <label for="id_motivo1" class="form-label">Motivo</label>
                                 <div class="input-group">
-                                  {# Campo individual para o motivo do agente adicional 1 #}
                                   {{ form.motivo1|add_class:"form-control border-danger" }}
                                 </div>
-                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <!-- Bloco para Agente Adicional 2 -->
-                <div id="agentes-container">
-                    <div class="agente-dinamico{% if not form.instance.prestador2 %} d-none{% endif %}" id="agente2">
+                <div class="agente-dinamico" id="agente2" style="display: none;">
                         <h3>_______________________________________________________________________________</h3>
                         <div class="row mb-3">
                             <div class="col-md-3">
@@ -305,20 +366,21 @@
                                 <label for="id_valor_total_km_excedente2" class="form-label">Valor KM Excedente 2</label>
                                 {{ form.valor_km_excedente2 }}
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
+                                <label for="id_hora_total2" class="form-label">Hora Total 2</label>
+                                <input type="text" name="hora_total2" id="id_hora_total2" class="form-control" placeholder="Hora Total" readonly>
+                            </div>
+                            <div class="col-md-3">
                                 <label for="id_motivo2" class="form-label">Motivo</label>
                                 <div class="input-group">
-                                  {# Campo individual para o motivo do agente adicional 2 #}
                                   {{ form.motivo2|add_class:"form-control border-danger" }}
                                 </div>
-                              </div>
+                            </div>
                         </div>
                     </div>
-                </div>
                 <h3>_________________________________________________________________________________</h3>
                 <!-- Bloco para Agente Adicional 3 -->
-                <div id="agentes-container">
-                    <div class="agente-dinamico{% if not form.instance.prestador3 %} d-none{% endif %}" id="agente3">
+                <div class="agente-dinamico" id="agente3" style="display: none;">
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <label for="id_prestador3" class="form-label">Prestador</label>
@@ -391,35 +453,53 @@
                                 <label for="id_valor_total_km_excedente3" class="form-label">Valor KM Excedente 3</label>
                                 {{ form.valor_km_excedente3 }}
                             </div>
-                            
-                            <div class="col-md-2">
+                            <div class="col-md-3">
+                                <label for="id_hora_total3" class="form-label">Hora Total 3</label>
+                                <input type="text" name="hora_total3" id="id_hora_total3" class="form-control" placeholder="Hora Total" readonly>
+                            </div>
+                            <div class="col-md-3">
                                 <label for="id_motivo3" class="form-label">Motivo</label>
                                 <div class="input-group">
-                                  {# Campo individual para o motivo do agente adicional 3 #}
                                   {{ form.motivo3|add_class:"form-control border-danger" }}
                                 </div>
-                              </div>
+                            </div>
                         </div>
                     </div>
-                </div>
                 <h3>_________________________________________________________________________________</h3>
                 <!-- DADOS GERAIS -->
                 <h4 class="mt-4">Dados Gerais</h4>
-                <!-- Botão para adicionar novos agentes -->
-                <button type="button" id="btnAdicionarAgente" class="btn btn-secondary mb-3">Adicionar Agente</button>
                 <!-- CAMPOS Marca / Modelo, Ano Fabricação / Modelo e Cor -->
                 <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label for="id_modelo_cor_ano" class="form-label">Marca / Modelo</label>
+                    <div class="col-md-3">
+                        <label for="id_modelo" class="form-label">Marca / Modelo</label>
                         {{ form.modelo }}
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="id_ano" class="form-label">Ano Fabricação / Modelo</label>
                         {{ form.ano }}
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="id_cor" class="form-label">Cor</label>
                         {{ form.cor }}
+                    </div>
+                </div>
+
+                <!-- Botão para revelar as placas -->
+                <button type="button" id="btnAdicionarPlaca" class="btn btn-secondary mb-3">Adicionar Placa</button>
+
+                <!-- Linha com as 3 placas (inicialmente ocultas) -->
+                <div class="row mb-3">
+                    <div class="col-md-4 placa-dinamica" id="placa1" style="display: none;">
+                        <label for="id_placas1" class="form-label">Placa1</label>
+                        {{ form.placas1 }}
+                    </div>
+                    <div class="col-md-4 placa-dinamica" id="placa2" style="display: none;">
+                        <label for="id_placas2" class="form-label">Placa2</label>
+                        {{ form.placas2 }}
+                    </div>
+                    <div class="col-md-4 placa-dinamica" id="placa3" style="display: none;">
+                        <label for="id_placas3" class="form-label">Placa3</label>
+                        {{ form.placas3 }}
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -637,8 +717,8 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
-    // Variável para armazenar os dados do prestador retornados via AJAX
-    var lastPrestadorData = null;
+    // Inicializar objeto para armazenar dados dos prestadores por bloco
+    window.prestadorData = {};
 
     // ======================================================
     // 1. registrarDataHora: Preenche o campo com a data/hora atual e oculta o botão.
@@ -685,44 +765,70 @@ document.addEventListener("DOMContentLoaded", function() {
         selectElem.addEventListener("change", function() {
             var prestadorId = this.value;
             var block = this.id.replace("id_prestador", "");
+            console.log("Prestador selecionado - ID:", prestadorId, "Block:", block);
+            
             if (prestadorId) {
-                fetch("{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId)
+                var url = "{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId;
+                console.log("Fazendo requisição para:", url);
+                
+                fetch(url)
                     .then(function(response) {
+                        console.log("Resposta recebida:", response.status, response.statusText);
                         if (!response.ok) {
-                            throw new Error("Erro na resposta da rede.");
+                            throw new Error("Erro na resposta da rede: " + response.status);
                         }
                         return response.json();
                     })
                     .then(function(data) {
+                        console.log("Dados do prestador recebidos:", data);
                         if (!data.error) {
-                            lastPrestadorData = data;
-                            var acionamentoId = "id_acionamento" + block;
-                            var franquiaHoraId = "id_franquia_hora" + block;
-                            var kmFranquiaId = "id_km_franquia" + block;
-                            var valorHoraExcedenteId = "id_valor_hora_excedente" + block;
-                            var valorKmExcedenteId = "id_valor_km_excedente" + block;
-        
-                            var campoAcionamento = document.getElementById(acionamentoId);
-                            var campoFranquiaHora = document.getElementById(franquiaHoraId);
-                            var campoKmFranquia = document.getElementById(kmFranquiaId);
-                            var campoValorHoraExcedente = document.getElementById(valorHoraExcedenteId);
-                            var campoValorKmExcedente = document.getElementById(valorKmExcedenteId);
-        
-                            if (campoAcionamento) { campoAcionamento.value = data.acionamento; }
-                            if (campoFranquiaHora) { campoFranquiaHora.value = data.franquia_hora; }
-                            if (campoKmFranquia) { campoKmFranquia.value = data.km_franquia; }
-                            if (campoValorHoraExcedente) { campoValorHoraExcedente.value = data.valor_hora_excedente; }
-                            if (campoValorKmExcedente) { campoValorKmExcedente.value = data.valor_km_excedente; }
-        
-                            // Após atualizar a franquia de hora, recalcula a Hora Excedente.
+                            // Armazenar dados do prestador específico para este bloco
+                            if (!window.prestadorData) {
+                                window.prestadorData = {};
+                            }
+                            window.prestadorData[block] = data;
+                            console.log("Dados do prestador armazenados para block", block, ":", data);
+                            
+                            // Preencher campos do prestador automaticamente
+                            fillPrestadorFields(block, data);
+                            
+                            // Atualizar campos baseado no motivo atual
+                            window.updateAcionamentoByMotivo(block);
                             calculateHoraExcedente(block);
                         } else {
-                            console.error("Erro:", data.error);
+                            console.error("Erro nos dados:", data.error);
                         }
                     })
                     .catch(function(error) {
                         console.error("Erro ao buscar os dados do prestador:", error);
                     });
+            } else {
+                console.log("Nenhum prestador selecionado para block", block);
+                if (window.prestadorData && window.prestadorData[block]) {
+                    delete window.prestadorData[block];
+                }
+            }
+        });
+    }
+
+    // Função para preencher campos do prestador automaticamente
+    function fillPrestadorFields(block, data) {
+        // Campos básicos do prestador - usando valores padrão
+        var fieldsToFill = {
+            'acionamento': data.valor_acionamento || "",
+            'franquia_hora': data.franquia_hora_armado || "",
+            'km_franquia': data.franquia_km_armado || "",
+            'valor_hora_excedente': data.valorh_armado || "",
+            'valor_km_excedente': data.valorkm_armado || ""
+        };
+
+        // Preencher cada campo
+        Object.keys(fieldsToFill).forEach(function(fieldName) {
+            var fieldId = "id_" + fieldName + block;
+            var fieldElement = document.getElementById(fieldId);
+            if (fieldElement && fieldsToFill[fieldName] !== "") {
+                fieldElement.value = fieldsToFill[fieldName];
+                console.log("Campo " + fieldName + " preenchido:", fieldsToFill[fieldName]);
             }
         });
     }
@@ -738,58 +844,153 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // ======================================================
     // 3. updateAcionamentoByMotivo: Atualiza os campos de acordo com o motivo selecionado.
-    // Se o motivo for "antenista", "pronta resposta armado" ou "pronta resposta desarmado", os campos serão atualizados conforme os valores do prestador.
-    function updateAcionamentoByMotivo(block) {
+    window.updateAcionamentoByMotivo = function(block) {
+        console.log("updateAcionamentoByMotivo chamado com block:", block);
+        
         var motivoField = document.getElementById("id_motivo" + block);
         var motivo = motivoField ? motivoField.value.trim().toLowerCase() : "";
-        console.log("Motivo selecionado:", motivo, "para block:", block);
         
+        console.log("Motivo selecionado:", motivo);
+        
+        // Obter dados do prestador específico para este bloco
+        var prestadorData = window.prestadorData && window.prestadorData[block] ? window.prestadorData[block] : null;
+        console.log("Dados do prestador para block", block, ":", prestadorData);
+
         var acionamentoField = document.getElementById("id_acionamento" + block);
         var franquiaHoraField = document.getElementById("id_franquia_hora" + block);
         var kmFranquiaField = document.getElementById("id_km_franquia" + block);
         var valorHoraExcedenteField = document.getElementById("id_valor_hora_excedente" + block);
         var valorKmExcedenteField = document.getElementById("id_valor_km_excedente" + block);
-        
-        if (motivo === "antenista") {
-            if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_antenista || ""; }
-            if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_antenista || ""; }
-            if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_antenista || ""; }
-            if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_antenista || ""; }
-            if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_antenista || ""; }
-        } else if (motivo === "pronta resposta armado") {
-            if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_armado || ""; }
-            if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_armado || ""; }
-            if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_armado || ""; }
-            if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_armado || ""; }
-            if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_armado || ""; }
-        } else if (motivo === "pronta resposta desarmado") {
-            if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_desarmado || ""; }
-            if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_desarmado || ""; }
-            if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_desarmado || ""; }
-            if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_desarmado || ""; }
-            if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_desarmado || ""; }
-        } else {
-            if (acionamentoField) { acionamentoField.value = lastPrestadorData.acionamento || ""; }
+
+        console.log("Campos encontrados:");
+        console.log("- acionamentoField:", acionamentoField);
+        console.log("- franquiaHoraField:", franquiaHoraField);
+        console.log("- kmFranquiaField:", kmFranquiaField);
+        console.log("- valorHoraExcedenteField:", valorHoraExcedenteField);
+        console.log("- valorKmExcedenteField:", valorKmExcedenteField);
+
+        // Verificar se temos dados do prestador
+        if (!prestadorData) {
+            console.log("Nenhum dado de prestador disponível para block", block);
+            return;
         }
-        console.log("Campo Acionamento atualizado para block", block, ":", acionamentoField ? acionamentoField.value : "não encontrado");
-    }
+
+        // Exemplos de motivos - corrigindo a comparação
+        if (motivo === "antenista") {
+            console.log("Aplicando valores para antenista");
+            if (acionamentoField) { 
+                acionamentoField.value = prestadorData.valor_antenista || ""; 
+                console.log("Valor acionamento antenista:", prestadorData.valor_antenista);
+            }
+            if (franquiaHoraField) { 
+                franquiaHoraField.value = prestadorData.franquia_hora_antenista || ""; 
+                console.log("Franquia hora antenista:", prestadorData.franquia_hora_antenista);
+            }
+            if (kmFranquiaField) { 
+                kmFranquiaField.value = prestadorData.franquia_km_antenista || ""; 
+                console.log("Franquia KM antenista:", prestadorData.franquia_km_antenista);
+            }
+            if (valorHoraExcedenteField) { 
+                valorHoraExcedenteField.value = prestadorData.valorh_antenista || ""; 
+                console.log("Valor hora excedente antenista:", prestadorData.valorh_antenista);
+            }
+            if (valorKmExcedenteField) { 
+                valorKmExcedenteField.value = prestadorData.valorkm_antenista || ""; 
+                console.log("Valor KM excedente antenista:", prestadorData.valorkm_antenista);
+            }
+        } else if (motivo === "pronta resposta armado" || motivo === "ponta resposta armado") {
+            console.log("Aplicando valores para pronta resposta armado");
+            if (acionamentoField) { 
+                acionamentoField.value = prestadorData.valor_prontaresposta_armado || ""; 
+                console.log("Valor acionamento armado:", prestadorData.valor_prontaresposta_armado);
+            }
+            if (franquiaHoraField) { 
+                franquiaHoraField.value = prestadorData.franquia_hora_armado || ""; 
+                console.log("Franquia hora armado:", prestadorData.franquia_hora_armado);
+            }
+            if (kmFranquiaField) { 
+                kmFranquiaField.value = prestadorData.franquia_km_armado || ""; 
+                console.log("Franquia KM armado:", prestadorData.franquia_km_armado);
+            }
+            if (valorHoraExcedenteField) { 
+                valorHoraExcedenteField.value = prestadorData.valorh_armado || ""; 
+                console.log("Valor hora excedente armado:", prestadorData.valorh_armado);
+            }
+            if (valorKmExcedenteField) { 
+                valorKmExcedenteField.value = prestadorData.valorkm_armado || ""; 
+                console.log("Valor KM excedente armado:", prestadorData.valorkm_armado);
+            }
+        } else if (motivo === "pronta resposta desarmado" || motivo === "ponta resposta desarmado") {
+            console.log("Aplicando valores para pronta resposta desarmado");
+            if (acionamentoField) { 
+                acionamentoField.value = prestadorData.valor_prontaresposta_desarmado || ""; 
+                console.log("Valor acionamento desarmado:", prestadorData.valor_prontaresposta_desarmado);
+            }
+            if (franquiaHoraField) { 
+                franquiaHoraField.value = prestadorData.franquia_hora_desarmado || ""; 
+                console.log("Franquia hora desarmado:", prestadorData.franquia_hora_desarmado);
+            }
+            if (kmFranquiaField) { 
+                kmFranquiaField.value = prestadorData.franquia_km_desarmado || ""; 
+                console.log("Franquia KM desarmado:", prestadorData.franquia_km_desarmado);
+            }
+            if (valorHoraExcedenteField) { 
+                valorHoraExcedenteField.value = prestadorData.valorh_desarmado || ""; 
+                console.log("Valor hora excedente desarmado:", prestadorData.valorh_desarmado);
+            }
+            if (valorKmExcedenteField) { 
+                valorKmExcedenteField.value = prestadorData.valorkm_desarmado || ""; 
+                console.log("Valor KM excedente desarmado:", prestadorData.valorkm_desarmado);
+            }
+        } else {
+            console.log("Motivo não reconhecido, aplicando valor padrão");
+            if (acionamentoField) { 
+                acionamentoField.value = prestadorData.valor_acionamento || ""; 
+                console.log("Valor acionamento padrão:", prestadorData.valor_acionamento);
+            }
+            if (franquiaHoraField) { 
+                franquiaHoraField.value = prestadorData.franquia_hora_armado || ""; 
+                console.log("Franquia hora padrão:", prestadorData.franquia_hora_armado);
+            }
+            if (kmFranquiaField) { 
+                kmFranquiaField.value = prestadorData.franquia_km_armado || ""; 
+                console.log("Franquia KM padrão:", prestadorData.franquia_km_armado);
+            }
+            if (valorHoraExcedenteField) { 
+                valorHoraExcedenteField.value = prestadorData.valorh_armado || ""; 
+                console.log("Valor hora excedente padrão:", prestadorData.valorh_armado);
+            }
+            if (valorKmExcedenteField) { 
+                valorKmExcedenteField.value = prestadorData.valorkm_armado || ""; 
+                console.log("Valor KM excedente padrão:", prestadorData.valorkm_armado);
+            }
+        }
+    };
     
-    // Atualiza o motivo para o agente principal
-    if (document.getElementById("id_motivo")) {
-        document.getElementById("id_motivo").addEventListener("change", function() {
-            updateAcionamentoByMotivo("");
-        });
-    }
-    // Atualiza para os agentes adicionais (ex: id_motivo1, id_motivo2, etc.)
-    var motivosAdicionais = document.querySelectorAll("[id^='id_motivo']");
-    motivosAdicionais.forEach(function(elem) {
-        if (elem.id !== "id_motivo") {
-            var block = elem.id.replace("id_motivo", "");
-            elem.addEventListener("change", function() {
-                updateAcionamentoByMotivo(block);
+    // Inicializar listeners para campos de motivo
+    window.initializeMotivoListeners = function() {
+        // Listener para o motivo principal
+        var motivoPrincipal = document.getElementById("id_motivo");
+        if (motivoPrincipal) {
+            motivoPrincipal.addEventListener("change", function() {
+                window.updateAcionamentoByMotivo("");
             });
         }
-    });
+
+        // Listeners para motivos dos agentes adicionais
+        for (var i = 1; i <= 3; i++) {
+            var motivoField = document.getElementById("id_motivo" + i);
+            if (motivoField) {
+                motivoField.addEventListener("change", function() {
+                    var block = this.id.replace("id_motivo", "");
+                    window.updateAcionamentoByMotivo(block);
+                });
+            }
+        }
+    };
+    
+    // Inicializar listeners de motivo
+    window.initializeMotivoListeners();
     
     
     // ======================================================
@@ -1069,11 +1270,25 @@ document.addEventListener("DOMContentLoaded", function() {
     var btnAdicionarAgente = document.getElementById("btnAdicionarAgente");
     if (btnAdicionarAgente) {
         btnAdicionarAgente.addEventListener("click", function() {
+            console.log("Botão Adicionar Agente clicado");
+            // Pega todos os blocos de agente adicional
             var agentes = document.querySelectorAll(".agente-dinamico");
+            console.log("Agentes encontrados:", agentes.length);
+
+            // Procura o primeiro que estiver com display: none
             for (var i = 0; i < agentes.length; i++) {
-                if (agentes[i].style.display === "none") {
+                console.log("Verificando agente", i, "display:", agentes[i].style.display);
+                if (agentes[i].style.display === "none" || agentes[i].style.display === "") {
                     agentes[i].style.display = "block";
-                    break; // Exibe apenas um bloco por clique
+                    console.log("Agente", i, "exibido com sucesso");
+                    
+                    // Adicionar listeners para os campos do agente recém-exibido
+                    var agenteId = agentes[i].id;
+                    var agenteNumber = agenteId.replace("agente", "");
+                    attachHoraTotalCalculation(agenteNumber);
+                    attachKmCalculation(agenteNumber);
+                    
+                    break;
                 }
             }
         });
@@ -1137,6 +1352,126 @@ document.addEventListener("DOMContentLoaded", function() {
     window.showMoreImages = showMoreImages;
     // Exibe o primeiro grupo ao carregar, se desejar
     showMoreImages();
+
+    // ======================================================
+    // 10. Inicializar agentes que já têm dados
+    function initializeExistingAgentes() {
+        // Verificar se há dados nos agentes adicionais e exibi-los
+        for (var i = 1; i <= 3; i++) {
+            var prestadorField = document.getElementById("id_prestador" + i);
+            var agenteDiv = document.getElementById("agente" + i);
+            
+            if (prestadorField && prestadorField.value && agenteDiv) {
+                agenteDiv.style.display = "block";
+                console.log("Agente", i, "já tem dados, exibindo...");
+                
+                // Adicionar listeners para os campos do agente
+                attachHoraTotalCalculation(i.toString());
+                attachKmCalculation(i.toString());
+            }
+        }
+    }
+    
+    // Inicializar agentes existentes
+    initializeExistingAgentes();
+
+    // ======================================================
+    // 11. Botão para adicionar placas
+    const btnPlaca = document.getElementById("btnAdicionarPlaca");
+    if (btnPlaca) {
+        btnPlaca.addEventListener("click", function() {
+            // Seleciona todas as divs que têm a classe "placa-dinamica"
+            const placas = document.querySelectorAll(".placa-dinamica");
+            // Procura a primeira que esteja oculta (display: none)
+            for (let i = 0; i < placas.length; i++) {
+                if (placas[i].style.display === "none") {
+                    // Exibe essa placa e para o loop
+                    placas[i].style.display = "block";
+                    break;
+                }
+            }
+        });
+    }
+
+    // ======================================================
+    // 12. Inicializar placas que já têm dados
+    function initializeExistingPlacas() {
+        for (var i = 1; i <= 3; i++) {
+            var placaField = document.getElementById("id_placas" + i);
+            var placaDiv = document.getElementById("placa" + i);
+            
+            if (placaField && placaField.value && placaDiv) {
+                placaDiv.style.display = "block";
+                console.log("Placa", i, "já tem dados, exibindo...");
+            }
+        }
+    }
+    
+    // Inicializar placas existentes
+    initializeExistingPlacas();
+
+    // ======================================================
+    // 13. Inicializar listeners de motivo quando a página carrega
+    function initializeMotivoListeners() {
+        console.log("Inicializando listeners de motivo...");
+        
+        // Listener para o motivo principal
+        var motivoPrincipal = document.getElementById("id_motivo");
+        if (motivoPrincipal) {
+            console.log("Adicionando listener para motivo principal");
+            motivoPrincipal.addEventListener("change", function() {
+                console.log("Motivo principal alterado para:", this.value);
+                window.updateAcionamentoByMotivo("");
+            });
+        } else {
+            console.log("Campo motivo principal não encontrado");
+        }
+
+        // Listeners para motivos dos agentes adicionais
+        for (var i = 1; i <= 3; i++) {
+            var motivoField = document.getElementById("id_motivo" + i);
+            if (motivoField) {
+                console.log("Adicionando listener para motivo", i);
+                motivoField.addEventListener("change", function() {
+                    var block = this.id.replace("id_motivo", "");
+                    console.log("Motivo", block, "alterado para:", this.value);
+                    window.updateAcionamentoByMotivo(block);
+                });
+            } else {
+                console.log("Campo motivo", i, "não encontrado");
+            }
+        }
+    }
+
+    // Inicializar listeners de motivo
+    window.initializeMotivoListeners();
+
+    // ======================================================
+    // 14. Inicializar dados dos prestadores existentes quando a página carrega
+    function initializeExistingPrestadorData() {
+        console.log("Inicializando dados dos prestadores existentes...");
+        
+        // Verificar prestador principal
+        var mainPrestadorSelect = document.getElementById("id_prestador");
+        if (mainPrestadorSelect && mainPrestadorSelect.value) {
+            console.log("Prestador principal já selecionado:", mainPrestadorSelect.value);
+            // Disparar evento change para carregar os dados
+            mainPrestadorSelect.dispatchEvent(new Event('change'));
+        }
+        
+        // Verificar prestadores dos agentes adicionais
+        for (var i = 1; i <= 3; i++) {
+            var prestadorSelect = document.getElementById("id_prestador" + i);
+            if (prestadorSelect && prestadorSelect.value) {
+                console.log("Prestador", i, "já selecionado:", prestadorSelect.value);
+                // Disparar evento change para carregar os dados
+                prestadorSelect.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+    
+    // Inicializar dados dos prestadores existentes
+    initializeExistingPrestadorData();
 
 });
 </script>

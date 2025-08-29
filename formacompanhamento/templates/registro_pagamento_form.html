@@ -826,6 +826,10 @@ form input, form select, form textarea {
 {% endif %}
 <script>
   document.addEventListener("DOMContentLoaded", function() {
+    
+    // Inicializar objeto para armazenar dados dos prestadores por bloco
+    window.prestadorData = {};
+    
     // ======================================================
     // 1) Função para registrar a data/hora atual (agora LOCAL, não UTC)
     function registrarDataHora(inputId, btnId) {
@@ -859,7 +863,6 @@ form input, form select, form textarea {
 
     // ======================================================
     // 2) Atualiza os campos do prestador via AJAX
-    var lastPrestadorData = null;
     function attachPrestadorChangeListener(selectElem) {
       selectElem.addEventListener("change", function() {
         var prestadorId = this.value;
@@ -881,14 +884,18 @@ form input, form select, form textarea {
             .then(function(data) {
               console.log("Dados do prestador recebidos:", data);
               if (!data.error) {
-                lastPrestadorData = data;
-                console.log("lastPrestadorData atualizado:", lastPrestadorData);
+                // Armazenar dados do prestador específico para este bloco
+                if (!window.prestadorData) {
+                  window.prestadorData = {};
+                }
+                window.prestadorData[block] = data;
+                console.log("Dados do prestador armazenados para block", block, ":", data);
                 
                 // Preencher campos do prestador automaticamente
                 fillPrestadorFields(block, data);
                 
                 // Atualizar campos baseado no motivo atual
-                updateAcionamentoByMotivo(block);
+                window.updateAcionamentoByMotivo(block);
                 calculateHoraExcedente(block);
               } else {
                 console.error("Erro nos dados:", data.error);
@@ -898,28 +905,30 @@ form input, form select, form textarea {
               console.error("Erro ao buscar os dados do prestador:", error);
             });
         } else {
-          console.log("Nenhum prestador selecionado");
-          lastPrestadorData = null;
+          console.log("Nenhum prestador selecionado para block", block);
+          if (window.prestadorData && window.prestadorData[block]) {
+            delete window.prestadorData[block];
+          }
         }
       });
     }
 
     // Função para preencher campos do prestador automaticamente
     function fillPrestadorFields(block, data) {
-      // Campos básicos do prestador
+      // Campos básicos do prestador - usando valores padrão
       var fieldsToFill = {
-        'acionamento': data.valor_acionamento,
-        'franquia_hora': data.franquia_hora_armado,
-        'km_franquia': data.franquia_km_armado,
-        'valor_hora_excedente': data.valorh_armado,
-        'valor_km_excedente': data.valorkm_armado
+        'acionamento': data.valor_acionamento || "",
+        'franquia_hora': data.franquia_hora_armado || "",
+        'km_franquia': data.franquia_km_armado || "",
+        'valor_hora_excedente': data.valorh_armado || "",
+        'valor_km_excedente': data.valorkm_armado || ""
       };
 
       // Preencher cada campo
       Object.keys(fieldsToFill).forEach(function(fieldName) {
         var fieldId = "id_" + fieldName + block;
         var fieldElement = document.getElementById(fieldId);
-        if (fieldElement && fieldsToFill[fieldName]) {
+        if (fieldElement && fieldsToFill[fieldName] !== "") {
           fieldElement.value = fieldsToFill[fieldName];
           console.log("Campo " + fieldName + " preenchido:", fieldsToFill[fieldName]);
         }
@@ -936,14 +945,17 @@ form input, form select, form textarea {
 
     // ======================================================
     // 3) Atualiza os campos de acionamento conforme o motivo selecionado
-    function updateAcionamentoByMotivo(block) {
+    window.updateAcionamentoByMotivo = function(block) {
       console.log("updateAcionamentoByMotivo chamado com block:", block);
       
       var motivoField = document.getElementById("id_motivo" + block);
       var motivo = motivoField ? motivoField.value.trim().toLowerCase() : "";
       
       console.log("Motivo selecionado:", motivo);
-      console.log("lastPrestadorData:", lastPrestadorData);
+      
+      // Obter dados do prestador específico para este bloco
+      var prestadorData = window.prestadorData && window.prestadorData[block] ? window.prestadorData[block] : null;
+      console.log("Dados do prestador para block", block, ":", prestadorData);
 
       var acionamentoField = document.getElementById("id_acionamento" + block);
       var franquiaHoraField = document.getElementById("id_franquia_hora" + block);
@@ -959,8 +971,8 @@ form input, form select, form textarea {
       console.log("- valorKmExcedenteField:", valorKmExcedenteField);
 
       // Verificar se temos dados do prestador
-      if (!lastPrestadorData) {
-        console.log("Nenhum dado de prestador disponível");
+      if (!prestadorData) {
+        console.log("Nenhum dado de prestador disponível para block", block);
         return;
       }
 
@@ -968,77 +980,93 @@ form input, form select, form textarea {
       if (motivo === "antenista") {
         console.log("Aplicando valores para antenista");
         if (acionamentoField) { 
-          acionamentoField.value = lastPrestadorData.valor_antenista || ""; 
-          console.log("Valor acionamento antenista:", lastPrestadorData.valor_antenista);
+          acionamentoField.value = prestadorData.valor_antenista || ""; 
+          console.log("Valor acionamento antenista:", prestadorData.valor_antenista);
         }
         if (franquiaHoraField) { 
-          franquiaHoraField.value = lastPrestadorData.franquia_hora_antenista || ""; 
-          console.log("Franquia hora antenista:", lastPrestadorData.franquia_hora_antenista);
+          franquiaHoraField.value = prestadorData.franquia_hora_antenista || ""; 
+          console.log("Franquia hora antenista:", prestadorData.franquia_hora_antenista);
         }
         if (kmFranquiaField) { 
-          kmFranquiaField.value = lastPrestadorData.franquia_km_antenista || ""; 
-          console.log("Franquia KM antenista:", lastPrestadorData.franquia_km_antenista);
+          kmFranquiaField.value = prestadorData.franquia_km_antenista || ""; 
+          console.log("Franquia KM antenista:", prestadorData.franquia_km_antenista);
         }
         if (valorHoraExcedenteField) { 
-          valorHoraExcedenteField.value = lastPrestadorData.valorh_antenista || ""; 
-          console.log("Valor hora excedente antenista:", lastPrestadorData.valorh_antenista);
+          valorHoraExcedenteField.value = prestadorData.valorh_antenista || ""; 
+          console.log("Valor hora excedente antenista:", prestadorData.valorh_antenista);
         }
         if (valorKmExcedenteField) { 
-          valorKmExcedenteField.value = lastPrestadorData.valorkm_antenista || ""; 
-          console.log("Valor KM excedente antenista:", lastPrestadorData.valorkm_antenista);
+          valorKmExcedenteField.value = prestadorData.valorkm_antenista || ""; 
+          console.log("Valor KM excedente antenista:", prestadorData.valorkm_antenista);
         }
       } else if (motivo === "pronta resposta armado" || motivo === "ponta resposta armado") {
         console.log("Aplicando valores para pronta resposta armado");
         if (acionamentoField) { 
-          acionamentoField.value = lastPrestadorData.valor_prontaresposta_armado || ""; 
-          console.log("Valor acionamento armado:", lastPrestadorData.valor_prontaresposta_armado);
+          acionamentoField.value = prestadorData.valor_prontaresposta_armado || ""; 
+          console.log("Valor acionamento armado:", prestadorData.valor_prontaresposta_armado);
         }
         if (franquiaHoraField) { 
-          franquiaHoraField.value = lastPrestadorData.franquia_hora_armado || ""; 
-          console.log("Franquia hora armado:", lastPrestadorData.franquia_hora_armado);
+          franquiaHoraField.value = prestadorData.franquia_hora_armado || ""; 
+          console.log("Franquia hora armado:", prestadorData.franquia_hora_armado);
         }
         if (kmFranquiaField) { 
-          kmFranquiaField.value = lastPrestadorData.franquia_km_armado || ""; 
-          console.log("Franquia KM armado:", lastPrestadorData.franquia_km_armado);
+          kmFranquiaField.value = prestadorData.franquia_km_armado || ""; 
+          console.log("Franquia KM armado:", prestadorData.franquia_km_armado);
         }
         if (valorHoraExcedenteField) { 
-          valorHoraExcedenteField.value = lastPrestadorData.valorh_armado || ""; 
-          console.log("Valor hora excedente armado:", lastPrestadorData.valorh_armado);
+          valorHoraExcedenteField.value = prestadorData.valorh_armado || ""; 
+          console.log("Valor hora excedente armado:", prestadorData.valorh_armado);
         }
         if (valorKmExcedenteField) { 
-          valorKmExcedenteField.value = lastPrestadorData.valorkm_armado || ""; 
-          console.log("Valor KM excedente armado:", lastPrestadorData.valorkm_armado);
+          valorKmExcedenteField.value = prestadorData.valorkm_armado || ""; 
+          console.log("Valor KM excedente armado:", prestadorData.valorkm_armado);
         }
       } else if (motivo === "pronta resposta desarmado" || motivo === "ponta resposta desarmado") {
         console.log("Aplicando valores para pronta resposta desarmado");
         if (acionamentoField) { 
-          acionamentoField.value = lastPrestadorData.valor_prontaresposta_desarmado || ""; 
-          console.log("Valor acionamento desarmado:", lastPrestadorData.valor_prontaresposta_desarmado);
+          acionamentoField.value = prestadorData.valor_prontaresposta_desarmado || ""; 
+          console.log("Valor acionamento desarmado:", prestadorData.valor_prontaresposta_desarmado);
         }
         if (franquiaHoraField) { 
-          franquiaHoraField.value = lastPrestadorData.franquia_hora_desarmado || ""; 
-          console.log("Franquia hora desarmado:", lastPrestadorData.franquia_hora_desarmado);
+          franquiaHoraField.value = prestadorData.franquia_hora_desarmado || ""; 
+          console.log("Franquia hora desarmado:", prestadorData.franquia_hora_desarmado);
         }
         if (kmFranquiaField) { 
-          kmFranquiaField.value = lastPrestadorData.franquia_km_desarmado || ""; 
-          console.log("Franquia KM desarmado:", lastPrestadorData.franquia_km_desarmado);
+          kmFranquiaField.value = prestadorData.franquia_km_desarmado || ""; 
+          console.log("Franquia KM desarmado:", prestadorData.franquia_km_desarmado);
         }
         if (valorHoraExcedenteField) { 
-          valorHoraExcedenteField.value = lastPrestadorData.valorh_desarmado || ""; 
-          console.log("Valor hora excedente desarmado:", lastPrestadorData.valorh_desarmado);
+          valorHoraExcedenteField.value = prestadorData.valorh_desarmado || ""; 
+          console.log("Valor hora excedente desarmado:", prestadorData.valorh_desarmado);
         }
         if (valorKmExcedenteField) { 
-          valorKmExcedenteField.value = lastPrestadorData.valorkm_desarmado || ""; 
-          console.log("Valor KM excedente desarmado:", lastPrestadorData.valorkm_desarmado);
+          valorKmExcedenteField.value = prestadorData.valorkm_desarmado || ""; 
+          console.log("Valor KM excedente desarmado:", prestadorData.valorkm_desarmado);
         }
       } else {
         console.log("Motivo não reconhecido, aplicando valor padrão");
         if (acionamentoField) { 
-          acionamentoField.value = lastPrestadorData.valor_acionamento || ""; 
-          console.log("Valor acionamento padrão:", lastPrestadorData.valor_acionamento);
+          acionamentoField.value = prestadorData.valor_acionamento || ""; 
+          console.log("Valor acionamento padrão:", prestadorData.valor_acionamento);
+        }
+        if (franquiaHoraField) { 
+          franquiaHoraField.value = prestadorData.franquia_hora_armado || ""; 
+          console.log("Franquia hora padrão:", prestadorData.franquia_hora_armado);
+        }
+        if (kmFranquiaField) { 
+          kmFranquiaField.value = prestadorData.franquia_km_armado || ""; 
+          console.log("Franquia KM padrão:", prestadorData.franquia_km_armado);
+        }
+        if (valorHoraExcedenteField) { 
+          valorHoraExcedenteField.value = prestadorData.valorh_armado || ""; 
+          console.log("Valor hora excedente padrão:", prestadorData.valorh_armado);
+        }
+        if (valorKmExcedenteField) { 
+          valorKmExcedenteField.value = prestadorData.valorkm_armado || ""; 
+          console.log("Valor KM excedente padrão:", prestadorData.valorkm_armado);
         }
       }
-    }
+    };
 
 
     let currentGroupIndex = 0;
@@ -1296,6 +1324,17 @@ form input, form select, form textarea {
             attachHoraTotalCalculation(agenteNumber);
             attachKmCalculation(agenteNumber);
             
+            // Adicionar listener para o campo de motivo do agente recém-exibido
+            var motivoField = document.getElementById("id_motivo" + agenteNumber);
+            if (motivoField) {
+              console.log("Adicionando listener para motivo do agente", agenteNumber);
+              motivoField.addEventListener("change", function() {
+                var block = this.id.replace("id_motivo", "");
+                console.log("Motivo do agente", block, "alterado para:", this.value);
+                window.updateAcionamentoByMotivo(block);
+              });
+            }
+            
             break;
           }
         }
@@ -1367,7 +1406,42 @@ form input, form select, form textarea {
       alert("Por favor, preencha o campo de endereço para visualizar o mapa.");
     }
   }
+  // Função para inicializar listeners de motivo
+  window.initializeMotivoListeners = function() {
+    console.log("Inicializando listeners de motivo...");
+    
+    // Listener para o motivo principal
+    var motivoPrincipal = document.getElementById("id_motivo");
+    if (motivoPrincipal) {
+      console.log("Adicionando listener para motivo principal");
+      motivoPrincipal.addEventListener("change", function() {
+        console.log("Motivo principal alterado para:", this.value);
+        window.updateAcionamentoByMotivo("");
+      });
+    } else {
+      console.log("Campo motivo principal não encontrado");
+    }
+
+    // Listeners para motivos dos agentes adicionais
+    for (var i = 1; i <= 3; i++) {
+      var motivoField = document.getElementById("id_motivo" + i);
+      if (motivoField) {
+        console.log("Adicionando listener para motivo", i);
+        motivoField.addEventListener("change", function() {
+          var block = this.id.replace("id_motivo", "");
+          console.log("Motivo", block, "alterado para:", this.value);
+          window.updateAcionamentoByMotivo(block);
+        });
+      } else {
+        console.log("Campo motivo", i, "não encontrado");
+      }
+    }
+  };
+
+  // Inicializar quando o DOM estiver carregado
   document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM carregado, inicializando listeners...");
+    
     // Inicializar botão de adicionar placas
     const btnPlaca = document.getElementById("btnAdicionarPlaca");
     if (btnPlaca) {
@@ -1386,30 +1460,31 @@ form input, form select, form textarea {
     }
 
     // Inicializar listeners para campos de motivo
-    initializeMotivoListeners();
-  });
-
-  // Função para inicializar listeners de motivo
-  function initializeMotivoListeners() {
-    // Listener para o motivo principal
-    var motivoPrincipal = document.getElementById("id_motivo");
-    if (motivoPrincipal) {
-      motivoPrincipal.addEventListener("change", function() {
-        updateAcionamentoByMotivo("");
-      });
-    }
-
-    // Listeners para motivos dos agentes adicionais
-    for (var i = 1; i <= 3; i++) {
-      var motivoField = document.getElementById("id_motivo" + i);
-      if (motivoField) {
-        motivoField.addEventListener("change", function() {
-          var block = this.id.replace("id_motivo", "");
-          updateAcionamentoByMotivo(block);
-        });
+    window.initializeMotivoListeners();
+    
+    // Verificar se há agentes já com dados e inicializar seus listeners
+    setTimeout(function() {
+      console.log("Verificando agentes existentes...");
+      for (var i = 1; i <= 3; i++) {
+        var agenteDiv = document.getElementById("agente" + i);
+        var motivoField = document.getElementById("id_motivo" + i);
+        
+        if (agenteDiv && motivoField && agenteDiv.style.display !== "none") {
+          console.log("Agente", i, "já está visível, adicionando listener para motivo");
+          // Remover listener anterior se existir
+          motivoField.removeEventListener("change", motivoField._changeHandler);
+          
+          // Adicionar novo listener
+          motivoField._changeHandler = function() {
+            var block = this.id.replace("id_motivo", "");
+            console.log("Motivo do agente", block, "alterado para:", this.value);
+            updateAcionamentoByMotivo(block);
+          };
+          motivoField.addEventListener("change", motivoField._changeHandler);
+        }
       }
-    }
-  }
+    }, 100);
+  });
 </script>
 
   {% endblock %}
