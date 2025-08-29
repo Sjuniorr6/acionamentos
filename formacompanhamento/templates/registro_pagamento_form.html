@@ -884,11 +884,8 @@ form input, form select, form textarea {
                 lastPrestadorData = data;
                 console.log("lastPrestadorData atualizado:", lastPrestadorData);
                 
-                var acionamentoId = "id_acionamento" + block;
-                if (document.getElementById(acionamentoId)) {
-                  document.getElementById(acionamentoId).value = data.valor_acionamento || "";
-                  console.log("Campo acionamento atualizado:", data.valor_acionamento);
-                }
+                // Preencher campos do prestador automaticamente
+                fillPrestadorFields(block, data);
                 
                 // Atualizar campos baseado no motivo atual
                 updateAcionamentoByMotivo(block);
@@ -903,6 +900,28 @@ form input, form select, form textarea {
         } else {
           console.log("Nenhum prestador selecionado");
           lastPrestadorData = null;
+        }
+      });
+    }
+
+    // Função para preencher campos do prestador automaticamente
+    function fillPrestadorFields(block, data) {
+      // Campos básicos do prestador
+      var fieldsToFill = {
+        'acionamento': data.valor_acionamento,
+        'franquia_hora': data.franquia_hora_armado,
+        'km_franquia': data.franquia_km_armado,
+        'valor_hora_excedente': data.valorh_armado,
+        'valor_km_excedente': data.valorkm_armado
+      };
+
+      // Preencher cada campo
+      Object.keys(fieldsToFill).forEach(function(fieldName) {
+        var fieldId = "id_" + fieldName + block;
+        var fieldElement = document.getElementById(fieldId);
+        if (fieldElement && fieldsToFill[fieldName]) {
+          fieldElement.value = fieldsToFill[fieldName];
+          console.log("Campo " + fieldName + " preenchido:", fieldsToFill[fieldName]);
         }
       });
     }
@@ -932,13 +951,20 @@ form input, form select, form textarea {
       var valorHoraExcedenteField = document.getElementById("id_valor_hora_excedente" + block);
       var valorKmExcedenteField = document.getElementById("id_valor_km_excedente" + block);
 
+      console.log("Campos encontrados:");
+      console.log("- acionamentoField:", acionamentoField);
+      console.log("- franquiaHoraField:", franquiaHoraField);
+      console.log("- kmFranquiaField:", kmFranquiaField);
+      console.log("- valorHoraExcedenteField:", valorHoraExcedenteField);
+      console.log("- valorKmExcedenteField:", valorKmExcedenteField);
+
       // Verificar se temos dados do prestador
       if (!lastPrestadorData) {
         console.log("Nenhum dado de prestador disponível");
         return;
       }
 
-      // Exemplos de motivos
+      // Exemplos de motivos - corrigindo a comparação
       if (motivo === "antenista") {
         console.log("Aplicando valores para antenista");
         if (acionamentoField) { 
@@ -961,7 +987,7 @@ form input, form select, form textarea {
           valorKmExcedenteField.value = lastPrestadorData.valorkm_antenista || ""; 
           console.log("Valor KM excedente antenista:", lastPrestadorData.valorkm_antenista);
         }
-      } else if (motivo === "pronta resposta armado") {
+      } else if (motivo === "pronta resposta armado" || motivo === "ponta resposta armado") {
         console.log("Aplicando valores para pronta resposta armado");
         if (acionamentoField) { 
           acionamentoField.value = lastPrestadorData.valor_prontaresposta_armado || ""; 
@@ -983,7 +1009,7 @@ form input, form select, form textarea {
           valorKmExcedenteField.value = lastPrestadorData.valorkm_armado || ""; 
           console.log("Valor KM excedente armado:", lastPrestadorData.valorkm_armado);
         }
-      } else if (motivo === "pronta resposta desarmado") {
+      } else if (motivo === "pronta resposta desarmado" || motivo === "ponta resposta desarmado") {
         console.log("Aplicando valores para pronta resposta desarmado");
         if (acionamentoField) { 
           acionamentoField.value = lastPrestadorData.valor_prontaresposta_desarmado || ""; 
@@ -1013,20 +1039,7 @@ form input, form select, form textarea {
         }
       }
     }
-    if (document.getElementById("id_motivo")) {
-      document.getElementById("id_motivo").addEventListener("change", function() {
-        updateAcionamentoByMotivo("");
-      });
-    }
-    var motivosAdicionais = document.querySelectorAll("[id^='id_motivo']");
-    motivosAdicionais.forEach(function(elem) {
-      if (elem.id !== "id_motivo") {
-        var block = elem.id.replace("id_motivo", "");
-        elem.addEventListener("change", function() {
-          updateAcionamentoByMotivo(block);
-        });
-      }
-    });
+
 
     let currentGroupIndex = 0;
     
@@ -1265,13 +1278,24 @@ form input, form select, form textarea {
     var btnAdicionarAgente = document.getElementById("btnAdicionarAgente");
     if (btnAdicionarAgente) {
       btnAdicionarAgente.addEventListener("click", function() {
+        console.log("Botão Adicionar Agente clicado");
         // Pega todos os blocos de agente adicional
         var agentes = document.querySelectorAll(".agente-dinamico");
+        console.log("Agentes encontrados:", agentes.length);
 
         // Procura o primeiro que estiver com display: none
         for (var i = 0; i < agentes.length; i++) {
-          if (agentes[i].style.display === "none") {
+          console.log("Verificando agente", i, "display:", agentes[i].style.display);
+          if (agentes[i].style.display === "none" || agentes[i].style.display === "") {
             agentes[i].style.display = "block";
+            console.log("Agente", i, "exibido com sucesso");
+            
+            // Adicionar listeners para os campos do agente recém-exibido
+            var agenteId = agentes[i].id;
+            var agenteNumber = agenteId.replace("agente", "");
+            attachHoraTotalCalculation(agenteNumber);
+            attachKmCalculation(agenteNumber);
+            
             break;
           }
         }
@@ -1344,22 +1368,48 @@ form input, form select, form textarea {
     }
   }
   document.addEventListener("DOMContentLoaded", function() {
-  const btnPlaca = document.getElementById("btnAdicionarPlaca");
-  if (btnPlaca) {
-    btnPlaca.addEventListener("click", function() {
-      // Seleciona todas as divs que têm a classe "placa-dinamica"
-      const placas = document.querySelectorAll(".placa-dinamica");
-      // Procura a primeira que esteja oculta (display: none)
-      for (let i = 0; i < placas.length; i++) {
-        if (placas[i].style.display === "none") {
-          // Exibe essa placa e para o loop
-          placas[i].style.display = "block";
-          break;
+    // Inicializar botão de adicionar placas
+    const btnPlaca = document.getElementById("btnAdicionarPlaca");
+    if (btnPlaca) {
+      btnPlaca.addEventListener("click", function() {
+        // Seleciona todas as divs que têm a classe "placa-dinamica"
+        const placas = document.querySelectorAll(".placa-dinamica");
+        // Procura a primeira que esteja oculta (display: none)
+        for (let i = 0; i < placas.length; i++) {
+          if (placas[i].style.display === "none") {
+            // Exibe essa placa e para o loop
+            placas[i].style.display = "block";
+            break;
+          }
         }
+      });
+    }
+
+    // Inicializar listeners para campos de motivo
+    initializeMotivoListeners();
+  });
+
+  // Função para inicializar listeners de motivo
+  function initializeMotivoListeners() {
+    // Listener para o motivo principal
+    var motivoPrincipal = document.getElementById("id_motivo");
+    if (motivoPrincipal) {
+      motivoPrincipal.addEventListener("change", function() {
+        updateAcionamentoByMotivo("");
+      });
+    }
+
+    // Listeners para motivos dos agentes adicionais
+    for (var i = 1; i <= 3; i++) {
+      var motivoField = document.getElementById("id_motivo" + i);
+      if (motivoField) {
+        motivoField.addEventListener("change", function() {
+          var block = this.id.replace("id_motivo", "");
+          updateAcionamentoByMotivo(block);
+        });
       }
-    });
+    }
   }
-});
 </script>
 
   {% endblock %}
