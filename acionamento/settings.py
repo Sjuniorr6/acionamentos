@@ -123,21 +123,20 @@ import os
 if os.environ.get('DJANGO_ENV') == 'production':
     # Configuração PostgreSQL para produção
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': '44523913',
-            'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
-            'PORT': '5432',
-            'OPTIONS': {
-                'sslmode': 'verify-full',
-                'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
-                'options': '-c timezone=America/Sao_Paulo -c datestyle=ISO,DMY'
-            }
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '44523913',
+        'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'verify-full',  # use 'require' para teste se o CA der erro
+            'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
+            'options': '-c timezone=America/Sao_Paulo -c datestyle=ISO,DMY',
+        },
     }
-
+}
 
 
 
