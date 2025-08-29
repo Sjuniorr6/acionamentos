@@ -192,7 +192,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'pt-br'          # Idioma: Português do Brasil
 TIME_ZONE = 'America/Sao_Paulo'    # Fuso horário: São Paulo (Brasília)
 USE_I18N = True
-USE_TZ = True  # Enable timezone support
+USE_TZ = False  # Desabilitar timezone support para salvar diretamente em Brasília
 USE_L10N = True  # Use localização para formatação de datas
 
 # Configuração para usar o fuso horário local para entrada de dados

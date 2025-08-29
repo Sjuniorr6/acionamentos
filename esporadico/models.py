@@ -1,12 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 from datetime import datetime, timedelta
 
 # Create your models here.
 class Esporadico(models.Model):
     nome_central = models.CharField(max_length=255)
-    data_acionamento = models.DateTimeField(auto_now=True, verbose_name='Data e Hora do Acionamento')
+    data_acionamento = models.DateTimeField(auto_now_add=True, verbose_name='Data e Hora do Acionamento')
     km_inicial = models.IntegerField(null=True, blank=True)
     foto_inicial = models.ImageField(upload_to='fotos_esporadicos/', null=True, blank=True)
     km_final = models.IntegerField(null=True, blank=True)
@@ -36,8 +35,8 @@ class Esporadico(models.Model):
     def diferenca_horas(self):
         """Calcula a diferença em horas entre hora_final e hora_inicial"""
         if self.hora_inicial and self.hora_final:
-            # Usar timezone.now() para garantir fuso horário correto
-            base_date = timezone.now().date()
+            # Usar datetime.now() para data local
+            base_date = datetime.now().date()
             inicio = datetime.combine(base_date, self.hora_inicial)
             fim = datetime.combine(base_date, self.hora_final)
             
