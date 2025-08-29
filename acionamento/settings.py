@@ -84,31 +84,67 @@ TEMPLATES = [
 # Aplicação WSGI
 WSGI_APPLICATION = 'acionamento.wsgi.application'
 
-
-# Configuração do banco de dados (SQLite para desenvolvimento)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+# Configuração de logging para debug de fuso horário
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django.utils.timezone': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'esporadico': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
 }
 
-#Configuração PostgreSQL (comentada para desenvolvimento local)
-DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.postgresql',
-         'NAME': 'postgres',  # ou o nome do banco que você definiu
-         'USER': 'postgres',  # ou o usuário mestre que você criou
-         'PASSWORD': '44523913',
-         'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
-         'PORT': '5432',
-         'OPTIONS': {
-             'sslmode': 'verify-full',
-             'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
-             'options': '-c timezone=America/Sao_Paulo'
-         }
-     }
- }
+
+# Configuração do banco de dados
+# Para desenvolvimento local, usar SQLite
+# Para produção, usar PostgreSQL
+
+import os
+if os.environ.get('DJANGO_ENV') == 'production':
+    # Configuração PostgreSQL para produção
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': '44523913',
+            'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
+            'PORT': '5432',
+            'OPTIONS': {
+                'sslmode': 'verify-full',
+                'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
+                'options': '-c timezone=America/Sao_Paulo -c datestyle=ISO,DMY'
+            }
+        }
+    }
+else:
+    # Configuração SQLite para desenvolvimento local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 
@@ -130,9 +166,33 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Configurações de internacionalização
 LANGUAGE_CODE = 'pt-br'          # Idioma: Português do Brasil
-TIME_ZONE = 'America/Sao_Paulo'    # Fuso horário: São Paulo
+TIME_ZONE = 'America/Sao_Paulo'    # Fuso horário: São Paulo (Brasília)
 USE_I18N = True
 USE_TZ = True  # Enable timezone support
+USE_L10N = True  # Use localização para formatação de datas
+
+# Configuração para usar o fuso horário local para entrada de dados
+DATETIME_FORMAT = 'd/m/Y H:i:s'
+DATE_FORMAT = 'd/m/Y'
+TIME_FORMAT = 'H:i:s'
+
+# Configuração para salvar datas no banco com fuso horário correto
+DATETIME_INPUT_FORMATS = [
+    '%d/%m/%Y %H:%M:%S',
+    '%d/%m/%Y %H:%M',
+    '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d %H:%M',
+]
+
+DATE_INPUT_FORMATS = [
+    '%d/%m/%Y',
+    '%Y-%m-%d',
+]
+
+TIME_INPUT_FORMATS = [
+    '%H:%M:%S',
+    '%H:%M',
+]
 
 # Configuração dos arquivos estáticos
 STATIC_URL = '/static/'
