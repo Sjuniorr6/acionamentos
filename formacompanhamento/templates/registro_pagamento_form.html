@@ -864,28 +864,45 @@ form input, form select, form textarea {
       selectElem.addEventListener("change", function() {
         var prestadorId = this.value;
         var block = this.id.replace("id_prestador", "");
+        console.log("Prestador selecionado - ID:", prestadorId, "Block:", block);
+        
         if (prestadorId) {
-          fetch("{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId)
+          var url = "{% url 'formacompanhamento:prestador_detail' %}?id=" + prestadorId;
+          console.log("Fazendo requisição para:", url);
+          
+          fetch(url)
             .then(function(response) {
+              console.log("Resposta recebida:", response.status, response.statusText);
               if (!response.ok) {
-                throw new Error("Erro na resposta da rede.");
+                throw new Error("Erro na resposta da rede: " + response.status);
               }
               return response.json();
             })
             .then(function(data) {
+              console.log("Dados do prestador recebidos:", data);
               if (!data.error) {
                 lastPrestadorData = data;
+                console.log("lastPrestadorData atualizado:", lastPrestadorData);
+                
                 var acionamentoId = "id_acionamento" + block;
                 if (document.getElementById(acionamentoId)) {
-                  document.getElementById(acionamentoId).value = data.acionamento || "";
+                  document.getElementById(acionamentoId).value = data.valor_acionamento || "";
+                  console.log("Campo acionamento atualizado:", data.valor_acionamento);
                 }
+                
+                // Atualizar campos baseado no motivo atual
                 updateAcionamentoByMotivo(block);
                 calculateHoraExcedente(block);
+              } else {
+                console.error("Erro nos dados:", data.error);
               }
             })
             .catch(function(error) {
               console.error("Erro ao buscar os dados do prestador:", error);
             });
+        } else {
+          console.log("Nenhum prestador selecionado");
+          lastPrestadorData = null;
         }
       });
     }
@@ -901,8 +918,13 @@ form input, form select, form textarea {
     // ======================================================
     // 3) Atualiza os campos de acionamento conforme o motivo selecionado
     function updateAcionamentoByMotivo(block) {
+      console.log("updateAcionamentoByMotivo chamado com block:", block);
+      
       var motivoField = document.getElementById("id_motivo" + block);
       var motivo = motivoField ? motivoField.value.trim().toLowerCase() : "";
+      
+      console.log("Motivo selecionado:", motivo);
+      console.log("lastPrestadorData:", lastPrestadorData);
 
       var acionamentoField = document.getElementById("id_acionamento" + block);
       var franquiaHoraField = document.getElementById("id_franquia_hora" + block);
@@ -910,27 +932,85 @@ form input, form select, form textarea {
       var valorHoraExcedenteField = document.getElementById("id_valor_hora_excedente" + block);
       var valorKmExcedenteField = document.getElementById("id_valor_km_excedente" + block);
 
+      // Verificar se temos dados do prestador
+      if (!lastPrestadorData) {
+        console.log("Nenhum dado de prestador disponível");
+        return;
+      }
+
       // Exemplos de motivos
       if (motivo === "antenista") {
-        if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_antenista || ""; }
-        if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_antenista || ""; }
-        if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_antenista || ""; }
-        if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_antenista || ""; }
-        if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_antenista || ""; }
+        console.log("Aplicando valores para antenista");
+        if (acionamentoField) { 
+          acionamentoField.value = lastPrestadorData.valor_antenista || ""; 
+          console.log("Valor acionamento antenista:", lastPrestadorData.valor_antenista);
+        }
+        if (franquiaHoraField) { 
+          franquiaHoraField.value = lastPrestadorData.franquia_hora_antenista || ""; 
+          console.log("Franquia hora antenista:", lastPrestadorData.franquia_hora_antenista);
+        }
+        if (kmFranquiaField) { 
+          kmFranquiaField.value = lastPrestadorData.franquia_km_antenista || ""; 
+          console.log("Franquia KM antenista:", lastPrestadorData.franquia_km_antenista);
+        }
+        if (valorHoraExcedenteField) { 
+          valorHoraExcedenteField.value = lastPrestadorData.valorh_antenista || ""; 
+          console.log("Valor hora excedente antenista:", lastPrestadorData.valorh_antenista);
+        }
+        if (valorKmExcedenteField) { 
+          valorKmExcedenteField.value = lastPrestadorData.valorkm_antenista || ""; 
+          console.log("Valor KM excedente antenista:", lastPrestadorData.valorkm_antenista);
+        }
       } else if (motivo === "pronta resposta armado") {
-        if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_armado || ""; }
-        if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_armado || ""; }
-        if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_armado || ""; }
-        if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_armado || ""; }
-        if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_armado || ""; }
+        console.log("Aplicando valores para pronta resposta armado");
+        if (acionamentoField) { 
+          acionamentoField.value = lastPrestadorData.valor_prontaresposta_armado || ""; 
+          console.log("Valor acionamento armado:", lastPrestadorData.valor_prontaresposta_armado);
+        }
+        if (franquiaHoraField) { 
+          franquiaHoraField.value = lastPrestadorData.franquia_hora_armado || ""; 
+          console.log("Franquia hora armado:", lastPrestadorData.franquia_hora_armado);
+        }
+        if (kmFranquiaField) { 
+          kmFranquiaField.value = lastPrestadorData.franquia_km_armado || ""; 
+          console.log("Franquia KM armado:", lastPrestadorData.franquia_km_armado);
+        }
+        if (valorHoraExcedenteField) { 
+          valorHoraExcedenteField.value = lastPrestadorData.valorh_armado || ""; 
+          console.log("Valor hora excedente armado:", lastPrestadorData.valorh_armado);
+        }
+        if (valorKmExcedenteField) { 
+          valorKmExcedenteField.value = lastPrestadorData.valorkm_armado || ""; 
+          console.log("Valor KM excedente armado:", lastPrestadorData.valorkm_armado);
+        }
       } else if (motivo === "pronta resposta desarmado") {
-        if (acionamentoField) { acionamentoField.value = lastPrestadorData.valor_prontaresposta_desarmado || ""; }
-        if (franquiaHoraField) { franquiaHoraField.value = lastPrestadorData.franquia_hora_desarmado || ""; }
-        if (kmFranquiaField) { kmFranquiaField.value = lastPrestadorData.franquia_km_desarmado || ""; }
-        if (valorHoraExcedenteField) { valorHoraExcedenteField.value = lastPrestadorData.valorh_desarmado || ""; }
-        if (valorKmExcedenteField) { valorKmExcedenteField.value = lastPrestadorData.valorkm_desarmado || ""; }
+        console.log("Aplicando valores para pronta resposta desarmado");
+        if (acionamentoField) { 
+          acionamentoField.value = lastPrestadorData.valor_prontaresposta_desarmado || ""; 
+          console.log("Valor acionamento desarmado:", lastPrestadorData.valor_prontaresposta_desarmado);
+        }
+        if (franquiaHoraField) { 
+          franquiaHoraField.value = lastPrestadorData.franquia_hora_desarmado || ""; 
+          console.log("Franquia hora desarmado:", lastPrestadorData.franquia_hora_desarmado);
+        }
+        if (kmFranquiaField) { 
+          kmFranquiaField.value = lastPrestadorData.franquia_km_desarmado || ""; 
+          console.log("Franquia KM desarmado:", lastPrestadorData.franquia_km_desarmado);
+        }
+        if (valorHoraExcedenteField) { 
+          valorHoraExcedenteField.value = lastPrestadorData.valorh_desarmado || ""; 
+          console.log("Valor hora excedente desarmado:", lastPrestadorData.valorh_desarmado);
+        }
+        if (valorKmExcedenteField) { 
+          valorKmExcedenteField.value = lastPrestadorData.valorkm_desarmado || ""; 
+          console.log("Valor KM excedente desarmado:", lastPrestadorData.valorkm_desarmado);
+        }
       } else {
-        if (acionamentoField) { acionamentoField.value = lastPrestadorData.acionamento || ""; }
+        console.log("Motivo não reconhecido, aplicando valor padrão");
+        if (acionamentoField) { 
+          acionamentoField.value = lastPrestadorData.valor_acionamento || ""; 
+          console.log("Valor acionamento padrão:", lastPrestadorData.valor_acionamento);
+        }
       }
     }
     if (document.getElementById("id_motivo")) {
