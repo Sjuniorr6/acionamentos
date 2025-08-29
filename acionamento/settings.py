@@ -120,23 +120,51 @@ LOGGING = {
 # Para produção, usar PostgreSQL
 
 import os
-if os.environ.get('DJANGO_ENV') == 'production':
+
+# Detectar se está em produção baseado no hostname ou variável de ambiente
+def is_production():
+    """Detecta se está em produção"""
+    # Verificar variável de ambiente
+    if os.environ.get('DJANGO_ENV') == 'production':
+        return True
+    
+    # Verificar se está rodando no servidor de produção
+    import socket
+    hostname = socket.gethostname()
+    if 'gsacionamento.com' in hostname or 'amazonaws.com' in hostname:
+        return True
+    
+    # Verificar se está rodando com uWSGI (indicador de produção)
+    if 'uwsgi' in os.environ.get('SERVER_SOFTWARE', '').lower():
+        return True
+    
+    return False
+
+if is_production():
     # Configuração PostgreSQL para produção
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': '44523913',
-        'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'verify-full',  # use 'require' para teste se o CA der erro
-            'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
-            'options': '-c timezone=America/Sao_Paulo -c datestyle=ISO,DMY',
-        },
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': '44523913',
+            'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
+            'PORT': '5432',
+            'OPTIONS': {
+                'sslmode': 'verify-full',  # use 'require' para teste se o CA der erro
+                'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
+                'options': '-c timezone=America/Sao_Paulo -c datestyle=ISO,DMY',
+            },
+        }
     }
-}
+else:
+    # Configuração SQLite para desenvolvimento local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 
