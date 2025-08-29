@@ -121,27 +121,32 @@ LOGGING = {
 
 import os
 
-# Detectar se está em produção baseado no hostname ou variável de ambiente
+# Detectar se está em produção
 def is_production():
     """Detecta se está em produção"""
     # Verificar variável de ambiente
     if os.environ.get('DJANGO_ENV') == 'production':
         return True
     
-    # Verificar se está rodando no servidor de produção
-    import socket
-    hostname = socket.gethostname()
-    if 'gsacionamento.com' in hostname or 'amazonaws.com' in hostname:
-        return True
-    
     # Verificar se está rodando com uWSGI (indicador de produção)
     if 'uwsgi' in os.environ.get('SERVER_SOFTWARE', '').lower():
         return True
     
+    # Verificar se está rodando no servidor de produção pelo caminho
+    current_path = os.getcwd()
+    if '/var/www/acionamentos' in current_path:
+        return True
+    
+    # Verificar se o arquivo db.sqlite3 não existe ou não é gravável
+    sqlite_path = BASE_DIR / 'db.sqlite3'
+    if not os.path.exists(sqlite_path) or not os.access(sqlite_path, os.W_OK):
+        return True
+    
     return False
 
+# Configuração do banco de dados
+# Forçar PostgreSQL em produção, SQLite em desenvolvimento
 if is_production():
-    # Configuração PostgreSQL para produção
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -151,14 +156,13 @@ if is_production():
             'HOST': 'database-1.cfegu84mu8gn.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
             'OPTIONS': {
-                'sslmode': 'verify-full',  # use 'require' para teste se o CA der erro
+                'sslmode': 'verify-full',
                 'sslrootcert': '/var/www/acionamentos/.postgresql/root.crt',
                 'options': '-c timezone=America/Sao_Paulo -c datestyle=ISO,DMY',
             },
         }
     }
 else:
-    # Configuração SQLite para desenvolvimento local
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
